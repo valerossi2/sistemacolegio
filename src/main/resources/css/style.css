@@ -1,0 +1,225 @@
+.root-bg{
+    -fx-background-color: #E6EAF0;
+}
+
+/* =========================
+   CARD PRINCIPAL
+========================= */
+
+.card-pane{
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 28, 0, 0, 7);
+    -fx-background-radius: 18;
+}
+
+/* =========================
+   PANEL AZUL
+========================= */
+
+.blue-panel{
+    -fx-background-color: #3A6FD8;
+}
+
+/* =========================
+   TEXTOS PANEL IZQUIERDO
+========================= */
+
+.panel-title{
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-wrap-text: true;
+    -fx-line-spacing: 3;
+}
+
+.panel-subtitle{
+    -fx-text-fill: rgba(255,255,255,0.82);
+    -fx-font-size: 13px;
+    -fx-wrap-text: true;
+    -fx-line-spacing: 2;
+}
+
+/* =========================
+   TITULO FORMULARIO
+========================= */
+
+.form-title{
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1A1A2E;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.input-field{
+    -fx-background-color: white;
+    -fx-border-color: #CDD5E0;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 9;
+    -fx-background-radius: 9;
+    -fx-padding: 9 14 9 14;
+    -fx-font-size: 13.5px;
+    -fx-text-fill: #2C3E50;
+    -fx-prompt-text-fill: #A8B4C5;
+    -fx-pref-height: 42;
+}
+
+.input-field:focused{
+    -fx-border-color: #3A6FD8;
+    -fx-effect: dropshadow(gaussian, rgba(58,111,216,0.22), 7, 0, 0, 0);
+}
+
+/* =========================
+   BOTON OJO
+========================= */
+
+.eye-button{
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 0 12 0 0;
+    -fx-focus-traversable: false;
+}
+
+.eye-icon{
+    -fx-background-color: #A8B4C5;
+}
+
+.eye-icon:hover{
+    -fx-background-color: #3A6FD8;
+}
+
+/* =========================
+   CHECKBOX
+========================= */
+
+.custom-check .box{
+    -fx-background-color: white;
+    -fx-border-color: #CDD5E0;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.custom-check:selected .box{
+    -fx-background-color: #3A6FD8;
+    -fx-border-color: #3A6FD8;
+}
+
+.custom-check .label{
+    -fx-text-fill: #4A5568;
+    -fx-font-size: 13px;
+}
+
+/* =========================
+   LINKS
+========================= */
+
+.link-label{
+    -fx-text-fill: #3A6FD8;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.link-label:hover{
+    -fx-underline: true;
+}
+
+.inline-link{
+    -fx-text-fill: #3A6FD8;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+/* =========================
+   BOTON PRINCIPAL
+========================= */
+
+.btn-primary{
+    -fx-background-color: #1E63CC;
+    -fx-text-fill: white;
+    -fx-background-radius: 9;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-pref-height: 44;
+    -fx-effect: dropshadow(gaussian, rgba(30,99,204,0.38), 18, 0, 0, 3);
+}
+
+.btn-primary:hover{
+    -fx-background-color: #1758BB;
+}
+
+.btn-primary:pressed{
+    -fx-background-color: #124DA8;
+    -fx-effect: none;
+}
+
+/* =========================
+   BOTON OUTLINE
+========================= */
+
+.btn-outline{
+    -fx-background-color: white;
+    -fx-border-color: #1E63CC;
+    -fx-border-width: 1.8;
+    -fx-border-radius: 9;
+    -fx-background-radius: 9;
+    -fx-text-fill: #1E63CC;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-pref-height: 44;
+}
+
+.btn-outline:hover{
+    -fx-background-color: #F5F8FF;
+}
+
+/* =========================
+   BOTON GOOGLE
+========================= */
+
+.btn-google{
+    -fx-background-color: white;
+    -fx-border-color: #CDD5E0;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 9;
+    -fx-background-radius: 9;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3C3C3C;
+    -fx-cursor: hand;
+    -fx-pref-height: 44;
+}
+
+.btn-google:hover{
+    -fx-background-color: #F5F8FF;
+}
+
+/* =========================
+   LOGO GOOGLE
+========================= */
+
+.google-g{
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4285F4;
+}
+
+/* =========================
+   DIVIDER
+========================= */
+
+.divider-line{
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 0 0 1.5 0;
+    -fx-pref-height: 1;
+    -fx-max-height: 1;
+}
+
+.divider-label{
+    -fx-text-fill: #A8B4C5;
+    -fx-font-size: 12.5px;
+}

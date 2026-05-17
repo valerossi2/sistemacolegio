@@ -94,6 +94,12 @@ public class LuminaAcademyFX extends Application {
 
         mainCanvas.getChildren().addAll(headerSec, kpiGrid, middleSection, scheduleBox);
         
+        // Inicializar el controlador para agregar secciones dinámicamente
+        DashboardController controller = new DashboardController(mainCanvas, kpiGrid, middleSection, scheduleBox);
+        
+        // Ejemplo: Agregar una nueva KPI Card dinámicamente
+        // controller.addKpiCard("Nueva Métrica", "100", COLOR_PRIMARY_FIXED, "⭐");
+        
         StackPane centerWrapper = new StackPane(mainCanvas);
         centerWrapper.setAlignment(Pos.TOP_CENTER);
         contentArea.getChildren().add(centerWrapper);
@@ -138,7 +144,7 @@ public class LuminaAcademyFX extends Application {
     }
 
     private VBox createSidebar() {
-        VBox sidebar = new VBox(16);
+        VBox sidebar = new VBox(24);
         sidebar.setPrefWidth(260);
         sidebar.setPadding(new Insets(32, 20, 32, 20));
         sidebar.setStyle("-fx-background-color: " + COLOR_WHITE + ";");
@@ -172,7 +178,7 @@ public class LuminaAcademyFX extends Application {
             {"Estudiantes", "🎓"},
             {"Cursos", "📖"},
             {"Horario", "📅"},
-            {"Configuración", "⚙️"}
+            {"Configuración", ""}
         };
 
         for (int i = 0; i < items.length; i++) {
@@ -189,6 +195,7 @@ public class LuminaAcademyFX extends Application {
             
             if (i == 0) {
                 btnContainer.getStyleClass().add("sidebar-active");
+                btnContainer.setEffect(new javafx.scene.effect.DropShadow(10, 0, 4, Color.web(COLOR_PRIMARY, 0.3)));
                 label.setFill(Color.WHITE);
                 icon.setFill(Color.WHITE);
             } else {
@@ -237,28 +244,6 @@ public class LuminaAcademyFX extends Application {
         HBox rightContainer = new HBox(24);
         rightContainer.setAlignment(Pos.CENTER_RIGHT);
 
-        // Icons
-        HBox iconBox = new HBox(20);
-        iconBox.setAlignment(Pos.CENTER);
-        
-        StackPane notifStack = new StackPane();
-        Text notifBell = new Text("🔔");
-        notifBell.setFont(Font.font(20));
-        Circle redDot = new Circle(4, Color.RED);
-        StackPane.setAlignment(redDot, Pos.TOP_RIGHT);
-        notifStack.getChildren().addAll(notifBell, redDot);
-        
-        StackPane helpStack = new StackPane();
-        Circle helpCircle = new Circle(10, Color.TRANSPARENT);
-        helpCircle.setStroke(Color.web(COLOR_OUTLINE));
-        helpCircle.setStrokeWidth(1.5);
-        Text helpQ = new Text("?");
-        helpQ.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-        helpQ.setFill(Color.web(COLOR_OUTLINE));
-        helpStack.getChildren().addAll(helpCircle, helpQ);
-        
-        iconBox.getChildren().addAll(notifStack, helpStack);
-
         // Vertical Separator
         Rectangle separator = new Rectangle(1, 24, Color.web(COLOR_SURFACE_CONTAINER));
         
@@ -283,7 +268,7 @@ public class LuminaAcademyFX extends Application {
         
         userBox.getChildren().addAll(uText, avatarStack);
 
-        rightContainer.getChildren().addAll(iconBox, separator, userBox);
+        rightContainer.getChildren().addAll(separator, userBox);
 
         header.getChildren().addAll(searchBox, spacer, rightContainer);
         return header;
@@ -341,6 +326,7 @@ public class LuminaAcademyFX extends Application {
         
         HBox cols = new HBox();
         cols.setPadding(new Insets(8, 0, 8, 0));
+        cols.setStyle("-fx-background-color: " + COLOR_SURFACE_LOW + "; -fx-background-radius: 8;");
         cols.getChildren().addAll(
             createColH("CURSO", 180), 
             createColH("PROFESOR", 180), 
@@ -352,7 +338,8 @@ public class LuminaAcademyFX extends Application {
         table.getChildren().addAll(
             createCourseRow("Introducción a la IA", "Dr. Roberto Sánchez", "32 Estudiantes", 0.92, "9.2"),
             createCourseRow("Cálculo Avanzado", "Dra. Elena Méndez", "28 Estudiantes", 0.78, "7.8"),
-            createCourseRow("Literatura Moderna", "Prof. Juan Carlos Rico", "40 Estudiantes", 0.85, "8.5")
+            createCourseRow("Literatura Moderna", "Prof. Juan Carlos Rico", "40 Estudiantes", 0.85, "8.5"),
+            createCourseRow("Diseño UX/UI", "Mtra. Sofía Valdéz", "24 Estudiantes", 0.88, "8.8")
         );
 
         panel.getChildren().addAll(head, table);
@@ -439,17 +426,20 @@ public class LuminaAcademyFX extends Application {
         // Gráfico
         HBox chart = new HBox(12);
         chart.setAlignment(Pos.BOTTOM_CENTER);
-        chart.setPrefHeight(30);
+        chart.setPrefHeight(120);
         
         String[] labels = {"5to E", "6to A", "4to B", "4to C", "5to A", "6to B"};
-        int[] heights = {80, 100, 90, 80, 140, 120};
+        int[] heights = {60, 70, 80, 60, 110, 90};
 
         for (int i = 0; i < labels.length; i++) {
             VBox barBox = new VBox(8);
             barBox.setAlignment(Pos.BOTTOM_CENTER);
             Color barColor = (i == 4) ? Color.web(COLOR_PRIMARY) : Color.web(COLOR_PRIMARY_FIXED);
-            Rectangle bar = new Rectangle(24, heights[i], barColor);
+            Rectangle bar = new Rectangle(20, heights[i], barColor);
             bar.setArcWidth(10); bar.setArcHeight(10);
+            // Make top rounded, bottom flat
+            bar.setArcWidth(10);
+            bar.setArcHeight(10);
             Text label = new Text(labels[i]);
             label.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
             label.setFill(i == 4 ? Color.web(COLOR_PRIMARY) : Color.web(COLOR_OUTLINE));
@@ -483,7 +473,7 @@ public class LuminaAcademyFX extends Application {
         // LISTA
         VBox list = new VBox(6);
         list.getChildren().addAll(
-            createScheduleRow("08:00", "Matemáticas Avanzadas", "Salón 402 • Prof. Sánchez", true),
+            createScheduleRow("08:00", "Matemáticas Avanzadas", "Salón 402 • Prof. Sánchez", false),
             createScheduleRow("10:00", "Historia Universal", "Biblioteca • Dra. Méndez", false),
             createScheduleRow("12:00", "Química Orgánica", "Laboratorio B • Prof. Rico", false),
             createScheduleRow("14:00", "Física Cuántica", "Laboratorio A • Prof. Einstein", false),
@@ -494,7 +484,7 @@ public class LuminaAcademyFX extends Application {
         ScrollPane sp = new ScrollPane(list);
         sp.setFitToWidth(true);
         sp.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
-        sp.setPrefHeight(180);
+        sp.setPrefHeight(220);
 
         panel.getChildren().addAll(title, sp);
         return panel;
@@ -545,7 +535,7 @@ public class LuminaAcademyFX extends Application {
 
     private String getInternalCSS() {
         return ".nav-item { -fx-background-color: transparent; -fx-cursor: hand; } " +
-               ".nav-item:hover { -fx-background-color: " + COLOR_SURFACE_LOW + "; } " +
+                ".nav-item:hover { -fx-background-color: " + COLOR_SURFACE_LOW + "; -fx-cursor: hand; -fx-background-radius: 12; } " +
                ".sidebar-active { -fx-background-color: " + COLOR_PRIMARY_CONTAINER + "; -fx-cursor: hand; -fx-background-radius: 12; } " +
                ".search-container { -fx-background-color: " + COLOR_SURFACE_LOW + "; -fx-background-radius: 32; -fx-border-color: " + COLOR_SURFACE_CONTAINER + "; -fx-border-radius: 32; } " +
                ".search-input { -fx-background-color: transparent; -fx-border-color: transparent; -fx-font-family: 'Plus Jakarta Sans'; } " +
@@ -553,7 +543,7 @@ public class LuminaAcademyFX extends Application {
                ".course-row { -fx-border-color: transparent transparent " + COLOR_SURFACE_CONTAINER + " transparent; } " +
                ".schedule-row { -fx-border-color: transparent transparent " + COLOR_SURFACE_CONTAINER + " transparent; } " +
                ".text-button { -fx-text-fill: " + COLOR_PRIMARY + "; -fx-background-color: transparent; -fx-underline: false; -fx-cursor: hand; -fx-font-weight: bold; } " +
-               ".growth-badge { -fx-background-color: #E8F5E9; -fx-text-fill: #2E7D32; -fx-font-weight: bold; -fx-padding: 4 12 4 12; -fx-background-radius: 16; } " +
+                ".growth-badge { -fx-background-color: " + COLOR_PRIMARY_FIXED + "; -fx-text-fill: " + COLOR_PRIMARY + "; -fx-font-weight: bold; -fx-padding: 4 12 4 12; -fx-background-radius: 16; } " +
                ".fab-button { -fx-background-color: " + COLOR_PRIMARY + "; -fx-background-radius: 32; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.4), 15, 0, 0, 8); }";
     }
 

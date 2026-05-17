@@ -207,21 +207,21 @@ public class LuminaAcademyFX extends Application {
     private HBox createHeader() {
         HBox header = new HBox();
         header.setPadding(new Insets(0, 32, 0, 32));
-        header.setPrefHeight(80);
+        header.setPrefHeight(70);
         header.setAlignment(Pos.CENTER_LEFT);
         header.setStyle("-fx-background-color: " + COLOR_WHITE + "; -fx-border-color: transparent transparent " + COLOR_SURFACE_CONTAINER + " transparent;");
 
-        // Left Spacer to push search bar to the right
+        // Left Spacer (Grows to center search bar)
         Region leftSpacer = new Region();
-        leftSpacer.setPrefWidth(40);
+        HBox.setHgrow(leftSpacer, Priority.ALWAYS);
 
         // Search Bar
-        HBox searchBox = new HBox(12);
-        searchBox.setPadding(new Insets(-10, 0, 0, 10));
+        HBox searchBox = new HBox(10);
+        searchBox.setPadding(new Insets(0, 16, 0, 16));
         searchBox.getStyleClass().add("search-container");
         searchBox.setAlignment(Pos.CENTER_LEFT);
-        searchBox.setPrefWidth(600);
-        searchBox.setPrefHeight(44);
+        searchBox.setPrefWidth(450);
+        searchBox.setPrefHeight(36);
         
         Text searchIcon = new Text("🔍");
         searchIcon.setFont(Font.font(14));
@@ -234,8 +234,9 @@ public class LuminaAcademyFX extends Application {
         
         searchBox.getChildren().addAll(searchIcon, searchField);
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        // Right Spacer (Grows to center search bar)
+        Region rightSpacer = new Region();
+        HBox.setHgrow(rightSpacer, Priority.ALWAYS);
 
         // Right Side Container
         HBox rightContainer = new HBox(24);
@@ -289,7 +290,7 @@ public class LuminaAcademyFX extends Application {
 
         rightContainer.getChildren().addAll(iconBox, separator, userBox);
 
-        header.getChildren().addAll(leftSpacer, searchBox, spacer, rightContainer);
+        header.getChildren().addAll(leftSpacer, searchBox, rightSpacer, rightContainer);
         return header;
     }
 

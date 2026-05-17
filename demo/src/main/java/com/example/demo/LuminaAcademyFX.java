@@ -49,9 +49,9 @@ public class LuminaAcademyFX extends Application {
         contentArea.getChildren().add(header);
 
         // Main Canvas
-        VBox mainCanvas = new VBox(24);
-        // Reduced top padding to 20 to bring the schedule back into view
-        mainCanvas.setPadding(new Insets(20, 40, 40, 40));
+        VBox mainCanvas = new VBox(16);
+        // Reduced top padding to bring everything up
+        mainCanvas.setPadding(new Insets(10, 40, 40, 40));
         mainCanvas.setAlignment(Pos.TOP_CENTER);
         mainCanvas.setMaxWidth(1200);
 
@@ -81,7 +81,7 @@ public class LuminaAcademyFX extends Application {
         
         // Gestión de Cursos (8/12)
         VBox coursesBox = createCourseManagement();
-        HBox.setHgrow(coursesBox, Priority.ALWAYS);
+        // Removed Hgrow to prevent vertical expansion and white space
         
         // Desempeño (4/12)
         VBox performanceBox = createPerformancePanel();
@@ -217,7 +217,7 @@ public class LuminaAcademyFX extends Application {
 
         // Search Bar
         HBox searchBox = new HBox(12);
-        searchBox.setPadding(new Insets(0, 20, 0, 20));
+        searchBox.setPadding(new Insets(-10, 0, 0, 10));
         searchBox.getStyleClass().add("search-container");
         searchBox.setAlignment(Pos.CENTER_LEFT);
         searchBox.setPrefWidth(600);
@@ -294,24 +294,24 @@ public class LuminaAcademyFX extends Application {
     }
 
     private VBox createKpiCard(String label, String value, String color, String icon) {
-        HBox card = new HBox(16);
-        card.setPadding(new Insets(16));
+        HBox card = new HBox(12);
+        card.setPadding(new Insets(12));
         card.setAlignment(Pos.CENTER_LEFT);
         card.getStyleClass().add("glass-card");
 
         // Icon in a light blue circle
-        Circle iconCircle = new Circle(20, Color.web(COLOR_SURFACE_CONTAINER));
+        Circle iconCircle = new Circle(16, Color.web(COLOR_SURFACE_CONTAINER));
         Text iconTxt = new Text(icon);
-        iconTxt.setFont(Font.font(16));
+        iconTxt.setFont(Font.font(14));
         iconTxt.setFill(Color.web(COLOR_PRIMARY));
         StackPane iconStack = new StackPane(iconCircle, iconTxt);
         
-        VBox text = new VBox(4);
+        VBox text = new VBox(2);
         Text lbl = new Text(label.toUpperCase());
-        lbl.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 11));
+        lbl.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
         lbl.setFill(Color.web(COLOR_OUTLINE));
         Text val = new Text(value);
-        val.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 20));
+        val.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
         val.setFill(Color.web(COLOR_ON_SURFACE));
         text.getChildren().addAll(lbl, val);
 
@@ -328,7 +328,7 @@ public class LuminaAcademyFX extends Application {
 
         // Header
         HBox head = new HBox();
-        head.setPadding(new Insets(16));
+        head.setPadding(new Insets(12));
         head.setAlignment(Pos.CENTER_LEFT);
         Text title = new Text("Gestión de Cursos");
         title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
@@ -341,7 +341,7 @@ public class LuminaAcademyFX extends Application {
 
         // Tabla
         VBox table = new VBox();
-        table.setPadding(new Insets(0, 16, 0, 16));
+        table.setPadding(new Insets(0, 12, 0, 12));
         
         HBox cols = new HBox();
         cols.setPadding(new Insets(8, 0, 8, 0));
@@ -422,7 +422,7 @@ public class LuminaAcademyFX extends Application {
     }
 
     private VBox createPerformancePanel() {
-        VBox panel = new VBox(12);
+        VBox panel = new VBox(8);
         panel.getStyleClass().add("glass-card");
         panel.setPadding(new Insets(12));
 
@@ -476,16 +476,16 @@ public class LuminaAcademyFX extends Application {
     }
 
     private VBox createSchedulePanel() {
-        VBox panel = new VBox(20);
+        VBox panel = new VBox(8);
         panel.getStyleClass().add("glass-card");
-        panel.setPadding(new Insets(24));
+        panel.setPadding(new Insets(12));
 
         Text title = new Text("Horario de Hoy");
-        title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 20));
+        title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
         title.setFill(Color.web(COLOR_ON_SURFACE));
 
         // LISTA
-        VBox list = new VBox(12);
+        VBox list = new VBox(6);
         list.getChildren().addAll(
             createScheduleRow("08:00", "Matemáticas Avanzadas", "Salón 402 • Prof. Sánchez", true),
             createScheduleRow("10:00", "Historia Universal", "Biblioteca • Dra. Méndez", false),
@@ -498,15 +498,15 @@ public class LuminaAcademyFX extends Application {
         ScrollPane sp = new ScrollPane(list);
         sp.setFitToWidth(true);
         sp.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
-        sp.setPrefHeight(240);
+        sp.setPrefHeight(180);
 
         panel.getChildren().addAll(title, sp);
         return panel;
     }
 
     private HBox createScheduleRow(String time, String subj, String det, boolean isFirst) {
-        HBox row = new HBox(20);
-        row.setPadding(new Insets(16, 0, 16, 0));
+        HBox row = new HBox(16);
+        row.setPadding(new Insets(8, 0, 8, 0));
         row.setAlignment(Pos.CENTER_LEFT);
         row.getStyleClass().add("schedule-row");
 

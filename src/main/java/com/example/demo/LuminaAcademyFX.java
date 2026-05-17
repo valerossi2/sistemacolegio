@@ -41,6 +41,7 @@ public class LuminaAcademyFX extends Application {
 
         // 2. Main Content Area (Header + Canvas)
         VBox contentArea = new VBox();
+        contentArea.setPadding(new Insets(20, 0, 0, 0)); // Added top padding to lower the header slightly
         HBox.setHgrow(contentArea, Priority.ALWAYS);
 
         // TopAppBar
@@ -49,6 +50,7 @@ public class LuminaAcademyFX extends Application {
 
         // Main Canvas
         VBox mainCanvas = new VBox(32);
+        // Reduced top padding to 40 to bring the schedule back into view
         mainCanvas.setPadding(new Insets(40, 40, 40, 40));
         mainCanvas.setAlignment(Pos.TOP_CENTER);
         mainCanvas.setMaxWidth(1200);
@@ -83,7 +85,7 @@ public class LuminaAcademyFX extends Application {
         
         // Desempeño (4/12)
         VBox performanceBox = createPerformancePanel();
-        performanceBox.setPrefWidth(380);
+        performanceBox.setPrefWidth(320);
 
         middleSection.getChildren().addAll(coursesBox, performanceBox);
 
@@ -321,10 +323,10 @@ public class LuminaAcademyFX extends Application {
 
         // Header
         HBox head = new HBox();
-        head.setPadding(new Insets(24));
+        head.setPadding(new Insets(16));
         head.setAlignment(Pos.CENTER_LEFT);
         Text title = new Text("Gestión de Cursos");
-        title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 20));
+        title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
         title.setFill(Color.web(COLOR_ON_SURFACE));
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -334,15 +336,15 @@ public class LuminaAcademyFX extends Application {
 
         // Tabla
         VBox table = new VBox();
-        table.setPadding(new Insets(0, 24, 24, 24));
+        table.setPadding(new Insets(0, 16, 16, 16));
         
         HBox cols = new HBox();
-        cols.setPadding(new Insets(12, 0, 12, 0));
+        cols.setPadding(new Insets(8, 0, 8, 0));
         cols.getChildren().addAll(
-            createColH("CURSO", 200), 
-            createColH("PROFESOR", 200), 
-            createColH("ALUMNOS", 150), 
-            createColH("RENDIMIENTO", 150)
+            createColH("CURSO", 180), 
+            createColH("PROFESOR", 180), 
+            createColH("ALUMNOS", 120), 
+            createColH("RENDIMIENTO", 120)
         );
 
         table.getChildren().addAll(cols);
@@ -359,7 +361,7 @@ public class LuminaAcademyFX extends Application {
 
     private HBox createColH(String t, double w) {
         Text txt = new Text(t);
-        txt.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 11));
+        txt.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
         txt.setFill(Color.web(COLOR_OUTLINE));
         HBox box = new HBox(txt);
         box.setPrefWidth(w);
@@ -368,24 +370,24 @@ public class LuminaAcademyFX extends Application {
 
     private HBox createCourseRow(String name, String prof, String st, double prog, String score) {
         HBox row = new HBox(15);
-        row.setPadding(new Insets(15, 0, 15, 0));
+        row.setPadding(new Insets(10, 0, 10, 0));
         row.setAlignment(Pos.CENTER_LEFT);
         row.getStyleClass().add("course-row");
 
         Text tName = new Text(name);
-        tName.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 14));
+        tName.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13));
         tName.setFill(Color.web(COLOR_ON_SURFACE));
         
         HBox progBox = new HBox(10);
         progBox.setAlignment(Pos.CENTER_RIGHT);
         
-        Rectangle bg = new Rectangle(60, 6, Color.web(COLOR_SURFACE_CONTAINER));
-        bg.setArcWidth(6); bg.setArcHeight(6);
-        Rectangle fill = new Rectangle(60 * prog, 6, Color.web(COLOR_PRIMARY));
-        fill.setArcWidth(6); fill.setArcHeight(6);
+        Rectangle bg = new Rectangle(50, 5, Color.web(COLOR_SURFACE_CONTAINER));
+        bg.setArcWidth(5); bg.setArcHeight(5);
+        Rectangle fill = new Rectangle(50 * prog, 5, Color.web(COLOR_PRIMARY));
+        fill.setArcWidth(5); fill.setArcHeight(5);
         
         Text tScore = new Text(score);
-        tScore.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13));
+        tScore.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12));
         tScore.setFill(Color.web(COLOR_PRIMARY));
 
         progBox.getChildren().addAll(new Pane(bg, fill), tScore);
@@ -395,20 +397,20 @@ public class LuminaAcademyFX extends Application {
         VBox stBox = new VBox(2);
         stBox.setAlignment(Pos.CENTER_LEFT);
         Text stNum = new Text(stParts[0]);
-        stNum.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13));
+        stNum.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12));
         Text stLabel = new Text(stParts[1]);
-        stLabel.setFont(Font.font("Plus Jakarta Sans", 11));
+        stLabel.setFont(Font.font("Plus Jakarta Sans", 10));
         stLabel.setFill(Color.web(COLOR_OUTLINE));
         stBox.getChildren().addAll(stNum, stLabel);
 
         HBox hName = new HBox(tName);
-        hName.setPrefWidth(200);
+        hName.setPrefWidth(180);
         HBox hProf = new HBox(new Text(prof));
-        hProf.setPrefWidth(200);
+        hProf.setPrefWidth(180);
         HBox hStud = new HBox(stBox);
-        hStud.setPrefWidth(150);
+        hStud.setPrefWidth(120);
         HBox hPerf = progBox;
-        hPerf.setPrefWidth(150);
+        hPerf.setPrefWidth(120);
 
         row.getChildren().addAll(hName, hProf, hStud, hPerf);
 
@@ -416,41 +418,40 @@ public class LuminaAcademyFX extends Application {
     }
 
     private VBox createPerformancePanel() {
-        VBox panel = new VBox(20);
+        VBox panel = new VBox(16);
         panel.getStyleClass().add("glass-card");
-        panel.setPadding(new Insets(24));
+        panel.setPadding(new Insets(16));
 
         HBox head = new HBox();
         Text title = new Text("Desempeño");
-        title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 20));
+        title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
         title.setFill(Color.web(COLOR_ON_SURFACE));
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         Text more = new Text("⋯");
-        more.setFont(Font.font(20));
+        more.setFont(Font.font(18));
         head.getChildren().addAll(title, spacer, more);
 
         Text sub = new Text("Promedio general mensual (6 meses)");
-        sub.setFont(Font.font("Plus Jakarta Sans", 14));
+        sub.setFont(Font.font("Plus Jakarta Sans", 12));
         sub.setFill(Color.web(COLOR_OUTLINE));
 
         // Gráfico
-        HBox chart = new HBox(16);
+        HBox chart = new HBox(12);
         chart.setAlignment(Pos.BOTTOM_CENTER);
-        chart.setPrefHeight(200);
+        chart.setPrefHeight(150);
         
         String[] labels = {"5to E", "6to A", "4to B", "4to C", "5to A", "6to B"};
-        int[] heights = {100, 130, 120, 110, 180, 150};
+        int[] heights = {80, 100, 90, 80, 140, 120};
 
         for (int i = 0; i < labels.length; i++) {
-            VBox barBox = new VBox(12);
+            VBox barBox = new VBox(8);
             barBox.setAlignment(Pos.BOTTOM_CENTER);
-            // Use primary for the highest bar, primary_fixed for others
             Color barColor = (i == 4) ? Color.web(COLOR_PRIMARY) : Color.web(COLOR_PRIMARY_FIXED);
-            Rectangle bar = new Rectangle(32, heights[i], barColor);
-            bar.setArcWidth(12); bar.setArcHeight(12);
+            Rectangle bar = new Rectangle(24, heights[i], barColor);
+            bar.setArcWidth(10); bar.setArcHeight(10);
             Text label = new Text(labels[i]);
-            label.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 11));
+            label.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
             label.setFill(i == 4 ? Color.web(COLOR_PRIMARY) : Color.web(COLOR_OUTLINE));
             barBox.getChildren().addAll(bar, label);
             chart.getChildren().add(barBox);
@@ -458,7 +459,7 @@ public class LuminaAcademyFX extends Application {
 
         HBox footer = new HBox();
         Text fT = new Text("Crecimiento Semestral");
-        fT.setFont(Font.font("Plus Jakarta Sans", 14));
+        fT.setFont(Font.font("Plus Jakarta Sans", 12));
         fT.setFill(Color.web(COLOR_OUTLINE));
         Region s2 = new Region();
         HBox.setHgrow(s2, Priority.ALWAYS);

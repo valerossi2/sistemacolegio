@@ -3,10 +3,11 @@ package model;
 import jakarta .persistence.*;
 
 @Entity
-@table (name = "roles")
+@Table (name = "roles")
+
 public class Rol {
 
-    @id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 

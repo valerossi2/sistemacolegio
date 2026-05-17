@@ -21,7 +21,7 @@ public class Hibernate_config {
         props.setProperty("hibernate.connection.url",
                 "jdbc:mysql://localhost:3306/sis_colegio?useSSL=false&serverTimezone=UTC");
         props.setProperty("hibernate.connection.username" ,
-                System.getenv("sis_colegio_user"));
+                System.getenv("sis_colegio_user1"));
         props.setProperty("hibernate.connection.password" ,
                 System.getenv("DhArMa@_478"));
 

@@ -1,225 +1,248 @@
-.root-bg{
-    -fx-background-color: #E6EAF0;
+/* ═══════════════════════════════════════════════════════════════
+
+   Colores:
+     Azul primario  : #1d5ed8
+     Azul oscuro    : #1748b0
+     Fondo app      : #f0f4fc
+     Texto oscuro   : #1a1a2e
+     Texto medio    : #4a4a6a
+     Texto claro    : #9999b5
+     Borde          : #dde3ef
+     Blanco         : #ffffff
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Root ──────────────────────────────────────────────────────── */
+.root-container {
+    -fx-background-color: #f0f4fc;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* =========================
-   CARD PRINCIPAL
-========================= */
-
-.card-pane{
-    -fx-background-color: white;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 28, 0, 0, 7);
-    -fx-background-radius: 18;
+/* ══════════════════════════════════════════════════════════════════
+   PANEL IZQUIERDO (azul)
+   ══════════════════════════════════════════════════════════════════ */
+.left-panel {
+    -fx-background-color: #1d5ed8;
+    -fx-min-width: 300px;
+    -fx-pref-width: 350px;
+    -fx-max-width: 380px;
 }
 
-/* =========================
-   PANEL AZUL
-========================= */
-
-.blue-panel{
-    -fx-background-color: #3A6FD8;
+/* Ola blanca lateral */
+.wave-shape {
+    -fx-fill: #f0f4fc;
 }
 
-/* =========================
-   TEXTOS PANEL IZQUIERDO
-========================= */
+/* Bloque de texto */
+.left-text-box {
+    -fx-alignment: TOP_LEFT;
+}
 
-.panel-title{
-    -fx-text-fill: white;
-    -fx-font-size: 24px;
+.left-title {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
-    -fx-wrap-text: true;
+    -fx-line-spacing: 4;
+}
+
+.left-subtitle {
+    -fx-text-fill: rgba(255,255,255,0.78);
+    -fx-font-size: 12.5px;
     -fx-line-spacing: 3;
 }
 
-.panel-subtitle{
-    -fx-text-fill: rgba(255,255,255,0.82);
-    -fx-font-size: 13px;
-    -fx-wrap-text: true;
-    -fx-line-spacing: 2;
+/* ══════════════════════════════════════════════════════════════════
+   PANEL DERECHO (blanco)
+   ══════════════════════════════════════════════════════════════════ */
+.right-panel {
+    -fx-background-color: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, -4, 0);
 }
 
-/* =========================
-   TITULO FORMULARIO
-========================= */
+/* ── Contenedor del formulario ──────────────────────────────────── */
+.form-container {
+    -fx-padding: 40 44 40 44;
+}
 
-.form-title{
-    -fx-font-size: 28px;
+.form-title {
+    -fx-text-fill: #1a1a2e;
+    -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1A1A2E;
 }
 
-/* =========================
-   INPUTS
-========================= */
-
-.input-field{
-    -fx-background-color: white;
-    -fx-border-color: #CDD5E0;
+/* ══════════════════════════════════════════════════════════════════
+   CAMPOS DE ENTRADA
+   ══════════════════════════════════════════════════════════════════ */
+.field-wrapper {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dde3ef;
     -fx-border-width: 1.5;
-    -fx-border-radius: 9;
-    -fx-background-radius: 9;
-    -fx-padding: 9 14 9 14;
-    -fx-font-size: 13.5px;
-    -fx-text-fill: #2C3E50;
-    -fx-prompt-text-fill: #A8B4C5;
-    -fx-pref-height: 42;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 2 12 2 12;
+    -fx-min-height: 48px;
+    -fx-pref-height: 48px;
+    -fx-effect: dropshadow(gaussian, rgba(29,94,216,0.04), 6, 0, 0, 2);
 }
 
-.input-field:focused{
-    -fx-border-color: #3A6FD8;
-    -fx-effect: dropshadow(gaussian, rgba(58,111,216,0.22), 7, 0, 0, 0);
+.field-wrapper:hover {
+    -fx-border-color: #1d5ed8;
 }
 
-/* =========================
-   BOTON OJO
-========================= */
+.field-icon {
+    -fx-text-fill: #9999b5;
+    -fx-font-size: 14px;
+}
 
-.eye-button{
+.field-input {
     -fx-background-color: transparent;
+    -fx-border-width: 0;
     -fx-border-color: transparent;
-    -fx-cursor: hand;
-    -fx-padding: 0 12 0 0;
-    -fx-focus-traversable: false;
-}
-
-.eye-icon{
-    -fx-background-color: #A8B4C5;
-}
-
-.eye-icon:hover{
-    -fx-background-color: #3A6FD8;
-}
-
-/* =========================
-   CHECKBOX
-========================= */
-
-.custom-check .box{
-    -fx-background-color: white;
-    -fx-border-color: #CDD5E0;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
-}
-
-.custom-check:selected .box{
-    -fx-background-color: #3A6FD8;
-    -fx-border-color: #3A6FD8;
-}
-
-.custom-check .label{
-    -fx-text-fill: #4A5568;
-    -fx-font-size: 13px;
-}
-
-/* =========================
-   LINKS
-========================= */
-
-.link-label{
-    -fx-text-fill: #3A6FD8;
-    -fx-font-size: 13px;
-    -fx-cursor: hand;
-}
-
-.link-label:hover{
-    -fx-underline: true;
-}
-
-.inline-link{
-    -fx-text-fill: #3A6FD8;
-    -fx-font-size: 13px;
-    -fx-cursor: hand;
-}
-
-/* =========================
-   BOTON PRINCIPAL
-========================= */
-
-.btn-primary{
-    -fx-background-color: #1E63CC;
-    -fx-text-fill: white;
-    -fx-background-radius: 9;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-cursor: hand;
-    -fx-pref-height: 44;
-    -fx-effect: dropshadow(gaussian, rgba(30,99,204,0.38), 18, 0, 0, 3);
-}
-
-.btn-primary:hover{
-    -fx-background-color: #1758BB;
-}
-
-.btn-primary:pressed{
-    -fx-background-color: #124DA8;
-    -fx-effect: none;
-}
-
-/* =========================
-   BOTON OUTLINE
-========================= */
-
-.btn-outline{
-    -fx-background-color: white;
-    -fx-border-color: #1E63CC;
-    -fx-border-width: 1.8;
-    -fx-border-radius: 9;
-    -fx-background-radius: 9;
-    -fx-text-fill: #1E63CC;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-cursor: hand;
-    -fx-pref-height: 44;
-}
-
-.btn-outline:hover{
-    -fx-background-color: #F5F8FF;
-}
-
-/* =========================
-   BOTON GOOGLE
-========================= */
-
-.btn-google{
-    -fx-background-color: white;
-    -fx-border-color: #CDD5E0;
-    -fx-border-width: 1.5;
-    -fx-border-radius: 9;
-    -fx-background-radius: 9;
+    -fx-background-radius: 0;
     -fx-font-size: 13.5px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #3C3C3C;
+    -fx-text-fill: #1a1a2e;
+    -fx-prompt-text-fill: #b0b8d0;
+}
+
+.field-input:focused {
+    -fx-background-color: transparent;
+}
+
+.eye-button {
+    -fx-text-fill: #9999b5;
+    -fx-font-size: 14px;
     -fx-cursor: hand;
-    -fx-pref-height: 44;
+    -fx-padding: 0 0 0 6;
 }
 
-.btn-google:hover{
-    -fx-background-color: #F5F8FF;
+.eye-button:hover {
+    -fx-text-fill: #1d5ed8;
 }
 
-/* =========================
-   LOGO GOOGLE
-========================= */
+/* ══════════════════════════════════════════════════════════════════
+   CHECKBOX Y LINKS
+   ══════════════════════════════════════════════════════════════════ */
+.remember-checkbox {
+    -fx-text-fill: #4a4a6a;
+    -fx-font-size: 12.5px;
+    -fx-cursor: hand;
+}
 
-.google-g{
+.forgot-link {
+    -fx-text-fill: #1d5ed8;
+    -fx-font-size: 12.5px;
+    -fx-font-weight: bold;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+    -fx-underline: false;
+}
+
+.forgot-link:hover {
+    -fx-underline: true;
+    -fx-text-fill: #1748b0;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BOTONES
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Primario — azul sólido */
+.btn-primary {
+    -fx-background-color: #1d5ed8;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 13 0 13 0;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(29,94,216,0.30), 12, 0, 0, 4);
+}
+
+.btn-primary:hover {
+    -fx-background-color: #1748b0;
+    -fx-effect: dropshadow(gaussian, rgba(29,94,216,0.45), 16, 0, 0, 6);
+}
+
+.btn-primary:pressed {
+    -fx-background-color: #1340a0;
+    -fx-effect: dropshadow(gaussian, rgba(29,94,216,0.20), 8, 0, 0, 2);
+}
+
+/* Secundario — contorno azul */
+.btn-secondary {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1d5ed8;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #1d5ed8;
+    -fx-border-width: 2;
+    -fx-padding: 11 0 11 0;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #e8f0fe;
+    -fx-border-color: #1748b0;
+    -fx-text-fill: #1748b0;
+}
+
+.btn-secondary:pressed {
+    -fx-background-color: #d0e1fc;
+}
+
+/* Google */
+.btn-google {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #dde3ef;
+    -fx-border-width: 1.5;
+    -fx-padding: 10 0 10 0;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);
+}
+
+.btn-google:hover {
+    -fx-background-color: #f5f8ff;
+    -fx-border-color: #b0bfdf;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.11), 12, 0, 0, 4);
+}
+
+.btn-google:pressed {
+    -fx-background-color: #eef3ff;
+}
+
+/* Ícono G dentro del botón Google */
+.google-logo {
+    -fx-text-fill: #1d5ed8;
     -fx-font-size: 17px;
     -fx-font-weight: bold;
-    -fx-text-fill: #4285F4;
 }
 
-/* =========================
-   DIVIDER
-========================= */
-
-.divider-line{
-    -fx-border-color: #E2E8F0;
-    -fx-border-width: 0 0 1.5 0;
-    -fx-pref-height: 1;
-    -fx-max-height: 1;
+.google-text {
+    -fx-text-fill: #1a1a2e;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
 }
 
-.divider-label{
-    -fx-text-fill: #A8B4C5;
-    -fx-font-size: 12.5px;
+/* Quitar el foco punteado de botones */
+.button:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   DIVISOR
+   ══════════════════════════════════════════════════════════════════ */
+.divider-line {
+    -fx-background-color: #dde3ef;
+    -fx-pref-height: 1.5;
+    -fx-max-height: 1.5;
+}
+
+.divider-text {
+    -fx-text-fill: #9999b5;
+    -fx-font-size: 12px;
 }

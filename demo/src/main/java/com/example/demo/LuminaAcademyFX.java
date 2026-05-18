@@ -10,34 +10,63 @@ import javafx.scene.shape.*;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
 import javafx.scene.Cursor;
-import javafx.animation.ScaleTransition;
-import javafx.util.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LuminaAcademyFX extends Application {
 
-    // --- PALETA DE COLORES EXACTA DEL DESIGN.MD ---
-    private final String COLOR_PRIMARY = "#004ac6";
-    private final String COLOR_PRIMARY_CONTAINER = "#2563eb";
-    private final String COLOR_BACKGROUND = "#f9f9ff";
-    private final String COLOR_SURFACE = "#f9f9ff";
-    private final String COLOR_SURFACE_LOW = "#f0f3ff";
-    private final String COLOR_SURFACE_CONTAINER = "#e7eeff";
-    private final String COLOR_SURFACE_CONTAINER_HIGH = "#dee8ff";
-    private final String COLOR_ON_SURFACE = "#111c2d";
-    private final String COLOR_ON_SURFACE_VARIANT = "#434655";
-    private final String COLOR_OUTLINE = "#737686";
-    private final String COLOR_OUTLINE_VARIANT = "#c3c6d7";
-    private final String COLOR_WHITE = "#ffffff";
-    private final String COLOR_PRIMARY_FIXED = "#dbe1ff";
-    private final String COLOR_PRIMARY_FIXED_DIM = "#b4c5ff";
-    private final String COLOR_SECONDARY = "#006686";
-    private final String COLOR_SECONDARY_FIXED = "#c0e8ff";
-    private final String COLOR_TERTIARY = "#4e565b";
-    private final String COLOR_TERTIARY_CONTAINER = "#666f74";
-    private final String COLOR_TERTIARY_FIXED = "#dbe4ea";
-    private final String COLOR_ERROR = "#ba1a1a";
+    private ThemeManager theme = new ThemeManager();
+    private List<Runnable> themeUpdaters = new ArrayList<>();
 
-    // --- MATERIAL SYMBOLS SVG PATHS ---
+    private VBox dashboardView;
+    private StackPane centerWrapper;
+    private HBox root;
+    private VBox sidebar;
+    private HBox header;
+
+    // --- COLORES LUZ ---
+    private final String L_PRIMARY = "#004ac6";
+    private final String L_PRIMARY_CONTAINER = "#2563eb";
+    private final String L_BG = "#f9f9ff";
+    private final String L_SURFACE_LOW = "#f0f3ff";
+    private final String L_SURFACE_CONTAINER = "#e7eeff";
+    private final String L_SURFACE_CONTAINER_HIGH = "#dee8ff";
+    private final String L_ON_SURFACE = "#111c2d";
+    private final String L_ON_SURFACE_VARIANT = "#434655";
+    private final String L_OUTLINE = "#737686";
+    private final String L_OUTLINE_VARIANT = "#c3c6d7";
+    private final String L_WHITE = "#ffffff";
+    private final String L_PRIMARY_FIXED = "#dbe1ff";
+    private final String L_PRIMARY_FIXED_DIM = "#b4c5ff";
+    private final String L_SECONDARY = "#006686";
+    private final String L_SECONDARY_FIXED = "#c0e8ff";
+    private final String L_TERTIARY = "#4e565b";
+    private final String L_TERTIARY_CONTAINER = "#666f74";
+    private final String L_TERTIARY_FIXED = "#dbe4ea";
+
+    // --- COLORES OSCUROS ---
+    private final String D_PRIMARY = "#2D6AEE";
+    private final String D_PRIMARY_CONTAINER = "#1D4ED8";
+    private final String D_BG = "#0F172A";
+    private final String D_SURFACE_LOW = "#1E293B";
+    private final String D_SURFACE_CONTAINER = "#334155";
+    private final String D_SURFACE_CONTAINER_HIGH = "#475569";
+    private final String D_ON_SURFACE = "#F8FAFC";
+    private final String D_ON_SURFACE_VARIANT = "#CBD5E1";
+    private final String D_OUTLINE = "#64748B";
+    private final String D_OUTLINE_VARIANT = "#475569";
+    private final String D_WHITE = "#1E293B";
+    private final String D_PRIMARY_FIXED = "#1E3A5F";
+    private final String D_PRIMARY_FIXED_DIM = "#1E3A5F";
+    private final String D_SECONDARY = "#38BDF8";
+    private final String D_SECONDARY_FIXED = "#0C4A6E";
+    private final String D_TERTIARY = "#94A3B8";
+    private final String D_TERTIARY_CONTAINER = "#475569";
+    private final String D_TERTIARY_FIXED = "#334155";
+
+    private String c(String l, String d) { return theme.isDark() ? d : l; }
+
+    // --- SVG PATHS ---
     private final String ICON_LIGHTBULB = "M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z";
     private final String ICON_HOME = "M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z";
     private final String ICON_SCHOOL = "M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z";
@@ -67,159 +96,134 @@ public class LuminaAcademyFX extends Application {
         return icon;
     }
 
-    private void addHoverScale(Region node, double scaleTo, double seconds) {
-        ScaleTransition stIn = new ScaleTransition(Duration.seconds(seconds), node);
-        stIn.setToX(scaleTo);
-        stIn.setToY(scaleTo);
-        ScaleTransition stOut = new ScaleTransition(Duration.seconds(seconds), node);
-        stOut.setToX(1.0);
-        stOut.setToY(1.0);
-        node.setOnMouseEntered(e -> stIn.playFromStart());
-        node.setOnMouseExited(e -> stOut.playFromStart());
-    }
-
-    private BorderPane root;
-    private StackPane contentArea;
-
     @Override
     public void start(Stage primaryStage) {
-        HBox root = new HBox();
-        root.setStyle("-fx-background-color: " + COLOR_BACKGROUND + ";");
+        root = new HBox();
 
-        // 1. Sidebar
-        VBox sidebar = createSidebar();
+        sidebar = createSidebar(v -> showView(v));
         root.getChildren().add(sidebar);
 
-        // 2. Main Content Area (Header + Canvas)
         VBox contentArea = new VBox();
-        contentArea.setPadding(new Insets(20, 0, 0, 0)); // Added top padding to lower the header slightly
+        contentArea.setPadding(new Insets(20, 0, 0, 0));
         HBox.setHgrow(contentArea, Priority.ALWAYS);
 
-        // TopAppBar
-        HBox header = createHeader();
+        header = createHeader();
         contentArea.getChildren().add(header);
 
-        // Main Canvas
         VBox mainCanvas = new VBox(16);
-        // Reduced top padding to bring everything up
         mainCanvas.setPadding(new Insets(10, 40, 40, 40));
         mainCanvas.setAlignment(Pos.TOP_CENTER);
         mainCanvas.setMaxWidth(1200);
 
-        // --- SECCIÓN 1: HEADER ---
         VBox headerSec = new VBox(8);
         Text h1 = new Text("Panel de Administración Central");
         h1.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 32));
-        h1.setFill(Color.web(COLOR_ON_SURFACE));
-        
         Text sub = new Text("Bienvenido de nuevo. Aquí tienes un resumen del estado institucional hoy.");
         sub.setFont(Font.font("Plus Jakarta Sans", 16));
-        sub.setFill(Color.web(COLOR_OUTLINE));
         headerSec.getChildren().addAll(h1, sub);
 
-        // --- SECCIÓN 2: KPI BENTO GRID ---
         HBox kpiGrid = new HBox(16);
         kpiGrid.setAlignment(Pos.CENTER);
         kpiGrid.getChildren().addAll(
-            createKpiCard("Total Estudiantes", "1,250", COLOR_SECONDARY_FIXED, COLOR_SECONDARY, ICON_PERSON_PIN),
-            createKpiCard("Total Cursos", "35", COLOR_PRIMARY_FIXED, COLOR_PRIMARY, ICON_TRENDING_UP),
-            createKpiCard("Profesores", "42", COLOR_TERTIARY_FIXED, COLOR_TERTIARY, ICON_SCHOOL),
-            createKpiCard("Asistencia Estudiantes", "92%", COLOR_SECONDARY_FIXED, COLOR_SECONDARY, ICON_CHECK_CIRCLE)
+            createKpiCard("Total Estudiantes", "1,250", L_SECONDARY_FIXED, L_SECONDARY, ICON_PERSON_PIN),
+            createKpiCard("Total Cursos", "35", L_PRIMARY_FIXED, L_PRIMARY, ICON_TRENDING_UP),
+            createKpiCard("Profesores", "42", L_TERTIARY_FIXED, L_TERTIARY, ICON_SCHOOL),
+            createKpiCard("Asistencia Estudiantes", "92%", L_SECONDARY_FIXED, L_SECONDARY, ICON_CHECK_CIRCLE)
         );
 
-        // --- SECCIÓN 3: DUAL COLUMN ---
         HBox middleSection = new HBox(24);
-        
-        // Gestión de Cursos (8/12)
         VBox coursesBox = createCourseManagement();
-        // Removed Hgrow to prevent vertical expansion and white space
-        
-        // Desempeño (4/12)
         VBox performanceBox = createPerformancePanel();
         performanceBox.setPrefWidth(320);
-
         middleSection.getChildren().addAll(coursesBox, performanceBox);
 
-        // --- SECCIÓN 4: HORARIO DE HOY ---
         VBox scheduleBox = createSchedulePanel();
 
         mainCanvas.getChildren().addAll(headerSec, kpiGrid, middleSection, scheduleBox);
-        
-        // Inicializar el controlador para agregar secciones dinámicamente
+
         DashboardController controller = new DashboardController(mainCanvas, kpiGrid, middleSection, scheduleBox);
-        
-        // Ejemplo: Agregar una nueva KPI Card dinámicamente
-        // controller.addKpiCard("Nueva Métrica", "100", COLOR_PRIMARY_FIXED, "⭐");
-        
-        StackPane centerWrapper = new StackPane(mainCanvas);
+
+        centerWrapper = new StackPane(mainCanvas);
         centerWrapper.setAlignment(Pos.TOP_CENTER);
+        dashboardView = mainCanvas;
         contentArea.getChildren().add(centerWrapper);
 
         root.getChildren().add(contentArea);
 
+        themeUpdaters.add(() -> {
+            root.setStyle("-fx-background-color: " + c(L_BG, D_BG) + ";");
+            h1.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            sub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+            refreshSidebarCSS();
+            refreshHeaderCSS();
+        });
+
+        theme.addListener(() -> {
+            for (Runnable r : themeUpdaters) r.run();
+            Scene scene = root.getScene();
+            if (scene != null) {
+                scene.getStylesheets().clear();
+                scene.getStylesheets().add("data:text/css," + getInternalCSS());
+            }
+        });
+
         Scene scene = new Scene(root, 1400, 900);
         scene.getStylesheets().add("data:text/css," + getInternalCSS());
-        
+
         primaryStage.setTitle("Lumina Academy - Admin Portal");
         primaryStage.setScene(scene);
-        
+
         root.setFocusTraversable(true);
         root.requestFocus();
-
         primaryStage.show();
     }
 
-    private StackPane stackWithFab(Region center) {
-        StackPane stack = new StackPane(center);
-        stack.setAlignment(Pos.TOP_CENTER);
-
-        // FAB Bolt
-        StackPane fab = new StackPane();
-        fab.setPrefSize(64, 64);
-        fab.getStyleClass().add("fab-button");
-        SVGPath bolt = createIcon(ICON_BOLT, 28, COLOR_WHITE);
-        fab.getChildren().add(bolt);
-
-        StackPane.setMargin(fab, new Insets(0, 0, 40, 0));
-        StackPane.setAlignment(fab, Pos.BOTTOM_RIGHT);
-        
-        // El FAB debe estar en una capa superior
-        Pane fabLayer = new Pane(fab);
-        fabLayer.setPrefSize(1300, 850);
-        
-        // Envolver todo
-        StackPane rootStack = new StackPane(center, fabLayer);
-        return rootStack;
+    private void showView(int index) {
+        if (index == 0) {
+            centerWrapper.getChildren().setAll(dashboardView);
+        } else if (index == 5) {
+            centerWrapper.getChildren().setAll(new Configuracion(theme).getView());
+        }
     }
 
-    private VBox createSidebar() {
-        VBox sidebar = new VBox(24);
-        sidebar.setPrefWidth(260);
-        sidebar.setPadding(new Insets(32, 20, 32, 20));
-        sidebar.setStyle("-fx-background-color: " + COLOR_WHITE + "; -fx-border-color: transparent " + COLOR_SURFACE_CONTAINER_HIGH + " transparent transparent;");
+    private void refreshSidebarCSS() {
+        String sbg = c(L_WHITE, D_WHITE);
+        String sborder = c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH);
+        sidebar.setStyle("-fx-background-color: " + sbg + "; -fx-border-color: transparent " + sborder + " transparent transparent;");
+    }
 
-        // Logo
+    private void refreshHeaderCSS() {
+        String hbg = c(L_WHITE, D_WHITE);
+        String hborder = c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH);
+        header.setStyle("-fx-background-color: " + hbg + "; -fx-border-color: transparent transparent " + hborder + " transparent;");
+    }
+
+    private VBox createSidebar(java.util.function.Consumer<Integer> onNavigate) {
+        VBox side = new VBox(24);
+        side.setPrefWidth(260);
+        side.setPadding(new Insets(32, 20, 32, 20));
+        side.setStyle("-fx-background-color: " + L_WHITE + "; -fx-border-color: transparent " + L_SURFACE_CONTAINER_HIGH + " transparent transparent;");
+
         HBox logo = new HBox(12);
         logo.setPadding(new Insets(0, 0, 48, 0));
         logo.setAlignment(Pos.CENTER_LEFT);
-        
-        Circle logoCircle = new Circle(20, Color.web(COLOR_PRIMARY));
-        SVGPath logoSymbol = createIcon(ICON_LIGHTBULB, 20, COLOR_WHITE);
+
+        Circle logoCircle = new Circle(20, Color.web(L_PRIMARY));
+        SVGPath logoSymbol = createIcon(ICON_LIGHTBULB, 20, L_WHITE);
         StackPane logoStack = new StackPane(logoCircle, logoSymbol);
-        
+
         VBox logoText = new VBox(2);
         Text lTitle = new Text("Lumina Academy");
         lTitle.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
-        lTitle.setFill(Color.web(COLOR_PRIMARY));
+        lTitle.setFill(Color.web(L_PRIMARY));
         Text lSub = new Text("ADMIN PORTAL");
         lSub.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
-        lSub.setFill(Color.web(COLOR_OUTLINE));
+        lSub.setFill(Color.web(L_OUTLINE));
         logoText.getChildren().addAll(lTitle, lSub);
-        
-        logo.getChildren().addAll(logoStack, logoText);
-        sidebar.getChildren().add(logo);
 
-        // Navegación con Iconos
+        logo.getChildren().addAll(logoStack, logoText);
+        side.getChildren().add(logo);
+
         String[][] items = {
             {"Inicio", ICON_HOME},
             {"Estudiantes", ICON_SCHOOL},
@@ -234,89 +238,112 @@ public class LuminaAcademyFX extends Application {
             btnContainer.setAlignment(Pos.CENTER_LEFT);
             btnContainer.setPadding(new Insets(12, 16, 12, 16));
             btnContainer.setPrefWidth(Double.MAX_VALUE);
-            
-            SVGPath icon = createIcon(items[i][1], 20, COLOR_WHITE);
-            
+
+            SVGPath icon = createIcon(items[i][1], 20, L_WHITE);
             Text label = new Text(items[i][0]);
             label.setFont(Font.font("Plus Jakarta Sans", FontWeight.MEDIUM, 15));
-            
+
+            int idx = i;
             if (i == 0) {
                 btnContainer.getStyleClass().add("sidebar-active");
                 label.setFill(Color.WHITE);
                 icon.setFill(Color.WHITE);
             } else {
                 btnContainer.getStyleClass().add("nav-item");
-                icon.setFill(Color.web(COLOR_ON_SURFACE_VARIANT));
-                label.setFill(Color.web(COLOR_ON_SURFACE_VARIANT));
-                
-                int idx = i;
+                icon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+                label.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+
                 btnContainer.setOnMouseEntered(e -> {
-                    label.setFill(Color.web(COLOR_PRIMARY));
-                    icon.setFill(Color.web(COLOR_PRIMARY));
+                    label.setFill(Color.web(L_PRIMARY));
+                    icon.setFill(Color.web(L_PRIMARY));
                 });
                 btnContainer.setOnMouseExited(e -> {
-                    label.setFill(Color.web(COLOR_ON_SURFACE_VARIANT));
-                    icon.setFill(Color.web(COLOR_ON_SURFACE_VARIANT));
+                    if (!btnContainer.getStyleClass().contains("sidebar-active")) {
+                        label.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+                        icon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+                    }
                 });
             }
-            
+
+            btnContainer.setOnMouseClicked(e -> {
+                for (int j = 1; j < side.getChildren().size(); j++) {
+                    Node child = side.getChildren().get(j);
+                    if (child instanceof HBox) {
+                        child.getStyleClass().remove("sidebar-active");
+                        child.getStyleClass().add("nav-item");
+                        HBox c = (HBox) child;
+                        if (c.getChildren().size() >= 2) {
+                            Node first = c.getChildren().get(0);
+                            Node second = c.getChildren().get(1);
+                            if (first instanceof SVGPath)
+                                ((SVGPath) first).setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+                            if (second instanceof Text)
+                                ((Text) second).setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+                        }
+                    }
+                }
+                btnContainer.getStyleClass().remove("nav-item");
+                btnContainer.getStyleClass().add("sidebar-active");
+                label.setFill(Color.WHITE);
+                icon.setFill(Color.WHITE);
+                onNavigate.accept(idx);
+            });
+
             btnContainer.getChildren().addAll(icon, label);
-            sidebar.getChildren().add(btnContainer);
+            side.getChildren().add(btnContainer);
         }
 
-        return sidebar;
+        return side;
     }
 
     private HBox createHeader() {
-        HBox header = new HBox();
-        header.setPadding(new Insets(0, 32, 0, 32));
-        header.setPrefHeight(70);
-        header.setAlignment(Pos.CENTER_LEFT);
-        header.setStyle("-fx-background-color: " + COLOR_WHITE + "; -fx-border-color: transparent transparent " + COLOR_SURFACE_CONTAINER_HIGH + " transparent;");
+        HBox head = new HBox();
+        head.setPadding(new Insets(0, 32, 0, 32));
+        head.setPrefHeight(70);
+        head.setAlignment(Pos.CENTER_LEFT);
+        head.setStyle("-fx-background-color: " + L_WHITE + "; -fx-border-color: transparent transparent " + L_SURFACE_CONTAINER_HIGH + " transparent;");
 
-        // Search Bar
         HBox searchBox = new HBox(10);
         searchBox.setPadding(new Insets(10, 20, 10, 20));
         searchBox.getStyleClass().add("search-container");
         searchBox.setAlignment(Pos.CENTER_LEFT);
         searchBox.setPrefWidth(400);
-        
-        SVGPath searchIcon = createIcon(ICON_SEARCH, 20, COLOR_OUTLINE);
+
+        SVGPath searchIcon = createIcon(ICON_SEARCH, 20, c(L_OUTLINE, D_OUTLINE));
 
         TextField searchField = new TextField();
         searchField.setPromptText("Buscar expedientes, cursos o reportes...");
         searchField.getStyleClass().add("search-input");
         HBox.setHgrow(searchField, Priority.ALWAYS);
-        
+
         searchBox.getChildren().addAll(searchIcon, searchField);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Right Side Container
         HBox rightContainer = new HBox(24);
         rightContainer.setAlignment(Pos.CENTER_RIGHT);
 
-        // Notification Bell
         StackPane notifBtn = new StackPane();
         notifBtn.setPrefSize(32, 32);
         notifBtn.getStyleClass().add("icon-button");
-        SVGPath bellIcon = createIcon(ICON_NOTIFICATIONS, 20, COLOR_ON_SURFACE_VARIANT);
+        SVGPath bellIcon = createIcon(ICON_NOTIFICATIONS, 20, c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT));
         notifBtn.getChildren().add(bellIcon);
-        addHoverScale(notifBtn, 1.1, 0.2);
 
-        // Help Button
+        notifBtn.setOnMouseEntered(e -> bellIcon.setFill(Color.web(L_PRIMARY)));
+        notifBtn.setOnMouseExited(e -> bellIcon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT))));
+
         StackPane helpBtn = new StackPane();
         helpBtn.setPrefSize(32, 32);
         helpBtn.getStyleClass().add("icon-button");
-        SVGPath helpIcon = createIcon(ICON_HELP, 20, COLOR_ON_SURFACE_VARIANT);
+        SVGPath helpIcon = createIcon(ICON_HELP, 20, c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT));
         helpBtn.getChildren().add(helpIcon);
-        addHoverScale(helpBtn, 1.1, 0.2);
 
-        // Vertical Separator
-        Rectangle separator = new Rectangle(1, 32, Color.web(COLOR_SURFACE_CONTAINER_HIGH));
-        
-        // User Profile
+        helpBtn.setOnMouseEntered(e -> helpIcon.setFill(Color.web(L_PRIMARY)));
+        helpBtn.setOnMouseExited(e -> helpIcon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT))));
+
+        Rectangle separator = new Rectangle(1, 32, Color.web(c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
+
         HBox userBox = new HBox(12);
         userBox.setAlignment(Pos.CENTER_RIGHT);
         userBox.setCursor(Cursor.HAND);
@@ -326,65 +353,74 @@ public class LuminaAcademyFX extends Application {
         uName.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 14));
         Text uEmail = new Text("ADMIN@LUMINA.EDU");
         uEmail.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
-        uEmail.setFill(Color.web(COLOR_OUTLINE));
+        uEmail.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
         uText.getChildren().addAll(uName, uEmail);
-        
-        Circle avatar = new Circle(20, Color.web(COLOR_PRIMARY_FIXED));
-        avatar.setStroke(Color.web(COLOR_PRIMARY_FIXED));
+
+        Circle avatar = new Circle(20, Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+        avatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
         avatar.setStrokeWidth(2);
-        SVGPath avatarSvg = createIcon(ICON_AVATAR, 20, COLOR_PRIMARY);
+        SVGPath avatarSvg = createIcon(ICON_AVATAR, 20, c(L_PRIMARY, D_PRIMARY));
         StackPane avatarStack = new StackPane(avatar, avatarSvg);
-        
+
         userBox.setOnMouseEntered(e -> {
-            uName.setFill(Color.web(COLOR_PRIMARY));
-            avatar.setStroke(Color.web(COLOR_PRIMARY));
+            uName.setFill(Color.web(L_PRIMARY));
+            avatar.setStroke(Color.web(L_PRIMARY));
         });
         userBox.setOnMouseExited(e -> {
-            uName.setFill(Color.web(COLOR_ON_SURFACE));
-            avatar.setStroke(Color.web(COLOR_PRIMARY_FIXED));
+            uName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            avatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
         });
-        
+
         userBox.getChildren().addAll(uText, avatarStack);
 
         rightContainer.getChildren().addAll(notifBtn, helpBtn, separator, userBox);
 
-        header.getChildren().addAll(searchBox, spacer, rightContainer);
-        return header;
+        head.getChildren().addAll(searchBox, spacer, rightContainer);
+
+        themeUpdaters.add(() -> {
+            head.setStyle("-fx-background-color: " + c(L_WHITE, D_WHITE) + "; -fx-border-color: transparent transparent " + c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH) + " transparent;");
+            bellIcon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+            helpIcon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+            separator.setFill(Color.web(c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
+            uName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            uEmail.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+            avatar.setFill(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+            avatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+            avatarSvg.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
+            searchIcon.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+        });
+
+        return head;
     }
 
-    private VBox createKpiCard(String label, String value, String bgColor, String iconColor, String iconPath) {
+    private VBox createKpiCard(String label, String value, String lightBg, String iconColor, String iconPath) {
         HBox card = new HBox(12);
         card.setPadding(new Insets(12));
         card.setAlignment(Pos.CENTER_LEFT);
         card.getStyleClass().add("glass-card");
 
-        // Icon in a colored circle
-        Circle iconCircle = new Circle(16, Color.web(bgColor));
+        Circle iconCircle = new Circle(16);
         SVGPath iconSvg = createIcon(iconPath, 16, iconColor);
         StackPane iconStack = new StackPane(iconCircle, iconSvg);
-        
-        // Hover: scale icon with transition
-        ScaleTransition stIn = new ScaleTransition(Duration.seconds(0.2), iconStack);
-        stIn.setToX(1.1);
-        stIn.setToY(1.1);
-        ScaleTransition stOut = new ScaleTransition(Duration.seconds(0.2), iconStack);
-        stOut.setToX(1.0);
-        stOut.setToY(1.0);
-        card.setOnMouseEntered(e -> stIn.playFromStart());
-        card.setOnMouseExited(e -> stOut.playFromStart());
-        
+
         VBox text = new VBox(2);
         Text lbl = new Text(label.toUpperCase());
         lbl.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
-        lbl.setFill(Color.web(COLOR_OUTLINE));
         Text val = new Text(value);
         val.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
-        val.setFill(Color.web(COLOR_ON_SURFACE));
         text.getChildren().addAll(lbl, val);
 
         card.getChildren().addAll(iconStack, text);
         VBox wrapper = new VBox(card);
         HBox.setHgrow(wrapper, Priority.ALWAYS);
+
+        themeUpdaters.add(() -> {
+            iconCircle.setFill(Color.web(c(lightBg, D_SURFACE_CONTAINER)));
+            iconSvg.setFill(Color.web(c(iconColor, D_PRIMARY)));
+            lbl.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+            val.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+        });
+
         return wrapper;
     }
 
@@ -393,30 +429,27 @@ public class LuminaAcademyFX extends Application {
         panel.getStyleClass().add("glass-card");
         panel.setPadding(new Insets(0));
 
-        // Header
         HBox head = new HBox();
         head.setPadding(new Insets(12));
         head.setAlignment(Pos.CENTER_LEFT);
         Text title = new Text("Gestión de Cursos");
         title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
-        title.setFill(Color.web(COLOR_ON_SURFACE));
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         Button btnAll = new Button("Ver todos");
         btnAll.getStyleClass().add("text-button");
         head.getChildren().addAll(title, spacer, btnAll);
 
-        // Tabla
         VBox table = new VBox();
         table.setPadding(new Insets(0, 12, 0, 12));
-        
+
         HBox cols = new HBox();
         cols.setPadding(new Insets(8, 0, 8, 0));
-        cols.setStyle("-fx-background-color: " + COLOR_SURFACE_LOW + "; -fx-background-radius: 8;");
+        cols.setStyle("-fx-background-color: " + L_SURFACE_LOW + "; -fx-background-radius: 8;");
         cols.getChildren().addAll(
-            createColH("CURSO", 180), 
-            createColH("PROFESOR", 180), 
-            createColH("ALUMNOS", 120), 
+            createColH("CURSO", 180),
+            createColH("PROFESOR", 180),
+            createColH("ALUMNOS", 120),
             createColH("RENDIMIENTO", 120)
         );
 
@@ -429,15 +462,22 @@ public class LuminaAcademyFX extends Application {
         );
 
         panel.getChildren().addAll(head, table);
+
+        themeUpdaters.add(() -> {
+            title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            cols.setStyle("-fx-background-color: " + c(L_SURFACE_LOW, D_SURFACE_LOW) + "; -fx-background-radius: 8;");
+        });
+
         return panel;
     }
 
     private HBox createColH(String t, double w) {
         Text txt = new Text(t);
         txt.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
-        txt.setFill(Color.web(COLOR_OUTLINE));
         HBox box = new HBox(txt);
         box.setPrefWidth(w);
+
+        themeUpdaters.add(() -> txt.setFill(Color.web(c(L_OUTLINE, D_OUTLINE))));
         return box;
     }
 
@@ -449,23 +489,21 @@ public class LuminaAcademyFX extends Application {
 
         Text tName = new Text(name);
         tName.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13));
-        tName.setFill(Color.web(COLOR_ON_SURFACE));
-        
+
         HBox progBox = new HBox(10);
         progBox.setAlignment(Pos.CENTER);
-        
-        Rectangle bg = new Rectangle(50, 5, Color.web(COLOR_SURFACE_CONTAINER));
+
+        Rectangle bg = new Rectangle(50, 5);
         bg.setArcWidth(5); bg.setArcHeight(5);
-        Rectangle fill = new Rectangle(50 * prog, 5, Color.web(COLOR_PRIMARY));
+        Rectangle fill = new Rectangle(50 * prog, 5, Color.web(c(L_PRIMARY, D_PRIMARY)));
         fill.setArcWidth(5); fill.setArcHeight(5);
-        
+
         Text tScore = new Text(score);
         tScore.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12));
-        tScore.setFill(Color.web(COLOR_PRIMARY));
+        tScore.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
 
         progBox.getChildren().addAll(new Pane(bg, fill), tScore);
 
-        // Stacked text for Students: Number (Bold) + "Estudiantes" (Smaller)
         String[] stParts = st.split(" ");
         VBox stBox = new VBox(2);
         stBox.setAlignment(Pos.CENTER_LEFT);
@@ -473,7 +511,6 @@ public class LuminaAcademyFX extends Application {
         stNum.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12));
         Text stLabel = new Text(stParts[1]);
         stLabel.setFont(Font.font("Plus Jakarta Sans", 10));
-        stLabel.setFill(Color.web(COLOR_OUTLINE));
         stBox.getChildren().addAll(stNum, stLabel);
 
         HBox hName = new HBox(tName);
@@ -487,6 +524,15 @@ public class LuminaAcademyFX extends Application {
 
         row.getChildren().addAll(hName, hProf, hStud, hPerf);
 
+        themeUpdaters.add(() -> {
+            tName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            bg.setFill(Color.web(c(L_SURFACE_CONTAINER, D_SURFACE_CONTAINER)));
+            fill.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
+            tScore.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
+            stNum.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            stLabel.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+        });
+
         return row;
     }
 
@@ -498,48 +544,44 @@ public class LuminaAcademyFX extends Application {
         HBox head = new HBox();
         Text title = new Text("Desempeño");
         title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
-        title.setFill(Color.web(COLOR_ON_SURFACE));
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         StackPane moreBtn = new StackPane();
         moreBtn.setPrefSize(32, 32);
         moreBtn.getStyleClass().add("icon-button");
-        SVGPath moreDots = createIcon(ICON_MORE_HORIZ, 20, COLOR_OUTLINE);
+        SVGPath moreDots = createIcon(ICON_MORE_HORIZ, 20, c(L_OUTLINE, D_OUTLINE));
         moreBtn.getChildren().add(moreDots);
         head.getChildren().addAll(title, spacer, moreBtn);
 
         Text sub = new Text("Promedio general mensual (6 meses)");
         sub.setFont(Font.font("Plus Jakarta Sans", 12));
-        sub.setFill(Color.web(COLOR_OUTLINE));
 
-        // Gráfico
         HBox chart = new HBox(12);
         chart.setAlignment(Pos.BOTTOM_CENTER);
         chart.setPrefHeight(120);
-        
+
         String[] labels = {"5to E", "6to A", "4to B", "4to C", "5to A", "6to B"};
         int[] heights = {60, 70, 80, 60, 110, 90};
+
+        List<Rectangle> bars = new ArrayList<>();
+        List<Text> barLabels = new ArrayList<>();
 
         for (int i = 0; i < labels.length; i++) {
             VBox barBox = new VBox(8);
             barBox.setAlignment(Pos.BOTTOM_CENTER);
-            Color barColor = (i == 4) ? Color.web(COLOR_PRIMARY) : Color.web(COLOR_PRIMARY_FIXED);
-            Rectangle bar = new Rectangle(20, heights[i], barColor);
+            Rectangle bar = new Rectangle(20, heights[i], Color.web(c(L_PRIMARY, D_PRIMARY)));
             bar.setArcWidth(10); bar.setArcHeight(10);
-            // Make top rounded, bottom flat
-            bar.setArcWidth(10);
-            bar.setArcHeight(10);
-            Text label = new Text(labels[i]);
-            label.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
-            label.setFill(i == 4 ? Color.web(COLOR_PRIMARY) : Color.web(COLOR_OUTLINE));
-            barBox.getChildren().addAll(bar, label);
+            Text lbl = new Text(labels[i]);
+            lbl.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
+            barBox.getChildren().addAll(bar, lbl);
             chart.getChildren().add(barBox);
+            bars.add(bar);
+            barLabels.add(lbl);
         }
 
         HBox footer = new HBox();
         Text fT = new Text("Crecimiento Semestral");
         fT.setFont(Font.font("Plus Jakarta Sans", 12));
-        fT.setFill(Color.web(COLOR_OUTLINE));
         Region s2 = new Region();
         HBox.setHgrow(s2, Priority.ALWAYS);
         Label fV = new Label("+12.4%");
@@ -547,6 +589,18 @@ public class LuminaAcademyFX extends Application {
         footer.getChildren().addAll(fT, s2, fV);
 
         panel.getChildren().addAll(head, sub, chart, footer);
+
+        themeUpdaters.add(() -> {
+            title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            sub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+            moreDots.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+            fT.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+            for (int i = 0; i < bars.size(); i++) {
+                bars.get(i).setFill(Color.web(c(i == 4 ? L_PRIMARY : L_PRIMARY_FIXED, D_PRIMARY)));
+                barLabels.get(i).setFill(Color.web(c(i == 4 ? L_PRIMARY : L_OUTLINE, D_ON_SURFACE)));
+            }
+        });
+
         return panel;
     }
 
@@ -557,9 +611,7 @@ public class LuminaAcademyFX extends Application {
 
         Text title = new Text("Horario de Hoy");
         title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
-        title.setFill(Color.web(COLOR_ON_SURFACE));
 
-        // LISTA
         VBox list = new VBox(6);
         list.getChildren().addAll(
             createScheduleRow("08:00", "Matemáticas Avanzadas", "Salón 402 • Prof. Sánchez", false),
@@ -576,6 +628,9 @@ public class LuminaAcademyFX extends Application {
         sp.setPrefHeight(220);
 
         panel.getChildren().addAll(title, sp);
+
+        themeUpdaters.add(() -> title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE))));
+
         return panel;
     }
 
@@ -585,21 +640,19 @@ public class LuminaAcademyFX extends Application {
         row.setAlignment(Pos.CENTER_LEFT);
         row.getStyleClass().add("schedule-row");
 
-        // Clock Icon
-        Circle iconCircle = new Circle(24, Color.web(COLOR_SURFACE_LOW));
-        SVGPath clockIcon = createIcon(ICON_SCHEDULE, 20, COLOR_ON_SURFACE);
+        Circle iconCircle = new Circle(24, Color.web(c(L_SURFACE_LOW, D_SURFACE_LOW)));
+        SVGPath clockIcon = createIcon(ICON_SCHEDULE, 20, c(L_ON_SURFACE, D_ON_SURFACE));
         StackPane iconStack = new StackPane(iconCircle, clockIcon);
-        
-        // Hover effect for schedule icon
+
         Color hoverBg, hoverText;
         if (subj.contains("Matemáticas") || subj.contains("Física")) {
-            hoverBg = Color.web(COLOR_PRIMARY);
+            hoverBg = Color.web(L_PRIMARY);
             hoverText = Color.WHITE;
         } else if (subj.contains("Historia") || subj.contains("Inglés")) {
-            hoverBg = Color.web(COLOR_SECONDARY);
+            hoverBg = Color.web(L_SECONDARY);
             hoverText = Color.WHITE;
         } else {
-            hoverBg = Color.web(COLOR_TERTIARY);
+            hoverBg = Color.web(L_TERTIARY);
             hoverText = Color.WHITE;
         }
         row.setOnMouseEntered(e -> {
@@ -607,57 +660,68 @@ public class LuminaAcademyFX extends Application {
             clockIcon.setFill(hoverText);
         });
         row.setOnMouseExited(e -> {
-            iconCircle.setFill(Color.web(COLOR_SURFACE_LOW));
-            clockIcon.setFill(Color.web(COLOR_ON_SURFACE));
+            iconCircle.setFill(Color.web(c(L_SURFACE_LOW, D_SURFACE_LOW)));
+            clockIcon.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
         });
-        
+
         VBox text = new VBox(4);
         Text t1 = new Text(time + " - " + subj);
         t1.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 15));
-        t1.setFill(Color.web(COLOR_ON_SURFACE));
         Text t2 = new Text(det);
         t2.setFont(Font.font("Plus Jakarta Sans", 13));
-        t2.setFill(Color.web(COLOR_OUTLINE));
         text.getChildren().addAll(t1, t2);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        if (isFirst) {
-            // FAB Bolt for the first row
-            StackPane fab = new StackPane();
-            fab.setPrefSize(40, 40);
-            fab.getStyleClass().add("fab-button");
-            SVGPath bolt = createIcon(ICON_BOLT, 18, COLOR_WHITE);
-            fab.getChildren().add(bolt);
-            row.getChildren().addAll(iconStack, text, spacer, fab);
-        } else {
-            StackPane arrowBtn = new StackPane();
-            arrowBtn.setPrefSize(40, 40);
-            arrowBtn.getStyleClass().add("icon-button");
-            SVGPath arrow = createIcon(ICON_CHEVRON_RIGHT, 20, COLOR_OUTLINE);
-            arrowBtn.getChildren().add(arrow);
-            row.getChildren().addAll(iconStack, text, spacer, arrowBtn);
-        }
+        StackPane actionBtn = new StackPane();
+        actionBtn.setPrefSize(40, 40);
+        actionBtn.getStyleClass().add("icon-button");
+        String arrowPath = isFirst ? ICON_BOLT : ICON_CHEVRON_RIGHT;
+        SVGPath arrow = createIcon(arrowPath, isFirst ? 18 : 20, c(isFirst ? L_WHITE : L_OUTLINE, isFirst ? L_WHITE : D_OUTLINE));
+        actionBtn.getChildren().add(arrow);
+        row.getChildren().addAll(iconStack, text, spacer, actionBtn);
+
+        themeUpdaters.add(() -> {
+            iconCircle.setFill(Color.web(c(L_SURFACE_LOW, D_SURFACE_LOW)));
+            clockIcon.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            t1.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            t2.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+            arrow.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+        });
+
         return row;
     }
 
     private String getInternalCSS() {
-        return ".nav-item { -fx-background-color: transparent; -fx-cursor: hand; -fx-text-fill: " + COLOR_ON_SURFACE_VARIANT + "; } " +
-                ".nav-item:hover { -fx-background-color: " + COLOR_SURFACE_LOW + "; -fx-cursor: hand; -fx-background-radius: 12; -fx-text-fill: " + COLOR_PRIMARY + "; } " +
-               ".sidebar-active { -fx-background-color: " + COLOR_PRIMARY_CONTAINER + "; -fx-cursor: hand; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(37,99,235,0.3), 16, 0, 0, 8); } " +
-               ".search-container { -fx-background-color: " + COLOR_SURFACE_LOW + "; -fx-background-radius: 32; -fx-border-color: " + COLOR_SURFACE_CONTAINER + "; -fx-border-radius: 32; } " +
-               ".search-input { -fx-background-color: transparent; -fx-border-color: transparent; -fx-font-family: 'Plus Jakarta Sans'; -fx-text-fill: " + COLOR_ON_SURFACE + "; -fx-prompt-text-fill: " + COLOR_OUTLINE + "; } " +
-               ".glass-card { -fx-background-color: " + COLOR_WHITE + "; -fx-background-radius: 16; -fx-border-color: " + COLOR_SURFACE_CONTAINER + "; -fx-border-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.05), 20, 0, 0, 4); } " +
-               ".course-row { -fx-border-color: transparent transparent " + COLOR_SURFACE_CONTAINER + " transparent; } " +
-               ".course-row:hover { -fx-background-color: " + COLOR_SURFACE_LOW + "; } " +
-               ".schedule-row { -fx-border-color: transparent transparent " + COLOR_SURFACE_CONTAINER + " transparent; } " +
-               ".schedule-row:hover { -fx-background-color: " + COLOR_SURFACE_LOW + "; } " +
-               ".text-button { -fx-text-fill: " + COLOR_PRIMARY + "; -fx-background-color: transparent; -fx-underline: false; -fx-cursor: hand; -fx-font-weight: bold; } " +
+        boolean d = theme.isDark();
+        String bg = d ? D_BG : L_BG;
+        String white = d ? D_WHITE : L_WHITE;
+        String surfaceLow = d ? D_SURFACE_LOW : L_SURFACE_LOW;
+        String surfaceContainer = d ? D_SURFACE_CONTAINER : L_SURFACE_CONTAINER;
+        String surfaceContainerHigh = d ? D_SURFACE_CONTAINER_HIGH : L_SURFACE_CONTAINER_HIGH;
+        String onSurface = d ? D_ON_SURFACE : L_ON_SURFACE;
+        String onSurfaceVariant = d ? D_ON_SURFACE_VARIANT : L_ON_SURFACE_VARIANT;
+        String outline = d ? D_OUTLINE : L_OUTLINE;
+        String primary = d ? D_PRIMARY : L_PRIMARY;
+        String primaryContainer = d ? D_PRIMARY_CONTAINER : L_PRIMARY_CONTAINER;
+        String primaryFixed = d ? D_PRIMARY_FIXED : L_PRIMARY_FIXED;
+
+        return ".nav-item { -fx-background-color: transparent; -fx-cursor: hand; -fx-text-fill: " + onSurfaceVariant + "; } " +
+                ".nav-item:hover { -fx-background-color: " + surfaceLow + "; -fx-cursor: hand; -fx-background-radius: 12; -fx-text-fill: " + primary + "; } " +
+               ".sidebar-active { -fx-background-color: " + primaryContainer + "; -fx-cursor: hand; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(37,99,235,0.3), 16, 0, 0, 8); } " +
+               ".search-container { -fx-background-color: " + surfaceLow + "; -fx-background-radius: 32; -fx-border-color: " + surfaceContainer + "; -fx-border-radius: 32; } " +
+               ".search-input { -fx-background-color: transparent; -fx-border-color: transparent; -fx-font-family: 'Plus Jakarta Sans'; -fx-text-fill: " + onSurface + "; -fx-prompt-text-fill: " + outline + "; } " +
+               ".glass-card { -fx-background-color: " + white + "; -fx-background-radius: 16; -fx-border-color: " + surfaceContainer + "; -fx-border-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.05), 20, 0, 0, 4); } " +
+               ".course-row { -fx-border-color: transparent transparent " + surfaceContainer + " transparent; } " +
+               ".course-row:hover { -fx-background-color: " + surfaceLow + "; } " +
+               ".schedule-row { -fx-border-color: transparent transparent " + surfaceContainer + " transparent; } " +
+               ".schedule-row:hover { -fx-background-color: " + surfaceLow + "; } " +
+               ".text-button { -fx-text-fill: " + primary + "; -fx-background-color: transparent; -fx-underline: false; -fx-cursor: hand; -fx-font-weight: bold; } " +
                ".text-button:hover { -fx-underline: true; } " +
                ".icon-button { -fx-background-radius: 32; -fx-cursor: hand; } " +
-                ".growth-badge { -fx-background-color: " + COLOR_PRIMARY_FIXED + "; -fx-text-fill: " + COLOR_PRIMARY + "; -fx-font-weight: bold; -fx-padding: 4 12 4 12; -fx-background-radius: 16; } " +
-               ".fab-button { -fx-background-color: " + COLOR_PRIMARY + "; -fx-background-radius: 32; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.4), 15, 0, 0, 8); } " +
+                ".growth-badge { -fx-background-color: " + primaryFixed + "; -fx-text-fill: " + primary + "; -fx-font-weight: bold; -fx-padding: 4 12 4 12; -fx-background-radius: 16; } " +
+               ".fab-button { -fx-background-color: " + primary + "; -fx-background-radius: 32; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.4), 15, 0, 0, 8); } " +
                ".fab-button:hover { -fx-scale-x: 1.1; -fx-scale-y: 1.1; }";
     }
 

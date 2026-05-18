@@ -4,12 +4,15 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import java.util.Properties;
+import model.*;
 
 public class Hibernate_config {
 
     public static SessionFactory sessionFactory;
 
-    private Hibernate_config (){}
+    private Hibernate_config (){
+
+    }
 
     public static void init () {
         if (sessionFactory != null) return;
@@ -41,7 +44,23 @@ public class Hibernate_config {
         props.setProperty("hibernate.c3p0.max_statements", "50");
 
         Configuration cfg = new Configuration()
-                .setProperties(props);
+                .setProperties(props)
+                .addAnnotatedClass(Rol.class)
+                .addAnnotatedClass(Usuario.class)
+                .addAnnotatedClass(NivelEducativo.class)
+                .addAnnotatedClass(Grado.class)
+                .addAnnotatedClass(Seccion.class)
+                .addAnnotatedClass(PeriodoAcademico.class)
+                .addAnnotatedClass(Materia.class)
+                .addAnnotatedClass(SesionLog.class)
+                .addAnnotatedClass(Curso.class)
+                .addAnnotatedClass(AsignacionMaestro.class)
+                .addAnnotatedClass(Horario.class)
+                .addAnnotatedClass(Estudiante.class)
+                .addAnnotatedClass(Matricula.class)
+                .addAnnotatedClass(TipoEvaluacion.class)
+                .addAnnotatedClass(Calificacion.class)
+                .addAnnotatedClass(Asistencia.class);
 
         // Aquí iremos agregando los modelos
         // cuando los creemos en el siguiente paso

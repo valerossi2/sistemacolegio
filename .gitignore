@@ -2,6 +2,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+
 .kotlin
 
 ### IntelliJ IDEA ###
@@ -34,6 +35,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### SIS Colegio - Archivos sensibles ###
+src/main/resources/client_secret.json
+DB_USER
+DB_PASSWORD
 
 ### Mac OS ###
 .DS_Store

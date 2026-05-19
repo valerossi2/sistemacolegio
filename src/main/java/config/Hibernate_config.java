@@ -26,7 +26,7 @@ public class Hibernate_config {
         props.setProperty("hibernate.connection.username" ,
                 System.getenv("sis_colegio_user1"));
         props.setProperty("hibernate.connection.password" ,
-                System.getenv("DhArMa@_478"));
+                System.getenv(""));
 
         props.setProperty("hibernate.dialect",
                 "org.hibernate.dialect.MySQLDialect");

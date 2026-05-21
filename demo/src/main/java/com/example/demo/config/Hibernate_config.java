@@ -1,4 +1,4 @@
-package config;
+package com.example.demo.config;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -43,7 +43,7 @@ public class Hibernate_config {
         Configuration cfg = new Configuration()
                 .setProperties(props);
 
-        // Aquí iremos agregando los modelos
+        // Aqui iremos agregando los modelos
         // cuando los creemos en el siguiente paso
         // .addAnnotatedClass(Rol.class)
         // .addAnnotatedClass(Usuario.class)
@@ -65,4 +65,3 @@ public class Hibernate_config {
             sessionFactory.close();
     }
 }
-

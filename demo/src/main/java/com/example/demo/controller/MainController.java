@@ -1,6 +1,7 @@
-package com.example.demo;
+package com.example.demo.controller;
 
-import javafx.application.Application;
+import com.example.demo.theme.ThemeManager;
+import javafx.animation.ScaleTransition;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -8,23 +9,47 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.*;
-import javafx.stage.Stage;
-import javafx.scene.Cursor;
+import javafx.util.Duration;
+import javafx.fxml.FXML;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
-public class LuminaAcademyFX extends Application {
+public class MainController {
 
-    private ThemeManager theme = new ThemeManager();
+    @FXML private HBox root;
+    @FXML private VBox sidebar;
+    @FXML private VBox navItemsContainer;
+    @FXML private HBox logo;
+    @FXML private StackPane logoStack;
+    @FXML private Text lTitle;
+    @FXML private Text lSub;
+    @FXML private VBox contentArea;
+    @FXML private HBox header;
+    @FXML private HBox searchBox;
+    @FXML private StackPane searchIconContainer;
+    @FXML private TextField searchField;
+    @FXML private HBox rightContainer;
+    @FXML private StackPane notifBtn;
+    @FXML private StackPane helpBtn;
+    @FXML private Rectangle headerSeparator;
+    @FXML private HBox userBox;
+    @FXML private Text uName;
+    @FXML private Text uEmail;
+    @FXML private StackPane avatarStack;
+    @FXML private StackPane centerWrapper;
+    @FXML private VBox mainCanvas;
+    @FXML private Text h1;
+    @FXML private Text sub;
+    @FXML private HBox kpiGrid;
+    @FXML private HBox middleSection;
+    @FXML private VBox coursesBox;
+    @FXML private VBox performanceBox;
+    @FXML private VBox scheduleBox;
+
+    private ThemeManager theme;
     private List<Runnable> themeUpdaters = new ArrayList<>();
 
-    private VBox dashboardView;
-    private StackPane centerWrapper;
-    private HBox root;
-    private VBox sidebar;
-    private HBox header;
-
-    // --- COLORES LUZ ---
     private final String L_PRIMARY = "#004ac6";
     private final String L_PRIMARY_CONTAINER = "#2563eb";
     private final String L_BG = "#f9f9ff";
@@ -34,17 +59,14 @@ public class LuminaAcademyFX extends Application {
     private final String L_ON_SURFACE = "#111c2d";
     private final String L_ON_SURFACE_VARIANT = "#434655";
     private final String L_OUTLINE = "#737686";
-    private final String L_OUTLINE_VARIANT = "#c3c6d7";
     private final String L_WHITE = "#ffffff";
     private final String L_PRIMARY_FIXED = "#dbe1ff";
-    private final String L_PRIMARY_FIXED_DIM = "#b4c5ff";
     private final String L_SECONDARY = "#006686";
     private final String L_SECONDARY_FIXED = "#c0e8ff";
     private final String L_TERTIARY = "#4e565b";
     private final String L_TERTIARY_CONTAINER = "#666f74";
     private final String L_TERTIARY_FIXED = "#dbe4ea";
 
-    // --- COLORES OSCUROS ---
     private final String D_PRIMARY = "#2D6AEE";
     private final String D_PRIMARY_CONTAINER = "#1D4ED8";
     private final String D_BG = "#0F172A";
@@ -54,10 +76,8 @@ public class LuminaAcademyFX extends Application {
     private final String D_ON_SURFACE = "#F8FAFC";
     private final String D_ON_SURFACE_VARIANT = "#CBD5E1";
     private final String D_OUTLINE = "#64748B";
-    private final String D_OUTLINE_VARIANT = "#475569";
     private final String D_WHITE = "#1E293B";
     private final String D_PRIMARY_FIXED = "#1E3A5F";
-    private final String D_PRIMARY_FIXED_DIM = "#1E3A5F";
     private final String D_SECONDARY = "#38BDF8";
     private final String D_SECONDARY_FIXED = "#0C4A6E";
     private final String D_TERTIARY = "#94A3B8";
@@ -66,7 +86,6 @@ public class LuminaAcademyFX extends Application {
 
     private String c(String l, String d) { return theme.isDark() ? d : l; }
 
-    // --- SVG PATHS ---
     private final String ICON_LIGHTBULB = "M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z";
     private final String ICON_HOME = "M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z";
     private final String ICON_SCHOOL = "M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z";
@@ -86,151 +105,50 @@ public class LuminaAcademyFX extends Application {
     private final String ICON_BOLT = "M14.69 2.21c-.29-.27-.71-.27-1.01 0l-10 9.52c-.29.28-.35.73-.14 1.07.2.34.58.51.98.44l5.93-.85-2.46 8.38c-.12.41.08.85.46 1.03.23.11.49.12.71.03.09-.04.17-.09.24-.16l10-9.52c.29-.28.35-.73.14-1.07-.2-.34-.58-.51-.98-.44l-5.93.85 2.46-8.38c.12-.41-.08-.85-.46-1.03-.11-.05-.23-.07-.34-.06z";
     private final String ICON_AVATAR = "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z";
 
-    private SVGPath createIcon(String pathData, double size, String fill) {
-        SVGPath icon = new SVGPath();
-        icon.setContent(pathData);
-        icon.setFill(Color.web(fill));
-        double scale = size / 24.0;
-        icon.setScaleX(scale);
-        icon.setScaleY(scale);
-        return icon;
+    public void setThemeManager(ThemeManager theme) {
+        this.theme = theme;
     }
 
-    @Override
-    public void start(Stage primaryStage) {
-        root = new HBox();
-
-        sidebar = createSidebar(v -> showView(v));
-        root.getChildren().add(sidebar);
-
-        VBox contentArea = new VBox();
-        contentArea.setPadding(new Insets(20, 0, 0, 0));
-        HBox.setHgrow(contentArea, Priority.ALWAYS);
-
-        header = createHeader();
-        contentArea.getChildren().add(header);
-
-        VBox mainCanvas = new VBox(16);
-        mainCanvas.setPadding(new Insets(10, 40, 40, 40));
-        mainCanvas.setAlignment(Pos.TOP_CENTER);
-        mainCanvas.setMaxWidth(1200);
-
-        VBox headerSec = new VBox(8);
-        Text h1 = new Text("Panel de Administración Central");
-        h1.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 32));
-        Text sub = new Text("Bienvenido de nuevo. Aquí tienes un resumen del estado institucional hoy.");
-        sub.setFont(Font.font("Plus Jakarta Sans", 16));
-        headerSec.getChildren().addAll(h1, sub);
-
-        HBox kpiGrid = new HBox(16);
-        kpiGrid.setAlignment(Pos.CENTER);
-        kpiGrid.getChildren().addAll(
-            createKpiCard("Total Estudiantes", "1,250", L_SECONDARY_FIXED, L_SECONDARY, ICON_PERSON_PIN),
-            createKpiCard("Total Cursos", "35", L_PRIMARY_FIXED, L_PRIMARY, ICON_TRENDING_UP),
-            createKpiCard("Profesores", "42", L_TERTIARY_FIXED, L_TERTIARY, ICON_SCHOOL),
-            createKpiCard("Asistencia Estudiantes", "92%", L_SECONDARY_FIXED, L_SECONDARY, ICON_CHECK_CIRCLE)
-        );
-
-        HBox middleSection = new HBox(24);
-        VBox coursesBox = createCourseManagement();
-        VBox performanceBox = createPerformancePanel();
-        performanceBox.setPrefWidth(320);
-        middleSection.getChildren().addAll(coursesBox, performanceBox);
-
-        VBox scheduleBox = createSchedulePanel();
-
-        mainCanvas.getChildren().addAll(headerSec, kpiGrid, middleSection, scheduleBox);
-
-        DashboardController controller = new DashboardController(mainCanvas, kpiGrid, middleSection, scheduleBox);
-
-        centerWrapper = new StackPane(mainCanvas);
-        centerWrapper.setAlignment(Pos.TOP_CENTER);
-        dashboardView = mainCanvas;
-        contentArea.getChildren().add(centerWrapper);
-
-        root.getChildren().add(contentArea);
-
-        themeUpdaters.add(() -> {
-            root.setStyle("-fx-background-color: " + c(L_BG, D_BG) + ";");
-            h1.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
-            sub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
-            refreshSidebarCSS();
-            refreshHeaderCSS();
-        });
-
-        theme.addListener(() -> {
-            for (Runnable r : themeUpdaters) r.run();
-            Scene scene = root.getScene();
-            if (scene != null) {
-                scene.getStylesheets().clear();
-                scene.getStylesheets().add("data:text/css," + getInternalCSS());
-            }
-        });
-
-        Scene scene = new Scene(root, 1400, 900);
-        scene.getStylesheets().add("data:text/css," + getInternalCSS());
-
-        primaryStage.setTitle("Lumina Academy - Admin Portal");
-        primaryStage.setScene(scene);
-
-        root.setFocusTraversable(true);
-        root.requestFocus();
-        primaryStage.show();
+    @FXML
+    public void initialize() {
+        // Dejamos vacío o solo configuraciones que no dependan del theme
     }
 
-    private void showView(int index) {
-        if (index == 0) {
-            centerWrapper.getChildren().setAll(dashboardView);
-        } else if (index == 5) {
-            centerWrapper.getChildren().setAll(new Configuracion(theme).getView());
-        }
+    public void setupEverything() {
+        setupUI();
+        setupTheme();
     }
 
-    private void refreshSidebarCSS() {
-        String sbg = c(L_WHITE, D_WHITE);
-        String sborder = c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH);
-        sidebar.setStyle("-fx-background-color: " + sbg + "; -fx-border-color: transparent " + sborder + " transparent transparent;");
+    private void setupUI() {
+        setupLogo();
+        setupNavigation();
+        setupHeader();
+        setupKpis();
+        setupCourseManagement();
+        setupPerformancePanel();
+        setupSchedulePanel();
     }
 
-    private void refreshHeaderCSS() {
-        String hbg = c(L_WHITE, D_WHITE);
-        String hborder = c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH);
-        header.setStyle("-fx-background-color: " + hbg + "; -fx-border-color: transparent transparent " + hborder + " transparent;");
-    }
-
-    private VBox createSidebar(java.util.function.Consumer<Integer> onNavigate) {
-        VBox side = new VBox(24);
-        side.setPrefWidth(260);
-        side.setPadding(new Insets(32, 20, 32, 20));
-        side.setStyle("-fx-background-color: " + L_WHITE + "; -fx-border-color: transparent " + L_SURFACE_CONTAINER_HIGH + " transparent transparent;");
-
-        HBox logo = new HBox(12);
-        logo.setPadding(new Insets(0, 0, 48, 0));
-        logo.setAlignment(Pos.CENTER_LEFT);
-
+    private void setupLogo() {
         Circle logoCircle = new Circle(20, Color.web(L_PRIMARY));
         SVGPath logoSymbol = createIcon(ICON_LIGHTBULB, 20, L_WHITE);
-        StackPane logoStack = new StackPane(logoCircle, logoSymbol);
-
-        VBox logoText = new VBox(2);
-        Text lTitle = new Text("Lumina Academy");
+        logoStack.getChildren().addAll(logoCircle, logoSymbol);
+        
         lTitle.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
         lTitle.setFill(Color.web(L_PRIMARY));
-        Text lSub = new Text("ADMIN PORTAL");
         lSub.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
-        lSub.setFill(Color.web(L_OUTLINE));
-        logoText.getChildren().addAll(lTitle, lSub);
+        
+        themeUpdaters.add(() -> lSub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE))));
+    }
 
-        logo.getChildren().addAll(logoStack, logoText);
-        side.getChildren().add(logo);
-
+    private void setupNavigation() {
         String[][] items = {
             {"Inicio", ICON_HOME},
             {"Estudiantes", ICON_SCHOOL},
             {"Profesores", ICON_GROUP},
             {"Cursos", ICON_BOOK},
             {"Horario", ICON_CALENDAR},
-            {"Configuración", ICON_SETTINGS}
+            {"Configuracion", ICON_SETTINGS}
         };
 
         for (int i = 0; i < items.length; i++) {
@@ -246,16 +164,16 @@ public class LuminaAcademyFX extends Application {
             int idx = i;
             if (i == 0) {
                 btnContainer.getStyleClass().add("sidebar-active");
-                label.setFill(Color.WHITE);
-                icon.setFill(Color.WHITE);
             } else {
                 btnContainer.getStyleClass().add("nav-item");
                 icon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
                 label.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
 
                 btnContainer.setOnMouseEntered(e -> {
-                    label.setFill(Color.web(L_PRIMARY));
-                    icon.setFill(Color.web(L_PRIMARY));
+                    if (!btnContainer.getStyleClass().contains("sidebar-active")) {
+                        label.setFill(Color.web(L_PRIMARY));
+                        icon.setFill(Color.web(L_PRIMARY));
+                    }
                 });
                 btnContainer.setOnMouseExited(e -> {
                     if (!btnContainer.getStyleClass().contains("sidebar-active")) {
@@ -265,20 +183,24 @@ public class LuminaAcademyFX extends Application {
                 });
             }
 
+            themeUpdaters.add(() -> {
+                if (!btnContainer.getStyleClass().contains("sidebar-active")) {
+                    icon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+                    label.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+                }
+            });
+
             btnContainer.setOnMouseClicked(e -> {
-                for (int j = 1; j < side.getChildren().size(); j++) {
-                    Node child = side.getChildren().get(j);
+                for (Node child : navItemsContainer.getChildren()) {
                     if (child instanceof HBox) {
-                        child.getStyleClass().remove("sidebar-active");
-                        child.getStyleClass().add("nav-item");
-                        HBox c = (HBox) child;
-                        if (c.getChildren().size() >= 2) {
-                            Node first = c.getChildren().get(0);
-                            Node second = c.getChildren().get(1);
-                            if (first instanceof SVGPath)
-                                ((SVGPath) first).setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
-                            if (second instanceof Text)
-                                ((Text) second).setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+                        HBox h = (HBox) child;
+                        h.getStyleClass().remove("sidebar-active");
+                        h.getStyleClass().add("nav-item");
+                        if (h.getChildren().size() >= 2) {
+                            Node first = h.getChildren().get(0);
+                            Node second = h.getChildren().get(1);
+                            if (first instanceof SVGPath) ((SVGPath) first).setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+                            if (second instanceof Text) ((Text) second).setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
                         }
                     }
                 }
@@ -286,81 +208,51 @@ public class LuminaAcademyFX extends Application {
                 btnContainer.getStyleClass().add("sidebar-active");
                 label.setFill(Color.WHITE);
                 icon.setFill(Color.WHITE);
-                onNavigate.accept(idx);
+                handleNavigation(idx);
             });
 
             btnContainer.getChildren().addAll(icon, label);
-            side.getChildren().add(btnContainer);
+            navItemsContainer.getChildren().add(btnContainer);
         }
-
-        return side;
     }
 
-    private HBox createHeader() {
-        HBox head = new HBox();
-        head.setPadding(new Insets(0, 32, 0, 32));
-        head.setPrefHeight(70);
-        head.setAlignment(Pos.CENTER_LEFT);
-        head.setStyle("-fx-background-color: " + L_WHITE + "; -fx-border-color: transparent transparent " + L_SURFACE_CONTAINER_HIGH + " transparent;");
+    private void handleNavigation(int index) {
+        if (index == 0) {
+            centerWrapper.getChildren().setAll(mainCanvas);
+        } else if (index == 5) {
+            com.example.demo.controller.Configuracion config = new com.example.demo.controller.Configuracion(theme);
+            centerWrapper.getChildren().setAll(config.getView());
+        } else {
+            System.out.println("Navegando a sección: " + index + " (No implementada)");
+        }
+    }
 
-        HBox searchBox = new HBox(10);
-        searchBox.setPadding(new Insets(10, 20, 10, 20));
-        searchBox.getStyleClass().add("search-container");
-        searchBox.setAlignment(Pos.CENTER_LEFT);
-        searchBox.setPrefWidth(400);
-
+    private void setupHeader() {
         SVGPath searchIcon = createIcon(ICON_SEARCH, 20, c(L_OUTLINE, D_OUTLINE));
+        searchIconContainer.getChildren().add(searchIcon);
 
-        TextField searchField = new TextField();
-        searchField.setPromptText("Buscar expedientes, cursos o reportes...");
-        searchField.getStyleClass().add("search-input");
-        HBox.setHgrow(searchField, Priority.ALWAYS);
-
-        searchBox.getChildren().addAll(searchIcon, searchField);
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        HBox rightContainer = new HBox(24);
-        rightContainer.setAlignment(Pos.CENTER_RIGHT);
-
-        StackPane notifBtn = new StackPane();
-        notifBtn.setPrefSize(32, 32);
-        notifBtn.getStyleClass().add("icon-button");
         SVGPath bellIcon = createIcon(ICON_NOTIFICATIONS, 20, c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT));
         notifBtn.getChildren().add(bellIcon);
-
         notifBtn.setOnMouseEntered(e -> bellIcon.setFill(Color.web(L_PRIMARY)));
         notifBtn.setOnMouseExited(e -> bellIcon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT))));
 
-        StackPane helpBtn = new StackPane();
-        helpBtn.setPrefSize(32, 32);
-        helpBtn.getStyleClass().add("icon-button");
         SVGPath helpIcon = createIcon(ICON_HELP, 20, c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT));
         helpBtn.getChildren().add(helpIcon);
-
         helpBtn.setOnMouseEntered(e -> helpIcon.setFill(Color.web(L_PRIMARY)));
         helpBtn.setOnMouseExited(e -> helpIcon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT))));
 
-        Rectangle separator = new Rectangle(1, 32, Color.web(c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
+        headerSeparator.setFill(Color.web(c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
 
-        HBox userBox = new HBox(12);
-        userBox.setAlignment(Pos.CENTER_RIGHT);
-        userBox.setCursor(Cursor.HAND);
-        VBox uText = new VBox(2);
-        uText.setAlignment(Pos.CENTER_RIGHT);
-        Text uName = new Text("Admin User");
         uName.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 14));
-        Text uEmail = new Text("ADMIN@LUMINA.EDU");
+        uName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
         uEmail.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
         uEmail.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
-        uText.getChildren().addAll(uName, uEmail);
 
         Circle avatar = new Circle(20, Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
         avatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
         avatar.setStrokeWidth(2);
         SVGPath avatarSvg = createIcon(ICON_AVATAR, 20, c(L_PRIMARY, D_PRIMARY));
-        StackPane avatarStack = new StackPane(avatar, avatarSvg);
+        avatarStack.getChildren().addAll(avatar, avatarSvg);
 
         userBox.setOnMouseEntered(e -> {
             uName.setFill(Color.web(L_PRIMARY));
@@ -371,26 +263,29 @@ public class LuminaAcademyFX extends Application {
             avatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
         });
 
-        userBox.getChildren().addAll(uText, avatarStack);
-
-        rightContainer.getChildren().addAll(notifBtn, helpBtn, separator, userBox);
-
-        head.getChildren().addAll(searchBox, spacer, rightContainer);
-
         themeUpdaters.add(() -> {
-            head.setStyle("-fx-background-color: " + c(L_WHITE, D_WHITE) + "; -fx-border-color: transparent transparent " + c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH) + " transparent;");
+            String hbg = c(L_WHITE, D_WHITE);
+            String hborder = c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH);
+            header.setStyle("-fx-background-color: " + hbg + "; -fx-border-color: transparent transparent " + hborder + " transparent;");
+            searchIcon.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
             bellIcon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
             helpIcon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
-            separator.setFill(Color.web(c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
+            headerSeparator.setFill(Color.web(c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
             uName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
             uEmail.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
             avatar.setFill(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
             avatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
             avatarSvg.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
-            searchIcon.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
         });
+    }
 
-        return head;
+    private void setupKpis() {
+        kpiGrid.getChildren().addAll(
+            createKpiCard("Total Estudiantes", "1,250", L_SECONDARY_FIXED, L_SECONDARY, ICON_PERSON_PIN),
+            createKpiCard("Total Cursos", "35", L_PRIMARY_FIXED, L_PRIMARY, ICON_TRENDING_UP),
+            createKpiCard("Profesores", "42", L_TERTIARY_FIXED, L_TERTIARY, ICON_SCHOOL),
+            createKpiCard("Asistencia Estudiantes", "92%", L_SECONDARY_FIXED, L_SECONDARY, ICON_CHECK_CIRCLE)
+        );
     }
 
     private VBox createKpiCard(String label, String value, String lightBg, String iconColor, String iconPath) {
@@ -400,8 +295,20 @@ public class LuminaAcademyFX extends Application {
         card.getStyleClass().add("glass-card");
 
         Circle iconCircle = new Circle(16);
-        SVGPath iconSvg = createIcon(iconPath, 16, iconColor);
+        SVGPath iconSvg = createIcon(iconPath, 16, "#FFFFFF");
         StackPane iconStack = new StackPane(iconCircle, iconSvg);
+
+        ScaleTransition st = new ScaleTransition(Duration.millis(200), iconStack);
+        card.setOnMouseEntered(e -> {
+            st.setFromX(1.0); st.setFromY(1.0);
+            st.setToX(1.1); st.setToY(1.1);
+            st.playFromStart();
+        });
+        card.setOnMouseExited(e -> {
+            st.setFromX(1.1); st.setFromY(1.1);
+            st.setToX(1.0); st.setToY(1.0);
+            st.playFromStart();
+        });
 
         VBox text = new VBox(2);
         Text lbl = new Text(label.toUpperCase());
@@ -416,7 +323,7 @@ public class LuminaAcademyFX extends Application {
 
         themeUpdaters.add(() -> {
             iconCircle.setFill(Color.web(c(lightBg, D_SURFACE_CONTAINER)));
-            iconSvg.setFill(Color.web(c(iconColor, D_PRIMARY)));
+            iconSvg.setFill(Color.web(c("#FFFFFF", iconColor)));
             lbl.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
             val.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
         });
@@ -424,16 +331,13 @@ public class LuminaAcademyFX extends Application {
         return wrapper;
     }
 
-    private VBox createCourseManagement() {
-        VBox panel = new VBox(0);
-        panel.getStyleClass().add("glass-card");
-        panel.setPadding(new Insets(0));
-
+    private void setupCourseManagement() {
         HBox head = new HBox();
         head.setPadding(new Insets(12));
         head.setAlignment(Pos.CENTER_LEFT);
-        Text title = new Text("Gestión de Cursos");
+        Text title = new Text("Gestion de Cursos");
         title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
+        title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         Button btnAll = new Button("Ver todos");
@@ -445,7 +349,7 @@ public class LuminaAcademyFX extends Application {
 
         HBox cols = new HBox();
         cols.setPadding(new Insets(8, 0, 8, 0));
-        cols.setStyle("-fx-background-color: " + L_SURFACE_LOW + "; -fx-background-radius: 8;");
+        cols.setStyle("-fx-background-color: " + c(L_SURFACE_LOW, D_SURFACE_LOW) + "; -fx-background-radius: 8;");
         cols.getChildren().addAll(
             createColH("CURSO", 180),
             createColH("PROFESOR", 180),
@@ -455,20 +359,17 @@ public class LuminaAcademyFX extends Application {
 
         table.getChildren().addAll(cols);
         table.getChildren().addAll(
-            createCourseRow("Introducción a la IA", "Dr. Roberto Sánchez", "32 Estudiantes", 0.92, "9.2"),
-            createCourseRow("Cálculo Avanzado", "Dra. Elena Méndez", "28 Estudiantes", 0.78, "7.8"),
+            createCourseRow("Introduccion a la IA", "Dr. Roberto Sanchez", "32 Estudiantes", 0.92, "9.2"),
+            createCourseRow("Calculo Avanzado", "Dra. Elena Mendez", "28 Estudiantes", 0.78, "7.8"),
             createCourseRow("Literatura Moderna", "Prof. Juan Carlos Rico", "40 Estudiantes", 0.85, "8.5"),
-            createCourseRow("Diseño UX/UI", "Mtra. Sofía Valdéz", "24 Estudiantes", 0.88, "8.8")
+            createCourseRow("Diseno UX/UI", "Mtra. Sofia Valdez", "24 Estudiantes", 0.88, "8.8")
         );
 
-        panel.getChildren().addAll(head, table);
-
+        coursesBox.getChildren().addAll(head, table);
         themeUpdaters.add(() -> {
             title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
             cols.setStyle("-fx-background-color: " + c(L_SURFACE_LOW, D_SURFACE_LOW) + "; -fx-background-radius: 8;");
         });
-
-        return panel;
     }
 
     private HBox createColH(String t, double w) {
@@ -476,7 +377,6 @@ public class LuminaAcademyFX extends Application {
         txt.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
         HBox box = new HBox(txt);
         box.setPrefWidth(w);
-
         themeUpdaters.add(() -> txt.setFill(Color.web(c(L_OUTLINE, D_OUTLINE))));
         return box;
     }
@@ -489,12 +389,14 @@ public class LuminaAcademyFX extends Application {
 
         Text tName = new Text(name);
         tName.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13));
+        tName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
 
         HBox progBox = new HBox(10);
         progBox.setAlignment(Pos.CENTER);
 
         Rectangle bg = new Rectangle(50, 5);
         bg.setArcWidth(5); bg.setArcHeight(5);
+        bg.setFill(Color.web(c(L_SURFACE_CONTAINER, D_SURFACE_CONTAINER)));
         Rectangle fill = new Rectangle(50 * prog, 5, Color.web(c(L_PRIMARY, D_PRIMARY)));
         fill.setArcWidth(5); fill.setArcHeight(5);
 
@@ -509,8 +411,10 @@ public class LuminaAcademyFX extends Application {
         stBox.setAlignment(Pos.CENTER_LEFT);
         Text stNum = new Text(stParts[0]);
         stNum.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12));
+        stNum.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
         Text stLabel = new Text(stParts[1]);
         stLabel.setFont(Font.font("Plus Jakarta Sans", 10));
+        stLabel.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
         stBox.getChildren().addAll(stNum, stLabel);
 
         HBox hName = new HBox(tName);
@@ -536,14 +440,11 @@ public class LuminaAcademyFX extends Application {
         return row;
     }
 
-    private VBox createPerformancePanel() {
-        VBox panel = new VBox(8);
-        panel.getStyleClass().add("glass-card");
-        panel.setPadding(new Insets(12));
-
+    private void setupPerformancePanel() {
         HBox head = new HBox();
-        Text title = new Text("Desempeño");
+        Text title = new Text("Desempeno");
         title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
+        title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         StackPane moreBtn = new StackPane();
@@ -555,6 +456,7 @@ public class LuminaAcademyFX extends Application {
 
         Text sub = new Text("Promedio general mensual (6 meses)");
         sub.setFont(Font.font("Plus Jakarta Sans", 12));
+        sub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
 
         HBox chart = new HBox(12);
         chart.setAlignment(Pos.BOTTOM_CENTER);
@@ -573,6 +475,7 @@ public class LuminaAcademyFX extends Application {
             bar.setArcWidth(10); bar.setArcHeight(10);
             Text lbl = new Text(labels[i]);
             lbl.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
+            lbl.setFill(Color.web(c(i == 4 ? L_PRIMARY : L_OUTLINE, D_ON_SURFACE)));
             barBox.getChildren().addAll(bar, lbl);
             chart.getChildren().add(barBox);
             bars.add(bar);
@@ -582,13 +485,16 @@ public class LuminaAcademyFX extends Application {
         HBox footer = new HBox();
         Text fT = new Text("Crecimiento Semestral");
         fT.setFont(Font.font("Plus Jakarta Sans", 12));
+        fT.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
         Region s2 = new Region();
         HBox.setHgrow(s2, Priority.ALWAYS);
         Label fV = new Label("+12.4%");
         fV.getStyleClass().add("growth-badge");
         footer.getChildren().addAll(fT, s2, fV);
 
-        panel.getChildren().addAll(head, sub, chart, footer);
+        performanceBox.getChildren().addAll(head, sub, chart, footer);
+        performanceBox.setPadding(new Insets(12));
+        performanceBox.setSpacing(8);
 
         themeUpdaters.add(() -> {
             title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
@@ -600,26 +506,21 @@ public class LuminaAcademyFX extends Application {
                 barLabels.get(i).setFill(Color.web(c(i == 4 ? L_PRIMARY : L_OUTLINE, D_ON_SURFACE)));
             }
         });
-
-        return panel;
     }
 
-    private VBox createSchedulePanel() {
-        VBox panel = new VBox(8);
-        panel.getStyleClass().add("glass-card");
-        panel.setPadding(new Insets(12));
-
+    private void setupSchedulePanel() {
         Text title = new Text("Horario de Hoy");
         title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
+        title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
 
         VBox list = new VBox(6);
         list.getChildren().addAll(
-            createScheduleRow("08:00", "Matemáticas Avanzadas", "Salón 402 • Prof. Sánchez", false),
-            createScheduleRow("10:00", "Historia Universal", "Biblioteca • Dra. Méndez", false),
-            createScheduleRow("12:00", "Química Orgánica", "Laboratorio B • Prof. Rico", false),
-            createScheduleRow("14:00", "Física Cuántica", "Laboratorio A • Prof. Einstein", false),
-            createScheduleRow("16:00", "Arte Moderno", "Galería • Prof. Picasso", false),
-            createScheduleRow("18:00", "Inglés Técnico", "Aula 10 • Prof. Smith", false)
+            createScheduleRow("08:00", "Matematicas Avanzadas", "Salon 402 - Prof. Sanchez", false),
+            createScheduleRow("10:00", "Historia Universal", "Biblioteca - Dra. Mendez", false),
+            createScheduleRow("12:00", "Quimica Organica", "Laboratorio B - Prof. Rico", false),
+            createScheduleRow("14:00", "Fisica Cuantica", "Laboratorio A - Prof. Einstein", false),
+            createScheduleRow("16:00", "Arte Moderno", "Galeria - Prof. Picasso", false),
+            createScheduleRow("18:00", "Ingles Tecnico", "Aula 10 - Prof. Smith", false)
         );
 
         ScrollPane sp = new ScrollPane(list);
@@ -627,11 +528,11 @@ public class LuminaAcademyFX extends Application {
         sp.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
         sp.setPrefHeight(220);
 
-        panel.getChildren().addAll(title, sp);
+        scheduleBox.getChildren().addAll(title, sp);
+        scheduleBox.setPadding(new Insets(12));
+        scheduleBox.setSpacing(8);
 
         themeUpdaters.add(() -> title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE))));
-
-        return panel;
     }
 
     private HBox createScheduleRow(String time, String subj, String det, boolean isFirst) {
@@ -645,10 +546,10 @@ public class LuminaAcademyFX extends Application {
         StackPane iconStack = new StackPane(iconCircle, clockIcon);
 
         Color hoverBg, hoverText;
-        if (subj.contains("Matemáticas") || subj.contains("Física")) {
+        if (subj.contains("Matematicas") || subj.contains("Fisica")) {
             hoverBg = Color.web(L_PRIMARY);
             hoverText = Color.WHITE;
-        } else if (subj.contains("Historia") || subj.contains("Inglés")) {
+        } else if (subj.contains("Historia") || subj.contains("Ingles")) {
             hoverBg = Color.web(L_SECONDARY);
             hoverText = Color.WHITE;
         } else {
@@ -667,8 +568,10 @@ public class LuminaAcademyFX extends Application {
         VBox text = new VBox(4);
         Text t1 = new Text(time + " - " + subj);
         t1.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 15));
+        t1.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
         Text t2 = new Text(det);
         t2.setFont(Font.font("Plus Jakarta Sans", 13));
+        t2.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
         text.getChildren().addAll(t1, t2);
 
         Region spacer = new Region();
@@ -693,39 +596,27 @@ public class LuminaAcademyFX extends Application {
         return row;
     }
 
-    private String getInternalCSS() {
-        boolean d = theme.isDark();
-        String bg = d ? D_BG : L_BG;
-        String white = d ? D_WHITE : L_WHITE;
-        String surfaceLow = d ? D_SURFACE_LOW : L_SURFACE_LOW;
-        String surfaceContainer = d ? D_SURFACE_CONTAINER : L_SURFACE_CONTAINER;
-        String surfaceContainerHigh = d ? D_SURFACE_CONTAINER_HIGH : L_SURFACE_CONTAINER_HIGH;
-        String onSurface = d ? D_ON_SURFACE : L_ON_SURFACE;
-        String onSurfaceVariant = d ? D_ON_SURFACE_VARIANT : L_ON_SURFACE_VARIANT;
-        String outline = d ? D_OUTLINE : L_OUTLINE;
-        String primary = d ? D_PRIMARY : L_PRIMARY;
-        String primaryContainer = d ? D_PRIMARY_CONTAINER : L_PRIMARY_CONTAINER;
-        String primaryFixed = d ? D_PRIMARY_FIXED : L_PRIMARY_FIXED;
-
-        return ".nav-item { -fx-background-color: transparent; -fx-cursor: hand; -fx-text-fill: " + onSurfaceVariant + "; } " +
-                ".nav-item:hover { -fx-background-color: " + surfaceLow + "; -fx-cursor: hand; -fx-background-radius: 12; -fx-text-fill: " + primary + "; } " +
-               ".sidebar-active { -fx-background-color: " + primaryContainer + "; -fx-cursor: hand; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(37,99,235,0.3), 16, 0, 0, 8); } " +
-               ".search-container { -fx-background-color: " + surfaceLow + "; -fx-background-radius: 32; -fx-border-color: " + surfaceContainer + "; -fx-border-radius: 32; } " +
-               ".search-input { -fx-background-color: transparent; -fx-border-color: transparent; -fx-font-family: 'Plus Jakarta Sans'; -fx-text-fill: " + onSurface + "; -fx-prompt-text-fill: " + outline + "; } " +
-               ".glass-card { -fx-background-color: " + white + "; -fx-background-radius: 16; -fx-border-color: " + surfaceContainer + "; -fx-border-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.05), 20, 0, 0, 4); } " +
-               ".course-row { -fx-border-color: transparent transparent " + surfaceContainer + " transparent; } " +
-               ".course-row:hover { -fx-background-color: " + surfaceLow + "; } " +
-               ".schedule-row { -fx-border-color: transparent transparent " + surfaceContainer + " transparent; } " +
-               ".schedule-row:hover { -fx-background-color: " + surfaceLow + "; } " +
-               ".text-button { -fx-text-fill: " + primary + "; -fx-background-color: transparent; -fx-underline: false; -fx-cursor: hand; -fx-font-weight: bold; } " +
-               ".text-button:hover { -fx-underline: true; } " +
-               ".icon-button { -fx-background-radius: 32; -fx-cursor: hand; } " +
-                ".growth-badge { -fx-background-color: " + primaryFixed + "; -fx-text-fill: " + primary + "; -fx-font-weight: bold; -fx-padding: 4 12 4 12; -fx-background-radius: 16; } " +
-               ".fab-button { -fx-background-color: " + primary + "; -fx-background-radius: 32; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.4), 15, 0, 0, 8); } " +
-               ".fab-button:hover { -fx-scale-x: 1.1; -fx-scale-y: 1.1; }";
+    private SVGPath createIcon(String pathData, double size, String fill) {
+        SVGPath icon = new SVGPath();
+        icon.setContent(pathData);
+        icon.setFill(Color.web(fill));
+        double scale = size / 24.0;
+        icon.setScaleX(scale);
+        icon.setScaleY(scale);
+        return icon;
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    private void setupTheme() {
+        h1.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 32));
+        h1.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+        sub.setFont(Font.font("Plus Jakarta Sans", 16));
+        sub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+
+        theme.addListener(() -> {
+            for (Runnable r : themeUpdaters) r.run();
+        });
+        
+        // Trigger initial update
+        for (Runnable r : themeUpdaters) r.run();
     }
 }

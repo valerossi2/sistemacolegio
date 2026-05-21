@@ -1,29 +1,30 @@
-package com.example.demo;
+package com.example.demo.theme;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ThemeManager {
 
-    public static final String COLOR_PRIMARY = "#2D6AEE";
+    public static final String COLOR_PRIMARY = "#004ac6";
+    public static final String COLOR_PRIMARY_CONTAINER = "#2563eb";
     public static final String COLOR_RED = "#DC2626";
     public static final String COLOR_RED_HOVER = "#B91C1C";
     public static final String COLOR_GREEN = "#22C55E";
 
-    public static final String LIGHT_BG = "#F4F7FE";
+    public static final String LIGHT_BG = "#f9f9ff";
     public static final String LIGHT_CARD = "#ffffff";
-    public static final String LIGHT_CARD_BORDER = "#E2E8F0";
-    public static final String LIGHT_TEXT = "#1E293B";
-    public static final String LIGHT_TEXT_SEC = "#64748B";
-    public static final String LIGHT_TEXT_MUTED = "#94A3B8";
-    public static final String LIGHT_INPUT_BG = "#F8FAFC";
-    public static final String LIGHT_INPUT_BORDER = "#E2E8F0";
-    public static final String LIGHT_TOGGLE_BG = "#F1F5F9";
-    public static final String LIGHT_DIVIDER = "#E2E8F0";
-    public static final String LIGHT_HEADER_BG = "#F8FAFC";
+    public static final String LIGHT_CARD_BORDER = "#e7eeff";
+    public static final String LIGHT_TEXT = "#111c2d";
+    public static final String LIGHT_TEXT_SEC = "#434655";
+    public static final String LIGHT_TEXT_MUTED = "#737686";
+    public static final String LIGHT_INPUT_BG = "#f0f3ff";
+    public static final String LIGHT_INPUT_BORDER = "#c3c6d7";
+    public static final String LIGHT_TOGGLE_BG = "#e7eeff";
+    public static final String LIGHT_DIVIDER = "#e7eeff";
+    public static final String LIGHT_HEADER_BG = "#ffffff";
     public static final String LIGHT_SIDEBAR_BG = "#ffffff";
-    public static final String LIGHT_ROW_HOVER = "#F8FAFC";
-    public static final String LIGHT_ICON_CIRCLE_BG = "#F4F4F5";
+    public static final String LIGHT_ROW_HOVER = "#f0f3ff";
+    public static final String LIGHT_ICON_CIRCLE_BG = "#dbe1ff";
 
     public static final String DARK_BG = "#0F172A";
     public static final String DARK_CARD = "#1E293B";

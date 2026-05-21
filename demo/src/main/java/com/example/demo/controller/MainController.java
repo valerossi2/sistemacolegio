@@ -376,6 +376,7 @@ public class MainController {
         Text txt = new Text(t);
         txt.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
         HBox box = new HBox(txt);
+        box.setPadding(new Insets(0, 0, 0, 10));
         box.setPrefWidth(w);
         themeUpdaters.add(() -> txt.setFill(Color.web(c(L_OUTLINE, D_OUTLINE))));
         return box;

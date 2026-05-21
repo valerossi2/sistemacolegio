@@ -22,7 +22,7 @@ public class Configuracion {
     public Configuracion(ThemeManager theme) {
         this.theme = theme;
         root = new VBox();
-        root.setPadding(new Insets(24, 32, 16, 32));
+        root.setPadding(new Insets(24, 32, 24, 32));
         root.setMaxWidth(900);
 
         Text title = new Text("Configuracion del Sistema");
@@ -33,9 +33,9 @@ public class Configuracion {
 
         VBox headerBox = new VBox(2);
         headerBox.getChildren().addAll(title, subtitle);
-        VBox.setMargin(headerBox, new Insets(0, 0, 12, 0));
+        VBox.setMargin(headerBox, new Insets(0, 0, 16, 0));
 
-        VBox content = new VBox(12);
+        VBox content = new VBox(16);
         content.setMaxWidth(820);
 
         HBox profileSection = createProfileSection();
@@ -68,7 +68,7 @@ public class Configuracion {
 
     private HBox createProfileSection() {
         HBox section = new HBox();
-        section.setPadding(new Insets(16, 20, 16, 20));
+        section.setPadding(new Insets(20, 24, 20, 24));
         section.setStyle(cardStyle());
 
         HBox leftBox = new HBox(12);
@@ -134,13 +134,13 @@ public class Configuracion {
 
     private VBox createPreferencesSection() {
         VBox section = new VBox();
-        section.setPadding(new Insets(16, 20, 16, 20));
+        section.setPadding(new Insets(20, 24, 20, 24));
         section.setStyle(cardStyle());
 
         Text sectionTitle = new Text("Preferencias de la Cuenta");
         sectionTitle.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         sectionTitle.setFill(Color.web(theme.text()));
-        VBox.setMargin(sectionTitle, new Insets(0, 0, 8, 0));
+        VBox.setMargin(sectionTitle, new Insets(0, 0, 12, 0));
 
         HBox idiomaRow = createIdiomaRow();
         HBox temaRow = createTemaRow();
@@ -158,7 +158,7 @@ public class Configuracion {
     private HBox createIdiomaRow() {
         HBox row = new HBox();
         row.setAlignment(Pos.CENTER_LEFT);
-        row.setPadding(new Insets(10, 0, 10, 0));
+        row.setPadding(new Insets(12, 0, 12, 0));
 
         Circle iconCircle = new Circle(16, Color.web(theme.isDark() ? "#1E3A5F" : "#dbe1ff"));
         SVGPath globeIcon = new SVGPath();
@@ -204,7 +204,7 @@ public class Configuracion {
     private HBox createTemaRow() {
         HBox row = new HBox();
         row.setAlignment(Pos.CENTER_LEFT);
-        row.setPadding(new Insets(10, 0, 0, 0));
+        row.setPadding(new Insets(12, 0, 0, 0));
 
         Circle iconCircle = new Circle(16);
         iconCircle.setFill(Color.web("#dbe1ff"));
@@ -278,13 +278,13 @@ public class Configuracion {
 
     private VBox createSecuritySection() {
         VBox section = new VBox();
-        section.setPadding(new Insets(16, 20, 16, 20));
+        section.setPadding(new Insets(20, 24, 20, 24));
         section.setStyle(cardStyle());
 
         Text sectionTitle = new Text("Seguridad");
         sectionTitle.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         sectionTitle.setFill(Color.web(theme.text()));
-        VBox.setMargin(sectionTitle, new Insets(0, 0, 8, 0));
+        VBox.setMargin(sectionTitle, new Insets(0, 0, 12, 0));
 
         Button changePwdBtn = new Button("Cambiar Contrasena");
         changePwdBtn.setMaxWidth(Double.MAX_VALUE);
@@ -327,11 +327,11 @@ public class Configuracion {
         modal.initModality(Modality.APPLICATION_MODAL);
         modal.initStyle(StageStyle.UNDECORATED);
         modal.setWidth(460);
-        modal.setHeight(540);
+        modal.setHeight(560);
 
         VBox dialog = new VBox();
         dialog.setPadding(new Insets(28));
-        dialog.setSpacing(16);
+        dialog.setSpacing(20);
         dialog.setMaxWidth(460);
         String dialogBg = theme.isDark() ? "#1E293B" : "#FFFFFF";
         dialog.setStyle("-fx-background-color: " + dialogBg + "; -fx-background-radius: 20; " +
@@ -355,8 +355,9 @@ public class Configuracion {
         closeBtn.setOnMouseClicked(e -> modal.close());
         topBar.getChildren().addAll(modalTitle, sp, closeBtn);
 
-        VBox avatarSection = new VBox();
+        VBox avatarSection = new VBox(8);
         avatarSection.setAlignment(Pos.CENTER);
+        
         StackPane avatarOuter = new StackPane();
         Circle avatarBig = new Circle(50, Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
         SVGPath avatarBigIcon = new SVGPath();
@@ -364,9 +365,10 @@ public class Configuracion {
         avatarBigIcon.setScaleX(2);
         avatarBigIcon.setScaleY(2);
         avatarBigIcon.setFill(Color.web(theme.textSec()));
+        
         StackPane cameraOverlay = new StackPane();
-        cameraOverlay.setPrefSize(32, 32);
-        cameraOverlay.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-background-radius: 16; " +
+        cameraOverlay.setPrefSize(30, 30);
+        cameraOverlay.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-background-radius: 15; " +
             "-fx-cursor: hand;");
         SVGPath cameraIcon = new SVGPath();
         cameraIcon.setContent("M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z");
@@ -374,21 +376,31 @@ public class Configuracion {
         cameraIcon.setScaleY(0.6);
         cameraIcon.setFill(Color.WHITE);
         cameraOverlay.getChildren().add(cameraIcon);
-        cameraOverlay.setTranslateX(40);
-        cameraOverlay.setTranslateY(40);
+        cameraOverlay.setTranslateX(35);
+        cameraOverlay.setTranslateY(35);
+        
         avatarOuter.getChildren().addAll(avatarBig, avatarBigIcon, cameraOverlay);
-        avatarSection.getChildren().add(avatarOuter);
+        Text changePhotoText = new Text("Cambiar Foto");
+        changePhotoText.setFont(Font.font("Inter", FontWeight.MEDIUM, 12));
+        changePhotoText.setFill(Color.web(theme.muted()));
+        avatarSection.getChildren().addAll(avatarOuter, changePhotoText);
         VBox.setMargin(avatarSection, new Insets(0, 0, 4, 0));
 
         VBox fields = new VBox(12);
+        VBox nameField = createInputField("Nombre Completo", "Admin User");
+        TextField nameTf = (TextField) nameField.getChildren().get(1);
+        nameTf.setStyle(nameTf.getStyle() + "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-width: 2;");
+        
         fields.getChildren().addAll(
-            createInputField("Nombre Completo", "Admin User"),
-            createInputField("Correo Electronico", "admin@lumina.edu"),
-            createInputField("Telefono", "+52 55 1234 5678")
+            nameField,
+            createInputField("Correo Electrónico", "admin@lumina.edu"),
+            createInputField("Cargo/Rol", "Admin")
         );
 
+        HBox buttonBox = new HBox(12);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
         Button saveBtn = new Button("Guardar Cambios");
-        saveBtn.setMaxWidth(Double.MAX_VALUE);
+        saveBtn.setPrefWidth(160);
         saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
             "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0; " +
@@ -403,18 +415,28 @@ public class Configuracion {
             "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.3), 15, 0, 0, 8);"));
         saveBtn.setOnMouseClicked(e -> modal.close());
 
-        dialog.getChildren().addAll(topBar, avatarSection, fields, saveBtn);
+        Button cancelBtn = new Button("Cancelar");
+        cancelBtn.setPrefWidth(160);
+        cancelBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        cancelBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "#334155" : "white") + "; " +
+            "-fx-text-fill: " + theme.text() + "; -fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0; " +
+            "-fx-border-color: " + (theme.isDark() ? "#475569" : "#E2E8F0") + "; -fx-border-radius: 10; -fx-border-width: 1;");
+        cancelBtn.setOnMouseClicked(e -> modal.close());
+
+        buttonBox.getChildren().addAll(saveBtn, cancelBtn);
+
+        dialog.getChildren().addAll(topBar, avatarSection, fields, buttonBox);
 
         StackPane backdrop = new StackPane(dialog);
         backdrop.setPadding(new Insets(80));
-        String backdropBg = "rgba(0,0,0,0.5)";
+        String backdropBg = "transparent";
         backdrop.setStyle("-fx-background-color: " + backdropBg + ";");
 
         Scene scene = new Scene(backdrop);
         modal.setScene(scene);
         modal.showAndWait();
     }
-
+ 
     private VBox createInputField(String label, String value) {
         VBox field = new VBox(6);
         Text lbl = new Text(label);
@@ -432,7 +454,7 @@ public class Configuracion {
 
     private VBox createLogoutSection() {
         VBox section = new VBox();
-        VBox.setMargin(section, new Insets(4, 0, 0, 0));
+        VBox.setMargin(section, new Insets(8, 0, 0, 0));
 
         Button logoutBtn = new Button("Cerrar Sesion");
         logoutBtn.setMaxWidth(Double.MAX_VALUE);

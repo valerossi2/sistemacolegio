@@ -471,36 +471,13 @@ public class Configuracion {
         closeBtn.setOnMouseClicked(e -> modal.close());
         topBar.getChildren().addAll(modalTitle, sp, closeBtn);
 
-        VBox avatarSection = new VBox(8);
-        avatarSection.setAlignment(Pos.CENTER);
-        
-        StackPane avatarOuter = new StackPane();
-        Circle avatarBig = new Circle(36, Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
-        SVGPath avatarBigIcon = new SVGPath();
-        avatarBigIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
-        avatarBigIcon.setScaleX(1.3);
-        avatarBigIcon.setScaleY(1.3);
-        avatarBigIcon.setFill(Color.web(theme.textSec()));
-        
-        StackPane cameraOverlay = new StackPane();
-        cameraOverlay.setPrefSize(18, 18);
-        cameraOverlay.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-background-radius: 9; " +
-            "-fx-cursor: hand;");
-        SVGPath cameraIcon = new SVGPath();
-        cameraIcon.setContent("M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z");
-        cameraIcon.setScaleX(0.4);
-        cameraIcon.setScaleY(0.4);
-        cameraIcon.setFill(Color.WHITE);
-        cameraOverlay.getChildren().add(cameraIcon);
-        cameraOverlay.setTranslateX(24);
-        cameraOverlay.setTranslateY(24);
-        
-        avatarOuter.getChildren().addAll(avatarBig, avatarBigIcon, cameraOverlay);
-        Text changePhotoText = new Text(lang.get("config.editProfile.photo"));
-        changePhotoText.setFont(Font.font("Inter", FontWeight.MEDIUM, 12));
-        changePhotoText.setFill(Color.web(theme.muted()));
-        avatarSection.getChildren().addAll(avatarOuter, changePhotoText);
-        VBox.setMargin(avatarSection, new Insets(0, 0, 4, 0));
+        Circle avatarCircle = new Circle(16, Color.web(theme.isDark() ? "#1E3A5F" : "#dbe1ff"));
+        SVGPath avatarIcon = new SVGPath();
+        avatarIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
+        avatarIcon.setScaleX(0.7);
+        avatarIcon.setScaleY(0.7);
+        avatarIcon.setFill(Color.web(ThemeManager.COLOR_PRIMARY));
+        StackPane avatarOuter = new StackPane(avatarCircle, avatarIcon);
 
         VBox fields = new VBox(12);
         VBox nameField = createInputField(lang.get("config.editProfile.name"), "Admin User");
@@ -535,7 +512,7 @@ public class Configuracion {
 
         buttonBox.getChildren().addAll(saveBtn, cancelBtn);
 
-        dialog.getChildren().addAll(topBar, avatarSection, fields, buttonBox);
+        dialog.getChildren().addAll(topBar, avatarOuter, fields, buttonBox);
 
         Group dialogGroup = new Group(dialog);
         dialogGroup.setScaleX(scale);

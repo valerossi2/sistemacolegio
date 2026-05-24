@@ -279,7 +279,7 @@ public class Configuracion {
 
         StackPane sunBtn = new StackPane();
         sunBtn.setPrefSize(28, 28);
-        sunBtn.setStyle("-fx-background-radius: 32; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 4, 0, 0, 2);");
+        sunBtn.setStyle("-fx-background-radius: 32;");
         SVGPath sunSmall = new SVGPath();
         sunSmall.setContent("M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM11 2h2v3h-2zM11 19h2v3h-2zM2 11h3v2H2zM19 11h3v2h-3zM5.64 5.64l1.41-1.41 2.12 2.12-1.41 1.41zM14.83 16.24l1.41-1.41 2.12 2.12-1.41 1.41zM5.64 18.36l2.12-2.12 1.41 1.41-2.12 2.12zM14.83 7.76l2.12-2.12 1.41 1.41-2.12 2.12z");
         sunSmall.setFill(Color.web(ThemeManager.COLOR_PRIMARY));
@@ -311,9 +311,9 @@ public class Configuracion {
             themeDesc.setFill(Color.web(theme.muted()));
             toggleGroup.setStyle("-fx-background-color: " + theme.toggleGroupBg() + "; -fx-background-radius: 32;");
             sunBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "transparent" : "white") + "; " +
-                "-fx-background-radius: 32; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 4, 0, 0, 2);");
+                "-fx-background-radius: 32;");
             moonBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "white" : "transparent") + "; " +
-                "-fx-background-radius: 32; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 4, 0, 0, 2);");
+                "-fx-background-radius: 32;");
             moonIcon.setFill(Color.web(theme.isDark() ? ThemeManager.COLOR_PRIMARY : theme.muted()));
             sunSmall.setFill(Color.web(theme.isDark() ? theme.muted() : ThemeManager.COLOR_PRIMARY));
         };
@@ -510,15 +510,15 @@ public class Configuracion {
         saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
             "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.3), 15, 0, 0, 8);");
+            ");");
         saveBtn.setOnMouseEntered(e -> saveBtn.setStyle("-fx-background-color: #1D4ED8; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 10; " +
             "-fx-cursor: hand; -fx-padding: 12 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.4), 20, 0, 0, 10);"));
+            ");"));
         saveBtn.setOnMouseExited(e -> saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 10; " +
             "-fx-cursor: hand; -fx-padding: 12 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.3), 15, 0, 0, 8);"));
+            ");"));
         saveBtn.setOnMouseClicked(e -> modal.close());
 
         Button cancelBtn = new Button(lang.get("config.editProfile.cancel"));
@@ -598,15 +598,15 @@ public class Configuracion {
         saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 13));
         saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
             "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.3), 15, 0, 0, 8);");
+            ");");
         saveBtn.setOnMouseEntered(e -> saveBtn.setStyle("-fx-background-color: #1D4ED8; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 13; -fx-background-radius: 10; " +
             "-fx-cursor: hand; -fx-padding: 12 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.4), 20, 0, 0, 10);"));
+            ");"));
         saveBtn.setOnMouseExited(e -> saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 13; -fx-background-radius: 10; " +
             "-fx-cursor: hand; -fx-padding: 12 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.3), 15, 0, 0, 8);"));
+            ");"));
         saveBtn.setOnMouseClicked(e -> modal.close());
 
         Button cancelBtn = new Button(lang.get("config.changePassword.cancel"));
@@ -671,18 +671,18 @@ public class Configuracion {
         logoutBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         logoutBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_RED + "; -fx-text-fill: white; " +
             "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(220,38,38,0.3), 15, 0, 0, 8);");
+            ");");
 
         logoutBtn.setOnMouseEntered(e -> logoutBtn.setStyle(
             "-fx-background-color: " + ThemeManager.COLOR_RED_HOVER + "; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
             "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(220,38,38,0.4), 20, 0, 0, 10);"));
+            ");"));
         logoutBtn.setOnMouseExited(e -> logoutBtn.setStyle(
             "-fx-background-color: " + ThemeManager.COLOR_RED + "; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
             "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(220,38,38,0.3), 15, 0, 0, 8);"));
+            ");"));
 
         section.getChildren().add(logoutBtn);
 
@@ -690,7 +690,7 @@ public class Configuracion {
             logoutBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_RED + "; -fx-text-fill: white; " +
                 "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
                 "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
-                "-fx-effect: dropshadow(three-pass-box, rgba(220,38,38,0.3), 15, 0, 0, 8);");
+                ");");
         });
 
         return section;

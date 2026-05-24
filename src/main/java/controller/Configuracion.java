@@ -504,14 +504,17 @@ public class Configuracion {
 
         VBox fields = new VBox(12);
         VBox nameField = createInputField(lang.get("config.editProfile.name"), "Admin User");
+        VBox emailField = createInputField(lang.get("config.editProfile.email"), "admin@lumina.edu");
+        VBox roleField = createInputField(lang.get("config.editProfile.role"), "Admin");
+
         TextField nameTf = (TextField) nameField.getChildren().get(1);
-        nameTf.setStyle(nameTf.getStyle() + "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-width: 2;");
-        
-        fields.getChildren().addAll(
-            nameField,
-            createInputField(lang.get("config.editProfile.email"), "admin@lumina.edu"),
-            createInputField(lang.get("config.editProfile.role"), "Admin")
-        );
+        TextField emailTf = (TextField) emailField.getChildren().get(1);
+        TextField roleTf = (TextField) roleField.getChildren().get(1);
+        addFocusBorder(nameTf);
+        addFocusBorder(emailTf);
+        addFocusBorder(roleTf);
+
+        fields.getChildren().addAll(nameField, emailField, roleField);
 
         HBox buttonBox = new HBox(12);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
@@ -602,6 +605,13 @@ public class Configuracion {
         VBox newPwdField = createPasswordField(lang.get("config.changePassword.new"), lang.get("config.changePassword.new"));
         VBox confirmPwdField = createPasswordField(lang.get("config.changePassword.confirm"), lang.get("config.changePassword.confirm"));
 
+        PasswordField oldPf = (PasswordField) oldPwdField.getChildren().get(1);
+        PasswordField newPf = (PasswordField) newPwdField.getChildren().get(1);
+        PasswordField confirmPf = (PasswordField) confirmPwdField.getChildren().get(1);
+        addFocusBorder(oldPf);
+        addFocusBorder(newPf);
+        addFocusBorder(confirmPf);
+
         fields.getChildren().addAll(oldPwdField, newPwdField, confirmPwdField);
 
         HBox buttonBox = new HBox(12);
@@ -668,6 +678,17 @@ public class Configuracion {
             "-fx-text-fill: " + theme.text() + ";");
         field.getChildren().addAll(lbl, tf);
         return field;
+    }
+
+    private void addFocusBorder(Control input) {
+        String baseStyle = input.getStyle();
+        input.focusedProperty().addListener((obs, old, focused) -> {
+            if (focused) {
+                input.setStyle(baseStyle + "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-width: 2;");
+            } else {
+                input.setStyle(baseStyle);
+            }
+        });
     }
 
     private VBox createLogoutSection() {

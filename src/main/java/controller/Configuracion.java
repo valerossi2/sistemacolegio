@@ -509,16 +509,13 @@ public class Configuracion {
         saveBtn.setPrefWidth(160);
         saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
-            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0; " +
-            ");");
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0;");
         saveBtn.setOnMouseEntered(e -> saveBtn.setStyle("-fx-background-color: #1D4ED8; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 10; " +
-            "-fx-cursor: hand; -fx-padding: 12 0; " +
-            ");"));
+            "-fx-cursor: hand; -fx-padding: 12 0;"));
         saveBtn.setOnMouseExited(e -> saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 10; " +
-            "-fx-cursor: hand; -fx-padding: 12 0; " +
-            ");"));
+            "-fx-cursor: hand; -fx-padding: 12 0;"));
         saveBtn.setOnMouseClicked(e -> modal.close());
 
         Button cancelBtn = new Button(lang.get("config.editProfile.cancel"));
@@ -597,16 +594,13 @@ public class Configuracion {
         saveBtn.setPrefWidth(180);
         saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 13));
         saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
-            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0; " +
-            ");");
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0;");
         saveBtn.setOnMouseEntered(e -> saveBtn.setStyle("-fx-background-color: #1D4ED8; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 13; -fx-background-radius: 10; " +
-            "-fx-cursor: hand; -fx-padding: 12 0; " +
-            ");"));
+            "-fx-cursor: hand; -fx-padding: 12 0;"));
         saveBtn.setOnMouseExited(e -> saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 13; -fx-background-radius: 10; " +
-            "-fx-cursor: hand; -fx-padding: 12 0; " +
-            ");"));
+            "-fx-cursor: hand; -fx-padding: 12 0;"));
         saveBtn.setOnMouseClicked(e -> modal.close());
 
         Button cancelBtn = new Button(lang.get("config.changePassword.cancel"));
@@ -670,27 +664,23 @@ public class Configuracion {
         logoutBtn.setMaxWidth(Double.MAX_VALUE);
         logoutBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         logoutBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_RED + "; -fx-text-fill: white; " +
-            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
-            ");");
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0;");
 
         logoutBtn.setOnMouseEntered(e -> logoutBtn.setStyle(
             "-fx-background-color: " + ThemeManager.COLOR_RED_HOVER + "; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
-            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
-            ");"));
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0;"));
         logoutBtn.setOnMouseExited(e -> logoutBtn.setStyle(
             "-fx-background-color: " + ThemeManager.COLOR_RED + "; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
-            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
-            ");"));
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0;"));
 
         section.getChildren().add(logoutBtn);
 
         theme.addListener(() -> {
             logoutBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_RED + "; -fx-text-fill: white; " +
                 "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
-                "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
-                ");");
+                "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0;");
         });
 
         return section;

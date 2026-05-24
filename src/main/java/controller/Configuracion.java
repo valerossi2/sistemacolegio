@@ -32,7 +32,7 @@ public class Configuracion {
     private double compactScale = 1.0;
     private VBox content;
     private Text title, subtitle;
-    private HBox profileSection;
+    private VBox profileSection;
     private VBox headerBox;
     private Text userName;
     private Button editBtn;
@@ -47,7 +47,7 @@ public class Configuracion {
     private static final String USER_DOB_KEY = "userDob";
     private static final String USER_PHONE_KEY = "userPhone";
 
-    private Text prefsTitle, langLabel, langDesc, themeLabel, themeDesc;
+    private Text profileTitle, prefsTitle, langLabel, langDesc, themeLabel, themeDesc;
     private Text secTitle;
     private Button changePwdBtn, resetPwdBtn, logoutBtn;
     private Button editModalTitle, editSaveBtn, editCancelBtn, editCloseBtn, editPhotoText;
@@ -115,27 +115,40 @@ public class Configuracion {
             "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.05), 20, 0, 0, 4);";
     }
 
-    private HBox createProfileSection() {
-        HBox section = new HBox();
+    private VBox createProfileSection() {
+        VBox section = new VBox();
         section.setPadding(new Insets(18, 24, 18, 24));
         section.setStyle(cardStyle());
 
-        HBox leftBox = new HBox(12);
+        profileTitle = new Text("Perfil del Usuario");
+        profileTitle.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        profileTitle.setFill(Color.web(theme.text()));
+
+        Region profileDivider = new Region();
+        profileDivider.setPrefHeight(1);
+        profileDivider.setStyle("-fx-background-color: " + theme.divider() + ";");
+        profileDivider.setOpacity(0.5);
+        VBox.setMargin(profileDivider, new Insets(8, 0, 12, 0));
+
+        HBox row = new HBox();
+        row.setAlignment(Pos.CENTER_LEFT);
+
+        HBox leftBox = new HBox(14);
         leftBox.setAlignment(Pos.CENTER_LEFT);
 
         StackPane avatarStack = new StackPane();
-        avatarBg = new Circle(22, Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
+        avatarBg = new Circle(28, Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
         profileAvatarIcon = new SVGPath();
         profileAvatarIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
-        profileAvatarIcon.setScaleX(0.9);
-        profileAvatarIcon.setScaleY(0.9);
+        profileAvatarIcon.setScaleX(1.1);
+        profileAvatarIcon.setScaleY(1.1);
         profileAvatarIcon.setFill(Color.web(theme.textSec()));
         avatarStack.getChildren().addAll(avatarBg, profileAvatarIcon);
 
-        Circle onlineDot = new Circle(4, Color.web(ThemeManager.COLOR_GREEN));
-        onlineDot.setTranslateX(15);
-        onlineDot.setTranslateY(15);
-        onlineDot.setStrokeWidth(1.5);
+        Circle onlineDot = new Circle(5, Color.web(ThemeManager.COLOR_GREEN));
+        onlineDot.setTranslateX(19);
+        onlineDot.setTranslateY(19);
+        onlineDot.setStrokeWidth(2);
         StackPane avatarWrapper = new StackPane(avatarStack, onlineDot);
 
         VBox nameBox = new VBox(0);
@@ -163,10 +176,13 @@ public class Configuracion {
             "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: " + (int)(8 * compactScale) + " " + (int)(24 * compactScale) + ";"));
         editBtn.setOnMouseClicked(e -> showEditProfileModal());
 
-        section.getChildren().addAll(leftBox, spacer, editBtn);
+        row.getChildren().addAll(leftBox, spacer, editBtn);
+        section.getChildren().addAll(profileTitle, profileDivider, row);
 
         theme.addListener(() -> {
             section.setStyle(cardStyle());
+            profileTitle.setFill(Color.web(theme.text()));
+            profileDivider.setStyle("-fx-background-color: " + theme.divider() + ";");
             if (profileAvatarIcon.isVisible()) avatarBg.setFill(Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
             if (profileAvatarIcon.isVisible()) profileAvatarIcon.setFill(Color.web(theme.textSec()));
             onlineDot.setStroke(Color.WHITE);
@@ -422,6 +438,7 @@ public class Configuracion {
         String fullName = (firstName + " " + lastName).trim();
         userName.setText(!fullName.isEmpty() ? fullName : lang.get("config.profile.name"));
         editBtn.setText(lang.get("config.profile.editBtn"));
+        profileTitle.setText(lang.get("config.profile.title"));
         prefsTitle.setText(lang.get("config.prefs.title"));
         langLabel.setText(lang.get("config.prefs.language"));
         langDesc.setText(lang.get("config.prefs.languageDesc"));
@@ -459,7 +476,7 @@ public class Configuracion {
 
         profileSection.setPadding(new Insets(18 * s, 24 * s, 18 * s, 24 * s));
         userName.setFont(Font.font("Inter", FontWeight.BOLD, 16 * s));
-        avatarBg.setRadius(22 * s);
+        avatarBg.setRadius(28 * s);
         String btnPad = (int)(8 * s) + " " + (int)(24 * s);
         editBtn.setFont(Font.font("Inter", FontWeight.BOLD, 12 * s));
         editBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +

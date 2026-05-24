@@ -465,9 +465,13 @@ public class MainController {
         });
 
         loadHeaderProfileImage();
+        loadHeaderUserName();
         prefs.addPreferenceChangeListener(e -> {
-            if ("profileImagePath".equals(e.getKey())) {
+            String key = e.getKey();
+            if ("profileImagePath".equals(key)) {
                 loadHeaderProfileImage();
+            } else if ("userName".equals(key) || "userEmail".equals(key)) {
+                loadHeaderUserName();
             }
         });
 
@@ -503,6 +507,13 @@ public class MainController {
             headerAvatar.setFill(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
             headerAvatarSvg.setVisible(true);
         }
+    }
+
+    private void loadHeaderUserName() {
+        String name = prefs.get("userName", "");
+        String email = prefs.get("userEmail", "");
+        if (!name.isEmpty()) uName.setText(name);
+        if (!email.isEmpty()) uEmail.setText(email);
     }
 
     private void setupKpis() {

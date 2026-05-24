@@ -39,6 +39,8 @@ public class Configuracion {
     private static final double COMPACT_THRESHOLD = 700;
     private Preferences prefs = Preferences.userNodeForPackage(Configuracion.class);
     private static final String PROFILE_IMAGE_KEY = "profileImagePath";
+    private static final String USER_NAME_KEY = "userName";
+    private static final String USER_EMAIL_KEY = "userEmail";
 
     private Text prefsTitle, langLabel, langDesc, themeLabel, themeDesc;
     private Text secTitle;
@@ -386,8 +388,10 @@ public class Configuracion {
         LanguageManager lang = LanguageManager.getInstance();
         title.setText(lang.get("config.title"));
         subtitle.setText(lang.get("config.subtitle"));
-        userName.setText(lang.get("config.profile.name"));
-        userEmail.setText(lang.get("config.profile.email"));
+        String storedName = prefs.get(USER_NAME_KEY, "");
+        String storedEmail = prefs.get(USER_EMAIL_KEY, "");
+        userName.setText(!storedName.isEmpty() ? storedName : lang.get("config.profile.name"));
+        userEmail.setText(!storedEmail.isEmpty() ? storedEmail : lang.get("config.profile.email"));
         editBtn.setText(lang.get("config.profile.editBtn"));
         prefsTitle.setText(lang.get("config.prefs.title"));
         langLabel.setText(lang.get("config.prefs.language"));
@@ -537,7 +541,15 @@ public class Configuracion {
         saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
             "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0;");
-        saveBtn.setOnMouseClicked(e -> modal.close());
+        saveBtn.setOnMouseClicked(e -> {
+            String name = nameTf.getText().trim();
+            String email = emailTf.getText().trim();
+            if (!name.isEmpty()) prefs.put(USER_NAME_KEY, name);
+            if (!email.isEmpty()) prefs.put(USER_EMAIL_KEY, email);
+            userName.setText(name);
+            userEmail.setText(email);
+            modal.close();
+        });
 
         Button cancelBtn = new Button(lang.get("config.editProfile.cancel"));
         cancelBtn.setPrefWidth(160);

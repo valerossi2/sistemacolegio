@@ -34,7 +34,7 @@ public class Configuracion {
     private Text title, subtitle;
     private HBox profileSection;
     private VBox headerBox;
-    private Text userName, userEmail;
+    private Text userName;
     private Button editBtn;
     private Circle avatarBg;
     private SVGPath profileAvatarIcon;
@@ -61,21 +61,21 @@ public class Configuracion {
     public Configuracion(ThemeManager theme) {
         this.theme = theme;
         root = new VBox();
-        root.setPadding(new Insets(16, 24, 16, 24));
+        root.setPadding(new Insets(20, 28, 20, 28));
         root.setAlignment(Pos.TOP_CENTER);
-
-        title = new Text("Configuracion del Sistema");
-        title.setFont(Font.font("Inter", FontWeight.BOLD, 22));
-
-        subtitle = new Text("Bienvenido de nuevo. Aqui tienes un resumen del estado institucional hoy.");
-        subtitle.setFont(Font.font("Inter", 12));
-
-        headerBox = new VBox(2);
-        headerBox.getChildren().addAll(title, subtitle);
-        VBox.setMargin(headerBox, new Insets(0, 0, 10, 0));
-
-        content = new VBox(10);
-        content.setMaxWidth(820);
+ 
+         title = new Text("Configuracion del Sistema");
+         title.setFont(Font.font("Inter", FontWeight.BOLD, 22));
+ 
+         subtitle = new Text("Bienvenido de nuevo. Aqui tienes un resumen del estado institucional hoy.");
+         subtitle.setFont(Font.font("Inter", 12));
+ 
+         headerBox = new VBox(4);
+         headerBox.getChildren().addAll(title, subtitle);
+         VBox.setMargin(headerBox, new Insets(0, 0, 16, 0));
+ 
+         content = new VBox(20);
+         content.setMaxWidth(820);
 
         profileSection = createProfileSection();
         VBox preferencesSection = createPreferencesSection();
@@ -117,7 +117,7 @@ public class Configuracion {
 
     private HBox createProfileSection() {
         HBox section = new HBox();
-        section.setPadding(new Insets(14, 20, 14, 20));
+        section.setPadding(new Insets(18, 24, 18, 24));
         section.setStyle(cardStyle());
 
         HBox leftBox = new HBox(12);
@@ -180,7 +180,7 @@ public class Configuracion {
 
     private VBox createPreferencesSection() {
         VBox section = new VBox();
-        section.setPadding(new Insets(14, 20, 14, 20));
+        section.setPadding(new Insets(18, 24, 18, 24));
         section.setStyle(cardStyle());
 
         prefsTitle = new Text("Preferencias de la Cuenta");
@@ -340,7 +340,7 @@ public class Configuracion {
 
     private VBox createSecuritySection() {
         VBox section = new VBox();
-        section.setPadding(new Insets(14, 20, 14, 20));
+        section.setPadding(new Insets(18, 24, 18, 24));
         section.setStyle(cardStyle());
 
         secTitle = new Text("Seguridad");
@@ -453,13 +453,12 @@ public class Configuracion {
 
         title.setFont(Font.font("Inter", FontWeight.BOLD, 22 * s));
         subtitle.setFont(Font.font("Inter", 12 * s));
-        VBox.setMargin(headerBox, new Insets(0, 0, 10 * s, 0));
-        content.setSpacing(10 * s);
-        root.setPadding(new Insets(16 * s, 24 * s, 16 * s, 24 * s));
+        VBox.setMargin(headerBox, new Insets(0, 0, 16 * s, 0));
+        content.setSpacing(20 * s);
+        root.setPadding(new Insets(20 * s, 28 * s, 20 * s, 28 * s));
 
-        profileSection.setPadding(new Insets(14 * s, 20 * s, 14 * s, 20 * s));
+        profileSection.setPadding(new Insets(18 * s, 24 * s, 18 * s, 24 * s));
         userName.setFont(Font.font("Inter", FontWeight.BOLD, 16 * s));
-        userEmail.setFont(Font.font("Inter", 12 * s));
         avatarBg.setRadius(22 * s);
         String btnPad = (int)(8 * s) + " " + (int)(24 * s);
         editBtn.setFont(Font.font("Inter", FontWeight.BOLD, 12 * s));
@@ -550,6 +549,17 @@ public class Configuracion {
         VBox avatarSection = new VBox(8, avatarOuter, photoText);
         avatarSection.setAlignment(Pos.CENTER);
 
+        Region modalDivider = new Region();
+        modalDivider.setPrefHeight(1);
+        modalDivider.setStyle("-fx-background-color: " + theme.divider() + ";");
+        modalDivider.setOpacity(0.5);
+        VBox.setMargin(modalDivider, new Insets(8, 0, 4, 0));
+
+        Text accountPrefsLabel = new Text(lang.get("config.prefs.title"));
+        accountPrefsLabel.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        accountPrefsLabel.setFill(Color.web(theme.text()));
+        VBox.setMargin(accountPrefsLabel, new Insets(8, 0, 0, 0));
+
         String currentFirstName = prefs.get(USER_FIRST_NAME_KEY, "");
         String currentLastName = prefs.get(USER_LAST_NAME_KEY, "");
         String currentEmail = prefs.get(USER_EMAIL_KEY, lang.get("config.profile.email"));
@@ -604,7 +614,6 @@ public class Configuracion {
             if (!ph.isEmpty()) prefs.put(USER_PHONE_KEY, ph);
             String fullName = (fn + " " + ln).trim();
             userName.setText(!fullName.isEmpty() ? fullName : lang.get("config.profile.name"));
-            userEmail.setText(em);
             modal.close();
             showToast(lang.get("config.toast.saved"));
         };
@@ -636,7 +645,7 @@ public class Configuracion {
 
         buttonBox.getChildren().addAll(saveBtn, cancelBtn);
 
-        dialog.getChildren().addAll(topBar, avatarSection, fields, buttonBox);
+        dialog.getChildren().addAll(topBar, avatarSection, modalDivider, accountPrefsLabel, fields, buttonBox);
 
         Group dialogGroup = new Group(dialog);
         dialogGroup.setScaleX(scale);

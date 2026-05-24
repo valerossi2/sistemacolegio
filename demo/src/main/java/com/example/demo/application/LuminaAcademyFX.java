@@ -18,7 +18,7 @@ public class LuminaAcademyFX extends Application {
     public void start(Stage primaryStage) {
         primaryStage.initStyle(StageStyle.UNDECORATED);
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/fxml/main_view.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/fxml/Login/main_view.fxml"));
             Parent rootNode = loader.load();
             com.example.demo.controller.MainController controller = loader.getController();
             controller.setThemeManager(theme);

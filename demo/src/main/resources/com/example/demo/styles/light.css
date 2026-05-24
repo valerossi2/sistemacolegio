@@ -27,6 +27,11 @@
     -fx-effect: dropshadow(three-pass-box, rgba(37,99,235,0.3), 16, 0, 0, 8); 
 } 
 
+.sidebar-active:hover { 
+    -fx-background-color: #2563eb; 
+    -fx-background-radius: 12; 
+} 
+
 .search-container { 
     -fx-background-color: #f0f3ff; 
     -fx-background-radius: 32; 

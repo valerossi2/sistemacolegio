@@ -330,7 +330,7 @@ public class Configuracion {
     private void showEditProfileModal() {
         Stage modal = new Stage();
         modal.initModality(Modality.APPLICATION_MODAL);
-        modal.initStyle(StageStyle.UNDECORATED);
+        modal.initStyle(StageStyle.TRANSPARENT);
         modal.setWidth(460);
         modal.setHeight(560);
         if (ownerStage != null) {
@@ -377,17 +377,17 @@ public class Configuracion {
         avatarBigIcon.setFill(Color.web(theme.textSec()));
         
         StackPane cameraOverlay = new StackPane();
-        cameraOverlay.setPrefSize(24, 24);
-        cameraOverlay.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-background-radius: 12; " +
+        cameraOverlay.setPrefSize(18, 18);
+        cameraOverlay.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-background-radius: 9; " +
             "-fx-cursor: hand;");
         SVGPath cameraIcon = new SVGPath();
         cameraIcon.setContent("M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z");
-        cameraIcon.setScaleX(0.5);
-        cameraIcon.setScaleY(0.5);
+        cameraIcon.setScaleX(0.4);
+        cameraIcon.setScaleY(0.4);
         cameraIcon.setFill(Color.WHITE);
         cameraOverlay.getChildren().add(cameraIcon);
-        cameraOverlay.setTranslateX(25);
-        cameraOverlay.setTranslateY(25);
+        cameraOverlay.setTranslateX(24);
+        cameraOverlay.setTranslateY(24);
         
         avatarOuter.getChildren().addAll(avatarBig, avatarBigIcon, cameraOverlay);
         Text changePhotoText = new Text("Cambiar Foto");

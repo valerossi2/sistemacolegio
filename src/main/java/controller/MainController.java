@@ -173,10 +173,12 @@ public class MainController {
         logoStack.getChildren().addAll(logoCircle, logoSymbol);
         
         lTitle.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
-        lTitle.setFill(Color.web(L_PRIMARY));
         lSub.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
         
-        themeUpdaters.add(() -> lSub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE))));
+        themeUpdaters.add(() -> {
+            lTitle.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
+            lSub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+        });
     }
 
     private void setupNavigation() {
@@ -213,8 +215,8 @@ public class MainController {
 
             btnContainer.setOnMouseEntered(e -> {
                 if (!btnContainer.getStyleClass().contains("sidebar-active")) {
-                    label.setFill(Color.web(L_PRIMARY));
-                    icon.setFill(Color.web(L_PRIMARY));
+                    label.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
+                    icon.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
                 }
             });
             btnContainer.setOnMouseExited(e -> {
@@ -423,12 +425,12 @@ public class MainController {
 
         SVGPath bellIcon = createIcon(ICON_NOTIFICATIONS, 20, c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT));
         notifBtn.getChildren().add(bellIcon);
-        notifBtn.setOnMouseEntered(e -> bellIcon.setFill(Color.web(L_PRIMARY)));
+        notifBtn.setOnMouseEntered(e -> bellIcon.setFill(Color.web(c(L_PRIMARY, D_PRIMARY))));
         notifBtn.setOnMouseExited(e -> bellIcon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT))));
 
         SVGPath helpIcon = createIcon(ICON_HELP, 20, c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT));
         helpBtn.getChildren().add(helpIcon);
-        helpBtn.setOnMouseEntered(e -> helpIcon.setFill(Color.web(L_PRIMARY)));
+        helpBtn.setOnMouseEntered(e -> helpIcon.setFill(Color.web(c(L_PRIMARY, D_PRIMARY))));
         helpBtn.setOnMouseExited(e -> helpIcon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT))));
 
         headerSeparator.setFill(Color.web(c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
@@ -445,8 +447,8 @@ public class MainController {
         avatarStack.getChildren().addAll(avatar, avatarSvg);
 
         userBox.setOnMouseEntered(e -> {
-            uName.setFill(Color.web(L_PRIMARY));
-            avatar.setStroke(Color.web(L_PRIMARY));
+            uName.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
+            avatar.setStroke(Color.web(c(L_PRIMARY, D_PRIMARY)));
         });
         userBox.setOnMouseExited(e -> {
             uName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
@@ -635,6 +637,7 @@ public class MainController {
 
         themeUpdaters.add(() -> {
             tName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            profText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
             bg.setFill(Color.web(c(L_SURFACE_CONTAINER, D_SURFACE_CONTAINER)));
             fill.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
             tScore.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));

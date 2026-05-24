@@ -437,10 +437,15 @@ public class Configuracion {
             modal.setHeight(560);
         }
 
+        double pad = Math.min(80, Math.min(modal.getWidth(), modal.getHeight()) * 0.06);
+        double maxW = Math.min(460, modal.getWidth() - pad * 2 - 8);
+        double maxH = Math.min(560, modal.getHeight() - pad * 2 - 8);
+
         VBox dialog = new VBox();
         dialog.setPadding(new Insets(28));
         dialog.setSpacing(20);
-        dialog.setMaxWidth(460);
+        dialog.setMaxWidth(maxW);
+        dialog.setMaxHeight(maxH);
         String dialogBg = theme.isDark() ? "#1E293B" : "#FFFFFF";
         dialog.setStyle("-fx-background-color: " + dialogBg + "; -fx-background-radius: 20; " +
             "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 30, 0, 0, 8);");
@@ -531,10 +536,17 @@ public class Configuracion {
 
         buttonBox.getChildren().addAll(saveBtn, cancelBtn);
 
-        dialog.getChildren().addAll(topBar, avatarSection, fields, buttonBox);
+        VBox scrollContent = new VBox(20, avatarSection, fields);
+        ScrollPane scroll = new ScrollPane(scrollContent);
+        scroll.setFitToWidth(true);
+        scroll.setFitToHeight(true);
+        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+        scroll.getStyleClass().add("modal-scroll");
+
+        dialog.getChildren().addAll(topBar, scroll, buttonBox);
 
         StackPane backdrop = new StackPane(dialog);
-        backdrop.setPadding(new Insets(80));
+        backdrop.setPadding(new Insets(pad));
         backdrop.setStyle("-fx-background-color: rgba(0,0,0,0.5);");
 
         Scene scene = new Scene(backdrop);
@@ -558,10 +570,15 @@ public class Configuracion {
             modal.setHeight(560);
         }
 
+        double pad = Math.min(60, Math.min(modal.getWidth(), modal.getHeight()) * 0.06);
+        double maxW = Math.min(460, modal.getWidth() - pad * 2 - 8);
+        double maxH = Math.min(560, modal.getHeight() - pad * 2 - 8);
+
         VBox dialog = new VBox();
         dialog.setPadding(new Insets(28));
         dialog.setSpacing(20);
-        dialog.setMaxWidth(460);
+        dialog.setMaxWidth(maxW);
+        dialog.setMaxHeight(maxH);
         String dialogBg = theme.isDark() ? "#1E293B" : "#FFFFFF";
         dialog.setStyle("-fx-background-color: " + dialogBg + "; -fx-background-radius: 20; " +
             "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 30, 0, 0, 8);");
@@ -618,10 +635,16 @@ public class Configuracion {
 
         buttonBox.getChildren().addAll(saveBtn, cancelBtn);
 
-        dialog.getChildren().addAll(topBar, fields, buttonBox);
+        ScrollPane scroll = new ScrollPane(fields);
+        scroll.setFitToWidth(true);
+        scroll.setFitToHeight(true);
+        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+        scroll.getStyleClass().add("modal-scroll");
+
+        dialog.getChildren().addAll(topBar, scroll, buttonBox);
 
         StackPane backdrop = new StackPane(dialog);
-        backdrop.setPadding(new Insets(60));
+        backdrop.setPadding(new Insets(pad));
         backdrop.setStyle("-fx-background-color: rgba(0,0,0,0.5);");
 
         Scene scene = new Scene(backdrop);

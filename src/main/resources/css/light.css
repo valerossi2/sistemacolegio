@@ -157,3 +157,24 @@
     -fx-pref-height: 0;
     -fx-opacity: 0;
 }
+
+.modal-scroll .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 6px;
+}
+.modal-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #CBD5E1;
+    -fx-background-radius: 3px;
+}
+.modal-scroll .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #94A3B8;
+}
+.modal-scroll .scroll-bar:vertical .increment-button,
+.modal-scroll .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-pref-height: 0;
+}
+.modal-scroll .scroll-bar:horizontal {
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
+}

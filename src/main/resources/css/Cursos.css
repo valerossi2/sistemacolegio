@@ -15,7 +15,6 @@
     -fx-border-width: 0 1 0 0;
     -fx-pref-width: 256px;
     -fx-min-width: 256px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 2, 0);
 }
 
 .side-navbar__brand {
@@ -113,8 +112,7 @@
     -fx-padding: 10 24 10 24;
     -fx-border-color: #E2E8F0;
     -fx-border-width: 0 0 1 0;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 2);
-    -fx-min-height: 64px;
+-fx-min-height: 64px;
     -fx-pref-height: 64px;
 }
 
@@ -226,7 +224,6 @@
     -fx-background-radius: 20px;
     -fx-border-radius: 20px;
     -fx-border-color: transparent;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 16, 0, 0, 4);
 }
 
 .list-table__header {
@@ -431,7 +428,6 @@
     -fx-font-weight: 600;
     -fx-padding: 8 16 8 16;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0,74,198,0.22), 4, 0, 0, 2);
 }
 .btn-primary:hover   { -fx-background-color: #0053db; }
 .btn-primary:pressed { -fx-background-color: #003ea8; }
@@ -552,8 +548,7 @@
     -fx-border-color: #E2E8F0;
     -fx-border-radius: 16px;
     -fx-border-width: 1px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);
-    -fx-padding: 24 24 24 24;
+-fx-padding: 24 24 24 24;
 }
 .card__title   { -fx-font-size: 16px; -fx-font-weight: 700; -fx-text-fill: #1E293B; }
 .card__subtitle { -fx-font-size: 12px; -fx-text-fill: #64748B; }
@@ -673,7 +668,6 @@
     -fx-background-color: #FFFFFF;
     -fx-text-fill: #1E293B;
     -fx-font-weight: 700;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.09), 3, 0, 0, 1);
 }
 .view-toggle__btn:hover:selected { -fx-text-fill: #1E293B; }
 

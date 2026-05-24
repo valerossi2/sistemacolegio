@@ -1,12 +1,17 @@
 package controller;
 
 import theme.ThemeManager;
+import util.LanguageManager;
+import java.io.File;
+import java.util.prefs.Preferences;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.*;
 import javafx.scene.text.*;
 import javafx.util.Duration;
@@ -67,12 +72,23 @@ public class MainController {
     private Text perfTitleText;
     private Text perfSubText;
     private Text scheduleTitleText;
+    private Button btnAll;
+    private final List<Text> navLabelList = new ArrayList<>();
     private final List<HBox> colHeaderList = new ArrayList<>();
     private final List<List<HBox>> courseRowCells = new ArrayList<>();
+    private final List<Text> courseNameTexts = new ArrayList<>();
+    private final List<Text> courseProfTexts = new ArrayList<>();
+    private final List<Text> courseStudNumTexts = new ArrayList<>();
+    private final List<Text> courseStudLabelTexts = new ArrayList<>();
+    private final List<Text> courseScoreTexts = new ArrayList<>();
     private final List<Circle> scheduleCircleList = new ArrayList<>();
     private final List<Text> scheduleSubjList = new ArrayList<>();
     private final List<Text> scheduleDetList = new ArrayList<>();
     private final List<Rectangle> perfBarsList = new ArrayList<>();
+    private final List<Text> perfBarLabelList = new ArrayList<>();
+    private Circle headerAvatar;
+    private SVGPath headerAvatarSvg;
+    private Preferences prefs = Preferences.userNodeForPackage(controller.Configuracion.class);
 
     private final String L_PRIMARY = "#004ac6";
     private final String L_PRIMARY_CONTAINER = "#2563eb";
@@ -164,20 +180,24 @@ public class MainController {
         logoStack.getChildren().addAll(logoCircle, logoSymbol);
         
         lTitle.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
-        lTitle.setFill(Color.web(L_PRIMARY));
         lSub.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
         
-        themeUpdaters.add(() -> lSub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE))));
+        themeUpdaters.add(() -> {
+            lTitle.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
+            lSub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+        });
     }
 
     private void setupNavigation() {
+        LanguageManager lang = LanguageManager.getInstance();
+        String[] navKeys = {"sidebar.home", "sidebar.students", "sidebar.teachers", "sidebar.courses", "sidebar.schedule", "sidebar.settings"};
         String[][] items = {
-            {"Inicio", ICON_HOME},
-            {"Estudiantes", ICON_SCHOOL},
-            {"Profesores", ICON_GROUP},
-            {"Cursos", ICON_BOOK},
-            {"Horario", ICON_CALENDAR},
-            {"Configuracion", ICON_SETTINGS}
+            {lang.get("sidebar.home"), ICON_HOME},
+            {lang.get("sidebar.students"), ICON_SCHOOL},
+            {lang.get("sidebar.teachers"), ICON_GROUP},
+            {lang.get("sidebar.courses"), ICON_BOOK},
+            {lang.get("sidebar.schedule"), ICON_CALENDAR},
+            {lang.get("sidebar.settings"), ICON_SETTINGS}
         };
 
         for (int i = 0; i < items.length; i++) {
@@ -189,6 +209,7 @@ public class MainController {
             SVGPath icon = createIcon(items[i][1], 20, L_WHITE);
             Text label = new Text(items[i][0]);
             label.setFont(Font.font("Plus Jakarta Sans", FontWeight.MEDIUM, 15));
+            navLabelList.add(label);
 
             int idx = i;
             if (i == 0) {
@@ -201,8 +222,8 @@ public class MainController {
 
             btnContainer.setOnMouseEntered(e -> {
                 if (!btnContainer.getStyleClass().contains("sidebar-active")) {
-                    label.setFill(Color.web(L_PRIMARY));
-                    icon.setFill(Color.web(L_PRIMARY));
+                    label.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
+                    icon.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
                 }
             });
             btnContainer.setOnMouseExited(e -> {
@@ -248,6 +269,7 @@ public class MainController {
     private void handleNavigation(int index) {
         if (index == 0) {
             setCenterView(mainCanvas);
+            loadHeaderProfileImage();
         } else if (index == 5) {
             controller.Configuracion config = new controller.Configuracion(theme);
             config.setOwnerStage(stage);
@@ -411,12 +433,12 @@ public class MainController {
 
         SVGPath bellIcon = createIcon(ICON_NOTIFICATIONS, 20, c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT));
         notifBtn.getChildren().add(bellIcon);
-        notifBtn.setOnMouseEntered(e -> bellIcon.setFill(Color.web(L_PRIMARY)));
+        notifBtn.setOnMouseEntered(e -> bellIcon.setFill(Color.web(c(L_PRIMARY, D_PRIMARY))));
         notifBtn.setOnMouseExited(e -> bellIcon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT))));
 
         SVGPath helpIcon = createIcon(ICON_HELP, 20, c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT));
         helpBtn.getChildren().add(helpIcon);
-        helpBtn.setOnMouseEntered(e -> helpIcon.setFill(Color.web(L_PRIMARY)));
+        helpBtn.setOnMouseEntered(e -> helpIcon.setFill(Color.web(c(L_PRIMARY, D_PRIMARY))));
         helpBtn.setOnMouseExited(e -> helpIcon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT))));
 
         headerSeparator.setFill(Color.web(c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
@@ -426,19 +448,31 @@ public class MainController {
         uEmail.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
         uEmail.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
 
-        Circle avatar = new Circle(20, Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
-        avatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
-        avatar.setStrokeWidth(2);
-        SVGPath avatarSvg = createIcon(ICON_AVATAR, 20, c(L_PRIMARY, D_PRIMARY));
-        avatarStack.getChildren().addAll(avatar, avatarSvg);
+        headerAvatar = new Circle(20, Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+        headerAvatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+        headerAvatar.setStrokeWidth(2);
+        headerAvatarSvg = createIcon(ICON_AVATAR, 20, c(L_PRIMARY, D_PRIMARY));
+        headerAvatarSvg.setId("headerAvatarSvg");
+        avatarStack.getChildren().addAll(headerAvatar, headerAvatarSvg);
 
         userBox.setOnMouseEntered(e -> {
-            uName.setFill(Color.web(L_PRIMARY));
-            avatar.setStroke(Color.web(L_PRIMARY));
+            uName.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
+            headerAvatar.setStroke(Color.web(c(L_PRIMARY, D_PRIMARY)));
         });
         userBox.setOnMouseExited(e -> {
             uName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
-            avatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+            headerAvatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+        });
+
+        loadHeaderProfileImage();
+        loadHeaderUserName();
+        prefs.addPreferenceChangeListener(e -> {
+            String key = e.getKey();
+            if ("profileImagePath".equals(key)) {
+                loadHeaderProfileImage();
+            } else if ("userName".equals(key) || "userEmail".equals(key)) {
+                loadHeaderUserName();
+            }
         });
 
         themeUpdaters.add(() -> {
@@ -451,18 +485,44 @@ public class MainController {
             headerSeparator.setFill(Color.web(c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
             uName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
             uEmail.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
-            avatar.setFill(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
-            avatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
-            avatarSvg.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
+            if (headerAvatarSvg.isVisible()) {
+                headerAvatar.setFill(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+                headerAvatarSvg.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
+            }
+            headerAvatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
         });
     }
 
+    private void loadHeaderProfileImage() {
+        String path = prefs.get("profileImagePath", "");
+        if (!path.isEmpty()) {
+            try {
+                Image img = new Image(new File(path).toURI().toString(), false);
+                headerAvatar.setFill(new ImagePattern(img));
+                headerAvatarSvg.setVisible(false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            headerAvatar.setFill(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+            headerAvatarSvg.setVisible(true);
+        }
+    }
+
+    private void loadHeaderUserName() {
+        String name = prefs.get("userName", "");
+        String email = prefs.get("userEmail", "");
+        if (!name.isEmpty()) uName.setText(name);
+        if (!email.isEmpty()) uEmail.setText(email);
+    }
+
     private void setupKpis() {
+        LanguageManager lang = LanguageManager.getInstance();
         kpiGrid.getChildren().addAll(
-            createKpiCard("Total Estudiantes", "1,250", L_SECONDARY_FIXED, L_SECONDARY, ICON_PERSON_PIN),
-            createKpiCard("Total Cursos", "35", L_PRIMARY_FIXED, L_PRIMARY, ICON_TRENDING_UP),
-            createKpiCard("Profesores", "42", L_TERTIARY_FIXED, L_TERTIARY, ICON_SCHOOL),
-            createKpiCard("Asistencia Estudiantes", "92%", L_SECONDARY_FIXED, L_SECONDARY, ICON_CHECK_CIRCLE)
+            createKpiCard(lang.get("kpi.totalStudents"), "1,250", L_SECONDARY_FIXED, L_SECONDARY, ICON_PERSON_PIN),
+            createKpiCard(lang.get("kpi.totalCourses"), "35", L_PRIMARY_FIXED, L_PRIMARY, ICON_TRENDING_UP),
+            createKpiCard(lang.get("kpi.totalTeachers"), "42", L_TERTIARY_FIXED, L_TERTIARY, ICON_SCHOOL),
+            createKpiCard(lang.get("kpi.attendance"), "92%", L_SECONDARY_FIXED, L_SECONDARY, ICON_CHECK_CIRCLE)
         );
     }
 
@@ -518,12 +578,12 @@ public class MainController {
         HBox head = new HBox();
         head.setPadding(new Insets(12));
         head.setAlignment(Pos.CENTER_LEFT);
-        courseTitleText = new Text("Gestion de Cursos");
+        courseTitleText = new Text(LanguageManager.getInstance().get("course.title"));
         courseTitleText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
         courseTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        Button btnAll = new Button("Ver todos");
+        btnAll = new Button(LanguageManager.getInstance().get("course.viewAll"));
         btnAll.getStyleClass().add("text-button");
         head.getChildren().addAll(courseTitleText, spacer, btnAll);
 
@@ -604,7 +664,8 @@ public class MainController {
 
         HBox hName = new HBox(tName);
         hName.setPrefWidth(180);
-        HBox hProf = new HBox(new Text(prof));
+        Text profText = new Text(prof);
+        HBox hProf = new HBox(profText);
         hProf.setPrefWidth(180);
         HBox hStud = new HBox(stBox);
         hStud.setPrefWidth(120);
@@ -613,9 +674,15 @@ public class MainController {
 
         row.getChildren().addAll(hName, hProf, hStud, hPerf);
         courseRowCells.add(List.of(hName, hProf, hStud, hPerf));
+        courseNameTexts.add(tName);
+        courseProfTexts.add(profText);
+        courseStudNumTexts.add(stNum);
+        courseStudLabelTexts.add(stLabel);
+        courseScoreTexts.add(tScore);
 
         themeUpdaters.add(() -> {
             tName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            profText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
             bg.setFill(Color.web(c(L_SURFACE_CONTAINER, D_SURFACE_CONTAINER)));
             fill.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
             tScore.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
@@ -628,7 +695,7 @@ public class MainController {
 
     private void setupPerformancePanel() {
         HBox head = new HBox();
-        perfTitleText = new Text("Desempeno");
+        perfTitleText = new Text(LanguageManager.getInstance().get("performance.title"));
         perfTitleText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
         perfTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
         Region spacer = new Region();
@@ -640,7 +707,7 @@ public class MainController {
         moreBtn.getChildren().add(moreDots);
         head.getChildren().addAll(perfTitleText, spacer, moreBtn);
 
-        perfSubText = new Text("Promedio general mensual (6 meses)");
+        perfSubText = new Text(LanguageManager.getInstance().get("performance.subtitle"));
         perfSubText.setFont(Font.font("Plus Jakarta Sans", 12));
         perfSubText.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
 
@@ -666,10 +733,11 @@ public class MainController {
             chart.getChildren().add(barBox);
             bars.add(bar);
             barLabels.add(lbl);
+            perfBarLabelList.add(lbl);
         }
 
         HBox footer = new HBox();
-        Text fT = new Text("Crecimiento Semestral");
+        Text fT = new Text(LanguageManager.getInstance().get("performance.growth"));
         fT.setFont(Font.font("Plus Jakarta Sans", 12));
         fT.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
         Region s2 = new Region();
@@ -696,7 +764,7 @@ public class MainController {
     }
 
     private void setupSchedulePanel() {
-        scheduleTitleText = new Text("Horario de Hoy");
+        scheduleTitleText = new Text(LanguageManager.getInstance().get("schedule.title"));
         scheduleTitleText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
         scheduleTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
 
@@ -851,10 +919,77 @@ public class MainController {
         sub.setFont(Font.font("Plus Jakarta Sans", 16));
         sub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
 
+        LanguageManager.getInstance().addListener(this::updateLanguageTexts);
+        updateLanguageTexts();
+
         theme.addListener(() -> {
             for (Runnable r : themeUpdaters) r.run();
         });
         
         for (Runnable r : themeUpdaters) r.run();
+    }
+
+    private void updateLanguageTexts() {
+        LanguageManager lang = LanguageManager.getInstance();
+        h1.setText(lang.get("dashboard.title"));
+        sub.setText(lang.get("dashboard.subtitle"));
+        courseTitleText.setText(lang.get("course.title"));
+        perfTitleText.setText(lang.get("performance.title"));
+        perfSubText.setText(lang.get("performance.subtitle"));
+        scheduleTitleText.setText(lang.get("schedule.title"));
+        btnAll.setText(lang.get("course.viewAll"));
+        searchField.setPromptText(lang.get("search.prompt"));
+        // Update sidebar labels
+        String[] navKeys = {"sidebar.home", "sidebar.students", "sidebar.teachers", "sidebar.courses", "sidebar.schedule", "sidebar.settings"};
+        for (int i = 0; i < navLabelList.size() && i < navKeys.length; i++) {
+            navLabelList.get(i).setText(lang.get(navKeys[i]));
+        }
+        // Update column headers
+        String[] colKeys = {"course.colCourse", "course.colProfessor", "course.colStudents", "course.colPerformance"};
+        String[] colDefs = {"CURSO", "PROFESOR", "ALUMNOS", "RENDIMIENTO"};
+        for (int i = 0; i < colHeaderList.size() && i < colKeys.length; i++) {
+            Text txt = (Text) colHeaderList.get(i).getChildren().get(0);
+            txt.setText(lang.get(colKeys[i], colDefs[i]));
+        }
+        // Update course rows
+        String[] scoreDefs = {"9.2", "7.8", "8.5", "8.8"};
+        String[] stDefs = {"32", "28", "40", "24"};
+        String[] nameDefs = {"Introduccion a la IA", "Calculo Avanzado", "Literatura Moderna", "Diseno UX/UI"};
+        String[] profDefs = {"Dr. Roberto Sanchez", "Dra. Elena Mendez", "Prof. Juan Carlos Rico", "Mtra. Sofia Valdez"};
+        for (int i = 0; i < courseNameTexts.size(); i++) {
+            String rowKey = "course.row" + (i + 1) + ".name";
+            String profKey = "course.row" + (i + 1) + ".prof";
+            String scoreKey = "course.row" + (i + 1) + ".score";
+            courseNameTexts.get(i).setText(lang.get(rowKey, nameDefs[i]));
+            courseProfTexts.get(i).setText(lang.get(profKey, profDefs[i]));
+            courseStudNumTexts.get(i).setText(lang.get("course.row" + (i + 1) + ".students", stDefs[i]));
+            courseStudLabelTexts.get(i).setText(lang.get("course.studentsLabel", "Estudiantes"));
+            courseScoreTexts.get(i).setText(lang.get(scoreKey, scoreDefs[i]));
+        }
+        // Update performance bar labels
+        String[] perfKeys = {"perf.label1", "perf.label2", "perf.label3", "perf.label4", "perf.label5", "perf.label6"};
+        String[] perfDefs = {"5to E", "6to A", "4to B", "4to C", "5to A", "6to B"};
+        for (int i = 0; i < perfBarLabelList.size() && i < perfKeys.length; i++) {
+            perfBarLabelList.get(i).setText(lang.get(perfKeys[i], perfDefs[i]));
+        }
+        // Update schedule items
+        String[] timeKeys = {"schedule.row1.time", "schedule.row2.time", "schedule.row3.time", "schedule.row4.time", "schedule.row5.time", "schedule.row6.time"};
+        String[] timeDefs = {"08:00", "10:00", "12:00", "14:00", "16:00", "18:00"};
+        String[] subjKeys = {"schedule.row1.subject", "schedule.row2.subject", "schedule.row3.subject", "schedule.row4.subject", "schedule.row5.subject", "schedule.row6.subject"};
+        String[] subjDefs = {"Matematicas Avanzadas", "Historia Universal", "Quimica Organica", "Fisica Cuantica", "Arte Moderno", "Ingles Tecnico"};
+        String[] detKeys = {"schedule.row1.detail", "schedule.row2.detail", "schedule.row3.detail", "schedule.row4.detail", "schedule.row5.detail", "schedule.row6.detail"};
+        String[] detDefs = {"Salon 402 - Prof. Sanchez", "Biblioteca - Dra. Mendez", "Laboratorio B - Prof. Rico", "Laboratorio A - Prof. Einstein", "Galeria - Prof. Picasso", "Aula 10 - Prof. Smith"};
+        for (int i = 0; i < scheduleSubjList.size() && i < subjKeys.length; i++) {
+            String tm = lang.get(timeKeys[i], timeDefs[i]);
+            scheduleSubjList.get(i).setText(tm + " - " + lang.get(subjKeys[i], subjDefs[i]));
+            scheduleDetList.get(i).setText(lang.get(detKeys[i], detDefs[i]));
+        }
+        // Update KPI labels
+        if (kpiLabelList.size() >= 4) {
+            kpiLabelList.get(0).setText(lang.get("kpi.totalStudents").toUpperCase());
+            kpiLabelList.get(1).setText(lang.get("kpi.totalCourses").toUpperCase());
+            kpiLabelList.get(2).setText(lang.get("kpi.totalTeachers").toUpperCase());
+            kpiLabelList.get(3).setText(lang.get("kpi.attendance").toUpperCase());
+        }
     }
 }

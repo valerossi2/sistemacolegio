@@ -1,13 +1,23 @@
 package controller;
 
 import theme.ThemeManager;
+import util.LanguageManager;
+import java.io.File;
+import java.util.prefs.Preferences;
 import javafx.geometry.*;
+import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.*;
 import javafx.scene.text.*;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -17,29 +27,57 @@ public class Configuracion {
     private ThemeManager theme;
     private VBox root;
     private Stage ownerStage;
-
     private Runnable updateTheme;
+
+    private double compactScale = 1.0;
+    private VBox content;
+    private Text title, subtitle;
+    private VBox profileSection;
+    private VBox headerBox;
+    private Text userName;
+    private Button editBtn;
+    private Circle avatarBg;
+    private SVGPath profileAvatarIcon;
+    private static final double COMPACT_THRESHOLD = 700;
+    private Preferences prefs = Preferences.userNodeForPackage(Configuracion.class);
+    private static final String PROFILE_IMAGE_KEY = "profileImagePath";
+    private static final String USER_FIRST_NAME_KEY = "userFirstName";
+    private static final String USER_LAST_NAME_KEY = "userLastName";
+    private static final String USER_EMAIL_KEY = "userEmail";
+    private static final String USER_DOB_KEY = "userDob";
+    private static final String USER_PHONE_KEY = "userPhone";
+
+    private Text profileTitle, prefsTitle, langLabel, langDesc, themeLabel, themeDesc;
+    private Text secTitle;
+    private Button changePwdBtn, resetPwdBtn, logoutBtn;
+    private Button editModalTitle, editSaveBtn, editCancelBtn, editCloseBtn, editPhotoText;
+    private VBox editNameField, editEmailField, editRoleField;
+    private Text changePwdModalTitle, changePwdCloseBtn;
+    private Button changePwdSaveBtn, changePwdCancelBtn;
+    private VBox changePwdOldField, changePwdNewField, changePwdConfirmField;
+    private ComboBox<String> langCombo;
+    private Runnable languageUpdater;
 
     public Configuracion(ThemeManager theme) {
         this.theme = theme;
         root = new VBox();
         root.setPadding(new Insets(16, 24, 16, 24));
-        root.setMaxWidth(900);
+        root.setAlignment(Pos.TOP_CENTER);
+  
+          title = new Text("Configuracion del Sistema");
+          title.setFont(Font.font("Inter", FontWeight.BOLD, 22));
+  
+          subtitle = new Text("Bienvenido de nuevo. Aqui tienes un resumen del estado institucional hoy.");
+          subtitle.setFont(Font.font("Inter", 12));
+  
+          headerBox = new VBox(4);
+          headerBox.getChildren().addAll(title, subtitle);
+          VBox.setMargin(headerBox, new Insets(0, 0, 12, 0));
+  
+          content = new VBox(14);
+         content.setMaxWidth(820);
 
-        Text title = new Text("Configuracion del Sistema");
-        title.setFont(Font.font("Inter", FontWeight.BOLD, 22));
-
-        Text subtitle = new Text("Bienvenido de nuevo. Aqui tienes un resumen del estado institucional hoy.");
-        subtitle.setFont(Font.font("Inter", 12));
-
-        VBox headerBox = new VBox(2);
-        headerBox.getChildren().addAll(title, subtitle);
-        VBox.setMargin(headerBox, new Insets(0, 0, 10, 0));
-
-        VBox content = new VBox(10);
-        content.setMaxWidth(820);
-
-        HBox profileSection = createProfileSection();
+        profileSection = createProfileSection();
         VBox preferencesSection = createPreferencesSection();
         VBox securitySection = createSecuritySection();
         VBox logoutSection = createLogoutSection();
@@ -52,9 +90,15 @@ public class Configuracion {
             subtitle.setFill(Color.web(theme.muted()));
         };
 
+        setupResponsive();
         root.getChildren().addAll(headerBox, content);
         theme.addListener(updateTheme);
         updateTheme.run();
+
+        languageUpdater = this::updateTexts;
+        LanguageManager.getInstance().addListener(languageUpdater);
+        updateTexts();
+        loadProfileImage();
     }
 
     public VBox getView() {
@@ -71,67 +115,83 @@ public class Configuracion {
             "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.05), 20, 0, 0, 4);";
     }
 
-    private HBox createProfileSection() {
-        HBox section = new HBox();
+    private VBox createProfileSection() {
+        VBox section = new VBox();
         section.setPadding(new Insets(14, 20, 14, 20));
         section.setStyle(cardStyle());
 
-        HBox leftBox = new HBox(12);
+        profileTitle = new Text("Perfil del Usuario");
+        profileTitle.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        profileTitle.setFill(Color.web(theme.text()));
+
+        Region profileDivider = new Region();
+        profileDivider.setPrefHeight(1);
+        profileDivider.setStyle("-fx-background-color: " + theme.divider() + ";");
+        profileDivider.setOpacity(0.5);
+        VBox.setMargin(profileDivider, new Insets(8, 0, 12, 0));
+
+        HBox row = new HBox();
+        row.setAlignment(Pos.CENTER_LEFT);
+
+        HBox leftBox = new HBox(14);
         leftBox.setAlignment(Pos.CENTER_LEFT);
 
         StackPane avatarStack = new StackPane();
-        Circle avatarBg = new Circle(22, Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
-        SVGPath avatarIcon = new SVGPath();
-        avatarIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
-        avatarIcon.setScaleX(0.9);
-        avatarIcon.setScaleY(0.9);
-        avatarIcon.setFill(Color.web(theme.textSec()));
-        avatarStack.getChildren().addAll(avatarBg, avatarIcon);
+        avatarBg = new Circle(28, Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
+        profileAvatarIcon = new SVGPath();
+        profileAvatarIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
+        profileAvatarIcon.setScaleX(1.1);
+        profileAvatarIcon.setScaleY(1.1);
+        profileAvatarIcon.setFill(Color.web(theme.textSec()));
+        avatarStack.getChildren().addAll(avatarBg, profileAvatarIcon);
 
-        Circle onlineDot = new Circle(4, Color.web(ThemeManager.COLOR_GREEN));
-        onlineDot.setTranslateX(15);
-        onlineDot.setTranslateY(15);
-        onlineDot.setStrokeWidth(1.5);
+        Circle onlineDot = new Circle(5, Color.web(ThemeManager.COLOR_GREEN));
+        onlineDot.setTranslateX(19);
+        onlineDot.setTranslateY(19);
+        onlineDot.setStrokeWidth(2);
         StackPane avatarWrapper = new StackPane(avatarStack, onlineDot);
+        VBox avatarBox = new VBox(avatarWrapper);
+        avatarBox.setAlignment(Pos.CENTER);
 
-        VBox nameBox = new VBox(0);
-        Text userName = new Text("Admin User");
+        userName = new Text("Admin User");
         userName.setFont(Font.font("Inter", FontWeight.BOLD, 16));
         userName.setFill(Color.web(theme.text()));
-        Text userEmail = new Text("admin@lumina.edu");
-        userEmail.setFont(Font.font("Inter", 12));
-        userEmail.setFill(Color.web(theme.muted()));
-        nameBox.getChildren().addAll(userName, userEmail);
+        userName.setBoundsType(TextBoundsType.VISUAL);
+        VBox nameBox = new VBox(userName);
+        nameBox.setAlignment(Pos.CENTER);
 
-        leftBox.getChildren().addAll(avatarWrapper, nameBox);
+        leftBox.getChildren().addAll(avatarBox, nameBox);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Button editBtn = new Button("Editar Perfil");
+        editBtn = new Button("Editar Perfil");
         editBtn.setFont(Font.font("Inter", FontWeight.BOLD, 12));
+        String btnPad = (int)(8 * compactScale) + " " + (int)(24 * compactScale);
         editBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
-            "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 8 24;");
+            "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: " + btnPad + ";");
 
         editBtn.setOnMouseEntered(e -> editBtn.setStyle(
             "-fx-background-color: #1D4ED8; -fx-text-fill: white; " +
-            "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 8 24;"));
+            "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: " + (int)(8 * compactScale) + " " + (int)(24 * compactScale) + ";"));
         editBtn.setOnMouseExited(e -> editBtn.setStyle(
             "-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
-            "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 8 24;"));
+            "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: " + (int)(8 * compactScale) + " " + (int)(24 * compactScale) + ";"));
         editBtn.setOnMouseClicked(e -> showEditProfileModal());
 
-        section.getChildren().addAll(leftBox, spacer, editBtn);
+        row.getChildren().addAll(leftBox, spacer, editBtn);
+        section.getChildren().addAll(profileTitle, profileDivider, row);
 
         theme.addListener(() -> {
             section.setStyle(cardStyle());
-            avatarBg.setFill(Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
-            avatarIcon.setFill(Color.web(theme.textSec()));
+            profileTitle.setFill(Color.web(theme.text()));
+            profileDivider.setStyle("-fx-background-color: " + theme.divider() + ";");
+            if (profileAvatarIcon.isVisible()) avatarBg.setFill(Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
+            if (profileAvatarIcon.isVisible()) profileAvatarIcon.setFill(Color.web(theme.textSec()));
             onlineDot.setStroke(Color.WHITE);
             userName.setFill(Color.web(theme.text()));
-            userEmail.setFill(Color.web(theme.muted()));
             editBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
-                "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 8 24;");
+                "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: " + (int)(8 * compactScale) + " " + (int)(24 * compactScale) + ";");
         });
 
         return section;
@@ -142,92 +202,105 @@ public class Configuracion {
         section.setPadding(new Insets(14, 20, 14, 20));
         section.setStyle(cardStyle());
 
-        Text sectionTitle = new Text("Preferencias de la Cuenta");
-        sectionTitle.setFont(Font.font("Inter", FontWeight.BOLD, 14));
-        sectionTitle.setFill(Color.web(theme.text()));
-        VBox.setMargin(sectionTitle, new Insets(0, 0, 8, 0));
+        prefsTitle = new Text("Preferencias de la Cuenta");
+        prefsTitle.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        prefsTitle.setFill(Color.web(theme.text()));
+        VBox.setMargin(prefsTitle, new Insets(0, 0, 8, 0));
 
         HBox idiomaRow = createIdiomaRow();
         HBox temaRow = createTemaRow();
 
-        section.getChildren().addAll(sectionTitle, idiomaRow, temaRow);
+        section.getChildren().addAll(prefsTitle, idiomaRow, temaRow);
 
         theme.addListener(() -> {
             section.setStyle(cardStyle());
-            sectionTitle.setFill(Color.web(theme.text()));
+            prefsTitle.setFill(Color.web(theme.text()));
         });
 
         return section;
     }
 
     private HBox createIdiomaRow() {
-        HBox row = new HBox();
+        HBox row = new HBox(12);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(8, 0, 8, 0));
 
         Circle iconCircle = new Circle(16, Color.web(theme.isDark() ? "#1E3A5F" : "#dbe1ff"));
         SVGPath globeIcon = new SVGPath();
-        globeIcon.setContent("M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9h18");
+        globeIcon.setContent("M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z");
         globeIcon.setFill(Color.web(ThemeManager.COLOR_PRIMARY));
         globeIcon.setScaleX(0.7);
         globeIcon.setScaleY(0.7);
         StackPane iconStack = new StackPane(iconCircle, globeIcon);
 
         VBox textBox = new VBox(0);
-        Text label = new Text("Idioma");
-        label.setFont(Font.font("Inter", FontWeight.BOLD, 13));
-        label.setFill(Color.web(theme.text()));
-        Text desc = new Text("Cambia la configuracion del idioma de la cuenta");
-        desc.setFont(Font.font("Inter", 11));
-        desc.setFill(Color.web(theme.muted()));
-        textBox.getChildren().addAll(label, desc);
+        langLabel = new Text("Idioma");
+        langLabel.setFont(Font.font("Inter", FontWeight.BOLD, 13));
+        langLabel.setFill(Color.web(theme.text()));
+        langDesc = new Text("Cambia la configuracion del idioma de la cuenta");
+        langDesc.setFont(Font.font("Inter", 11));
+        langDesc.setFill(Color.web(theme.muted()));
+        textBox.getChildren().addAll(langLabel, langDesc);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        ComboBox<String> langCombo = new ComboBox<>();
-        langCombo.getItems().addAll("Español", "Ingles", "Frances");
-        langCombo.setValue("Español");
+        langCombo = new ComboBox<>();
+        langCombo.getItems().addAll("Español", "Inglés");
+        String currentLang = LanguageManager.getInstance().getCurrentLanguageCode();
+        langCombo.setValue(currentLang.equals("en") ? "Inglés" : "Español");
         langCombo.setPrefWidth(160);
+        langCombo.setOnAction(e -> {
+            String selected = langCombo.getValue();
+            LanguageManager lm = LanguageManager.getInstance();
+            if (lm.get("config.prefs.lang.en").equals(selected)) {
+                lm.setLanguage("en");
+            } else {
+                lm.setLanguage("es");
+            }
+        });
 
         row.getChildren().addAll(iconStack, textBox, spacer, langCombo);
 
-        theme.addListener(() -> {
+        Runnable updateRowTheme = () -> {
             row.setStyle("-fx-border-color: transparent transparent " + theme.divider() + " transparent;");
             iconCircle.setFill(Color.web(theme.isDark() ? "#1E3A5F" : "#dbe1ff"));
-            label.setFill(Color.web(theme.text()));
-            desc.setFill(Color.web(theme.muted()));
+            langLabel.setFill(Color.web(theme.text()));
+            langDesc.setFill(Color.web(theme.muted()));
             langCombo.setStyle("-fx-background-color: " + theme.inputBg() + "; " +
                 "-fx-border-color: " + theme.inputBorder() + "; -fx-border-radius: 8; " +
                 "-fx-background-radius: 8; -fx-font-family: 'Inter'; -fx-font-size: 13; " +
                 "-fx-padding: 4 8;");
-        });
+        };
+
+        theme.addListener(updateRowTheme);
+        updateRowTheme.run();
 
         return row;
     }
 
     private HBox createTemaRow() {
-        HBox row = new HBox();
+        HBox row = new HBox(12);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(12, 0, 0, 0));
 
         Circle iconCircle = new Circle(16);
         iconCircle.setFill(Color.web("#dbe1ff"));
         SVGPath sunIcon = new SVGPath();
-        sunIcon.setContent("M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z");
+        sunIcon.setContent("M12 3a9 9 0 0 0 0 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z");
         sunIcon.setScaleX(0.6);
         sunIcon.setScaleY(0.6);
         sunIcon.setFill(Color.web(theme.textSec()));
         StackPane iconStack = new StackPane(iconCircle, sunIcon);
 
         VBox textBox = new VBox(0);
-        Text label = new Text("Tema");
-        label.setFont(Font.font("Inter", FontWeight.BOLD, 13));
-        label.setFill(Color.web(theme.text()));
-        Text desc = new Text("Personaliza la apariencia de tu interfaz");
-        desc.setFont(Font.font("Inter", 11));
-        desc.setFill(Color.web(theme.muted()));
-        textBox.getChildren().addAll(label, desc);
+        themeLabel = new Text("Tema");
+        themeLabel.setFont(Font.font("Inter", FontWeight.BOLD, 13));
+        themeLabel.setFill(Color.web(theme.text()));
+        themeDesc = new Text("Personaliza la apariencia de tu interfaz");
+        themeDesc.setFont(Font.font("Inter", 11));
+        themeDesc.setFill(Color.web(theme.muted()));
+        textBox.getChildren().addAll(themeLabel, themeDesc);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -239,9 +312,9 @@ public class Configuracion {
 
         StackPane sunBtn = new StackPane();
         sunBtn.setPrefSize(28, 28);
-        sunBtn.setStyle("-fx-background-radius: 32; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 4, 0, 0, 2);");
+        sunBtn.setStyle("-fx-background-radius: 32;");
         SVGPath sunSmall = new SVGPath();
-        sunSmall.setContent("M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12z");
+        sunSmall.setContent("M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM11 2h2v3h-2zM11 19h2v3h-2zM2 11h3v2H2zM19 11h3v2h-3zM5.64 5.64l1.41-1.41 2.12 2.12-1.41 1.41zM14.83 16.24l1.41-1.41 2.12 2.12-1.41 1.41zM5.64 18.36l2.12-2.12 1.41 1.41-2.12 2.12zM14.83 7.76l2.12-2.12 1.41 1.41-2.12 2.12z");
         sunSmall.setFill(Color.web(ThemeManager.COLOR_PRIMARY));
         sunSmall.setScaleX(0.7);
         sunSmall.setScaleY(0.7);
@@ -263,20 +336,23 @@ public class Configuracion {
 
         row.getChildren().addAll(iconStack, textBox, spacer, toggleGroup);
 
-        theme.addListener(() -> {
+        Runnable updateTemaRow = () -> {
             row.setStyle("-fx-border-color: transparent transparent " + theme.divider() + " transparent;");
             iconCircle.setFill(Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
             sunIcon.setFill(Color.web(theme.textSec()));
-            label.setFill(Color.web(theme.text()));
-            desc.setFill(Color.web(theme.muted()));
+            themeLabel.setFill(Color.web(theme.text()));
+            themeDesc.setFill(Color.web(theme.muted()));
             toggleGroup.setStyle("-fx-background-color: " + theme.toggleGroupBg() + "; -fx-background-radius: 32;");
             sunBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "transparent" : "white") + "; " +
-                "-fx-background-radius: 32; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 4, 0, 0, 2);");
+                "-fx-background-radius: 32;");
             moonBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "white" : "transparent") + "; " +
-                "-fx-background-radius: 32; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 4, 0, 0, 2);");
+                "-fx-background-radius: 32;");
             moonIcon.setFill(Color.web(theme.isDark() ? ThemeManager.COLOR_PRIMARY : theme.muted()));
             sunSmall.setFill(Color.web(theme.isDark() ? theme.muted() : ThemeManager.COLOR_PRIMARY));
-        });
+        };
+
+        theme.addListener(updateTemaRow);
+        updateTemaRow.run();
 
         return row;
     }
@@ -286,12 +362,12 @@ public class Configuracion {
         section.setPadding(new Insets(14, 20, 14, 20));
         section.setStyle(cardStyle());
 
-        Text sectionTitle = new Text("Seguridad");
-        sectionTitle.setFont(Font.font("Inter", FontWeight.BOLD, 14));
-        sectionTitle.setFill(Color.web(theme.text()));
-        VBox.setMargin(sectionTitle, new Insets(0, 0, 8, 0));
+        secTitle = new Text("Seguridad");
+        secTitle.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        secTitle.setFill(Color.web(theme.text()));
+        VBox.setMargin(secTitle, new Insets(0, 0, 8, 0));
 
-        Button changePwdBtn = new Button("Cambiar Contrasena");
+        changePwdBtn = new Button("Cambiar Contrasena");
         changePwdBtn.setMaxWidth(Double.MAX_VALUE);
         changePwdBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         changePwdBtn.setStyle("-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
@@ -311,13 +387,42 @@ public class Configuracion {
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
             "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
             "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-radius: 10; -fx-border-width: 1.5;"));
+        changePwdBtn.setOnMouseClicked(e -> showChangePasswordModal());
 
-        section.getChildren().addAll(sectionTitle, changePwdBtn);
+        resetPwdBtn = new Button("Restablecer Contrasena");
+        resetPwdBtn.setMaxWidth(Double.MAX_VALUE);
+        resetPwdBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        resetPwdBtn.setStyle("-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
+            "-fx-border-radius: 10; -fx-border-width: 1.5; " +
+            "-fx-background-color: transparent; -fx-text-fill: " + ThemeManager.COLOR_PRIMARY + "; " +
+            "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + ";");
+        VBox.setMargin(resetPwdBtn, new Insets(6, 0, 0, 0));
+
+        resetPwdBtn.setOnMouseEntered(e -> resetPwdBtn.setStyle(
+            "-fx-background-color: " + (theme.isDark() ? "#1E3A5F" : "#EFF6FF") + "; " +
+            "-fx-text-fill: " + ThemeManager.COLOR_PRIMARY + "; " +
+            "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
+            "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-radius: 10; -fx-border-width: 1.5;"));
+        resetPwdBtn.setOnMouseExited(e -> resetPwdBtn.setStyle(
+            "-fx-background-color: transparent; " +
+            "-fx-text-fill: " + ThemeManager.COLOR_PRIMARY + "; " +
+            "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
+            "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-radius: 10; -fx-border-width: 1.5;"));
+        resetPwdBtn.setOnMouseClicked(e -> showResetPasswordModal());
+
+        section.getChildren().addAll(secTitle, changePwdBtn, resetPwdBtn);
 
         theme.addListener(() -> {
             section.setStyle(cardStyle());
-            sectionTitle.setFill(Color.web(theme.text()));
+            secTitle.setFill(Color.web(theme.text()));
             changePwdBtn.setStyle("-fx-background-color: transparent; " +
+                "-fx-text-fill: " + ThemeManager.COLOR_PRIMARY + "; " +
+                "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
+                "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
+                "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-radius: 10; -fx-border-width: 1.5;");
+            resetPwdBtn.setStyle("-fx-background-color: transparent; " +
                 "-fx-text-fill: " + ThemeManager.COLOR_PRIMARY + "; " +
                 "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
                 "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
@@ -327,17 +432,80 @@ public class Configuracion {
         return section;
     }
 
+    private void updateTexts() {
+        LanguageManager lang = LanguageManager.getInstance();
+        title.setText(lang.get("config.title"));
+        subtitle.setText(lang.get("config.subtitle"));
+        String firstName = prefs.get(USER_FIRST_NAME_KEY, "");
+        String lastName = prefs.get(USER_LAST_NAME_KEY, "");
+        String fullName = (firstName + " " + lastName).trim();
+        userName.setText(!fullName.isEmpty() ? fullName : lang.get("config.profile.name"));
+        editBtn.setText(lang.get("config.profile.editBtn"));
+        profileTitle.setText(lang.get("config.profile.title"));
+        prefsTitle.setText(lang.get("config.prefs.title"));
+        langLabel.setText(lang.get("config.prefs.language"));
+        langDesc.setText(lang.get("config.prefs.languageDesc"));
+        themeLabel.setText(lang.get("config.prefs.theme"));
+        themeDesc.setText(lang.get("config.prefs.themeDesc"));
+        secTitle.setText(lang.get("config.security.title"));
+        changePwdBtn.setText(lang.get("config.security.changePwd"));
+        resetPwdBtn.setText(lang.get("config.security.resetPwd"));
+        logoutBtn.setText(lang.get("config.security.logout"));
+
+        String selected = lang.getCurrentLanguageCode().equals("en")
+            ? lang.get("config.prefs.lang.en")
+            : lang.get("config.prefs.lang.es");
+        langCombo.getItems().setAll(lang.get("config.prefs.lang.es"), lang.get("config.prefs.lang.en"));
+        langCombo.setValue(selected);
+    }
+
+    private void setupResponsive() {
+        root.widthProperty().addListener((obs, oldVal, newVal) -> {
+            double w = newVal.doubleValue();
+            applyCompactScale(w < COMPACT_THRESHOLD);
+        });
+    }
+
+    private void applyCompactScale(boolean compact) {
+        double s = compact ? 0.7 : 1.0;
+        if (Math.abs(s - compactScale) < 0.01) return;
+        compactScale = s;
+
+        title.setFont(Font.font("Inter", FontWeight.BOLD, 22 * s));
+        subtitle.setFont(Font.font("Inter", 12 * s));
+        VBox.setMargin(headerBox, new Insets(0, 0, 12 * s, 0));
+        content.setSpacing(14 * s);
+        root.setPadding(new Insets(16 * s, 24 * s, 16 * s, 24 * s));
+
+        profileSection.setPadding(new Insets(14 * s, 20 * s, 14 * s, 20 * s));
+        userName.setFont(Font.font("Inter", FontWeight.BOLD, 16 * s));
+        avatarBg.setRadius(28 * s);
+        String btnPad = (int)(8 * s) + " " + (int)(24 * s);
+        editBtn.setFont(Font.font("Inter", FontWeight.BOLD, 12 * s));
+        editBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
+            "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: " + btnPad + ";");
+    }
+
     private void showEditProfileModal() {
         Stage modal = new Stage();
         modal.initModality(Modality.APPLICATION_MODAL);
         modal.initStyle(StageStyle.TRANSPARENT);
-        modal.setWidth(460);
-        modal.setHeight(560);
         if (ownerStage != null) {
             modal.initOwner(ownerStage);
-            modal.setX(ownerStage.getX() + (ownerStage.getWidth() - 460) / 2);
-            modal.setY(ownerStage.getY() + (ownerStage.getHeight() - 560) / 2);
+            modal.setX(ownerStage.getX());
+            modal.setY(ownerStage.getY());
+            modal.setWidth(ownerStage.getWidth());
+            modal.setHeight(ownerStage.getHeight());
+        } else {
+            modal.setWidth(460);
+            modal.setHeight(560);
         }
+
+        double pad = Math.min(80, Math.min(modal.getWidth(), modal.getHeight()) * 0.06);
+        double scale = Math.min(1.0, Math.min(
+            (modal.getWidth() - pad * 2) / 540,
+            (modal.getHeight() - pad * 2) / 640
+        ));
 
         VBox dialog = new VBox();
         dialog.setPadding(new Insets(28));
@@ -349,7 +517,8 @@ public class Configuracion {
 
         HBox topBar = new HBox();
         topBar.setAlignment(Pos.CENTER_LEFT);
-        Text modalTitle = new Text("Editar Perfil");
+        LanguageManager lang = LanguageManager.getInstance();
+        Text modalTitle = new Text(lang.get("config.editProfile.title"));
         modalTitle.setFont(Font.font("Inter", FontWeight.BOLD, 20));
         modalTitle.setFill(Color.web(theme.text()));
         Region sp = new Region();
@@ -365,67 +534,128 @@ public class Configuracion {
         closeBtn.setOnMouseClicked(e -> modal.close());
         topBar.getChildren().addAll(modalTitle, sp, closeBtn);
 
-        VBox avatarSection = new VBox(8);
+        String storedPath = prefs.get(PROFILE_IMAGE_KEY, "");
+        Circle avatarCircle = new Circle(36, Color.web(theme.isDark() ? "#1E3A5F" : "#dbe1ff"));
+        if (!storedPath.isEmpty()) {
+            try {
+                avatarCircle.setFill(new ImagePattern(new Image(new File(storedPath).toURI().toString(), false)));
+            } catch (Exception e) { e.printStackTrace(); }
+        }
+        SVGPath avatarEditIcon = new SVGPath();
+        avatarEditIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
+        avatarEditIcon.setScaleX(0.9);
+        avatarEditIcon.setScaleY(0.9);
+        avatarEditIcon.setFill(Color.web(ThemeManager.COLOR_PRIMARY));
+        if (!storedPath.isEmpty()) avatarEditIcon.setVisible(false);
+        StackPane avatarOuter = new StackPane(avatarCircle, avatarEditIcon);
+        avatarOuter.setCursor(Cursor.HAND);
+        avatarOuter.setOnMouseClicked(e -> {
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Seleccionar foto de perfil");
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg", "*.gif"));
+            File file = fc.showOpenDialog(modal);
+            if (file != null) {
+                String path = file.getAbsolutePath();
+                Image img = new Image(file.toURI().toString(), false);
+                avatarCircle.setFill(new ImagePattern(img));
+                avatarEditIcon.setVisible(false);
+                storeProfileImage(path);
+                applyProfileImage(path);
+            }
+        });
+        Text photoText = new Text(lang.get("config.editProfile.photo"));
+        photoText.setFont(Font.font("Inter", FontWeight.MEDIUM, 12));
+        photoText.setFill(Color.web(theme.muted()));
+        VBox avatarSection = new VBox(8, avatarOuter, photoText);
         avatarSection.setAlignment(Pos.CENTER);
-        
-        StackPane avatarOuter = new StackPane();
-        Circle avatarBig = new Circle(36, Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
-        SVGPath avatarBigIcon = new SVGPath();
-        avatarBigIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
-        avatarBigIcon.setScaleX(1.3);
-        avatarBigIcon.setScaleY(1.3);
-        avatarBigIcon.setFill(Color.web(theme.textSec()));
-        
-        StackPane cameraOverlay = new StackPane();
-        cameraOverlay.setPrefSize(18, 18);
-        cameraOverlay.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-background-radius: 9; " +
-            "-fx-cursor: hand;");
-        SVGPath cameraIcon = new SVGPath();
-        cameraIcon.setContent("M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z");
-        cameraIcon.setScaleX(0.4);
-        cameraIcon.setScaleY(0.4);
-        cameraIcon.setFill(Color.WHITE);
-        cameraOverlay.getChildren().add(cameraIcon);
-        cameraOverlay.setTranslateX(24);
-        cameraOverlay.setTranslateY(24);
-        
-        avatarOuter.getChildren().addAll(avatarBig, avatarBigIcon, cameraOverlay);
-        Text changePhotoText = new Text("Cambiar Foto");
-        changePhotoText.setFont(Font.font("Inter", FontWeight.MEDIUM, 12));
-        changePhotoText.setFill(Color.web(theme.muted()));
-        avatarSection.getChildren().addAll(avatarOuter, changePhotoText);
-        VBox.setMargin(avatarSection, new Insets(0, 0, 4, 0));
+
+        Region modalDivider = new Region();
+        modalDivider.setPrefHeight(1);
+        modalDivider.setStyle("-fx-background-color: " + theme.divider() + ";");
+        modalDivider.setOpacity(0.5);
+        VBox.setMargin(modalDivider, new Insets(8, 0, 4, 0));
+
+        Text accountPrefsLabel = new Text(lang.get("config.prefs.title"));
+        accountPrefsLabel.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        accountPrefsLabel.setFill(Color.web(theme.text()));
+        VBox.setMargin(accountPrefsLabel, new Insets(8, 0, 0, 0));
+
+        String currentFirstName = prefs.get(USER_FIRST_NAME_KEY, "");
+        String currentLastName = prefs.get(USER_LAST_NAME_KEY, "");
+        String currentEmail = prefs.get(USER_EMAIL_KEY, lang.get("config.profile.email"));
+        String currentDob = prefs.get(USER_DOB_KEY, "");
+        String currentPhone = prefs.get(USER_PHONE_KEY, "");
 
         VBox fields = new VBox(12);
-        VBox nameField = createInputField("Nombre Completo", "Admin User");
-        TextField nameTf = (TextField) nameField.getChildren().get(1);
-        nameTf.setStyle(nameTf.getStyle() + "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-width: 2;");
-        
-        fields.getChildren().addAll(
-            nameField,
-            createInputField("Correo Electrónico", "admin@lumina.edu"),
-            createInputField("Cargo/Rol", "Admin")
-        );
+
+        HBox nameRow = new HBox(12);
+        VBox firstNameField = createInputField(lang.get("config.editProfile.firstName"), currentFirstName);
+        VBox lastNameField = createInputField(lang.get("config.editProfile.lastName"), currentLastName);
+        HBox.setHgrow(firstNameField, Priority.ALWAYS);
+        HBox.setHgrow(lastNameField, Priority.ALWAYS);
+        nameRow.getChildren().addAll(firstNameField, lastNameField);
+
+        VBox emailField = createInputField(lang.get("config.editProfile.email"), currentEmail);
+
+        HBox extraRow = new HBox(12);
+        VBox dobField = createInputField(lang.get("config.editProfile.dob"), currentDob);
+        VBox phoneField = createInputField(lang.get("config.editProfile.phone"), currentPhone);
+        HBox.setHgrow(dobField, Priority.ALWAYS);
+        HBox.setHgrow(phoneField, Priority.ALWAYS);
+        extraRow.getChildren().addAll(dobField, phoneField);
+
+        TextField firstNameTf = (TextField) firstNameField.getChildren().get(1);
+        TextField lastNameTf = (TextField) lastNameField.getChildren().get(1);
+        TextField emailTf = (TextField) emailField.getChildren().get(1);
+        TextField dobTf = (TextField) dobField.getChildren().get(1);
+        TextField phoneTf = (TextField) phoneField.getChildren().get(1);
+
+        addFocusBorder(firstNameTf);
+        addFocusBorder(lastNameTf);
+        addFocusBorder(emailTf);
+        addFocusBorder(dobTf);
+        addFocusBorder(phoneTf);
+
+        dobTf.setPromptText("DD/MM/AA");
+        setupDateMask(dobTf);
+        phoneTf.setPromptText("000-000-0000");
+        setupPhoneMask(phoneTf);
+
+        Runnable saveAction = () -> {
+            String fn = firstNameTf.getText().trim();
+            String ln = lastNameTf.getText().trim();
+            String em = emailTf.getText().trim();
+            String dob = dobTf.getText().trim();
+            String ph = phoneTf.getText().trim();
+            if (!fn.isEmpty()) prefs.put(USER_FIRST_NAME_KEY, fn);
+            if (!ln.isEmpty()) prefs.put(USER_LAST_NAME_KEY, ln);
+            if (!em.isEmpty()) prefs.put(USER_EMAIL_KEY, em);
+            if (!dob.isEmpty()) prefs.put(USER_DOB_KEY, dob);
+            if (!ph.isEmpty()) prefs.put(USER_PHONE_KEY, ph);
+            String fullName = (fn + " " + ln).trim();
+            userName.setText(!fullName.isEmpty() ? fullName : lang.get("config.profile.name"));
+            modal.close();
+            showToast(lang.get("config.toast.saved"));
+        };
+
+        firstNameTf.setOnAction(e -> saveAction.run());
+        lastNameTf.setOnAction(e -> saveAction.run());
+        emailTf.setOnAction(e -> saveAction.run());
+        dobTf.setOnAction(e -> saveAction.run());
+        phoneTf.setOnAction(e -> saveAction.run());
+
+        fields.getChildren().addAll(nameRow, emailField, extraRow);
 
         HBox buttonBox = new HBox(12);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
-        Button saveBtn = new Button("Guardar Cambios");
+        Button saveBtn = new Button(lang.get("config.editProfile.save"));
         saveBtn.setPrefWidth(160);
         saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
-            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.3), 15, 0, 0, 8);");
-        saveBtn.setOnMouseEntered(e -> saveBtn.setStyle("-fx-background-color: #1D4ED8; -fx-text-fill: white; " +
-            "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 10; " +
-            "-fx-cursor: hand; -fx-padding: 12 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.4), 20, 0, 0, 10);"));
-        saveBtn.setOnMouseExited(e -> saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
-            "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 10; " +
-            "-fx-cursor: hand; -fx-padding: 12 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.3), 15, 0, 0, 8);"));
-        saveBtn.setOnMouseClicked(e -> modal.close());
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0;");
+        saveBtn.setOnMouseClicked(e -> saveAction.run());
 
-        Button cancelBtn = new Button("Cancelar");
+        Button cancelBtn = new Button(lang.get("config.editProfile.cancel"));
         cancelBtn.setPrefWidth(160);
         cancelBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         cancelBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "#334155" : "white") + "; " +
@@ -435,17 +665,256 @@ public class Configuracion {
 
         buttonBox.getChildren().addAll(saveBtn, cancelBtn);
 
-        dialog.getChildren().addAll(topBar, avatarSection, fields, buttonBox);
+        dialog.getChildren().addAll(topBar, avatarSection, modalDivider, accountPrefsLabel, fields, buttonBox);
 
-        StackPane backdrop = new StackPane(dialog);
-        backdrop.setPadding(new Insets(80));
-        String backdropBg = "transparent";
-        backdrop.setStyle("-fx-background-color: " + backdropBg + ";");
+        Group dialogGroup = new Group(dialog);
+        dialogGroup.setScaleX(scale);
+        dialogGroup.setScaleY(scale);
+
+        StackPane backdrop = new StackPane(dialogGroup);
+        backdrop.setPadding(new Insets(pad));
+        backdrop.setStyle("-fx-background-color: rgba(0,0,0,0.5);");
 
         Scene scene = new Scene(backdrop);
         scene.setFill(Color.TRANSPARENT);
         modal.setScene(scene);
         modal.showAndWait();
+    }
+
+    private void showChangePasswordModal() {
+        Stage modal = new Stage();
+        modal.initModality(Modality.APPLICATION_MODAL);
+        modal.initStyle(StageStyle.TRANSPARENT);
+        if (ownerStage != null) {
+            modal.initOwner(ownerStage);
+            modal.setX(ownerStage.getX());
+            modal.setY(ownerStage.getY());
+            modal.setWidth(ownerStage.getWidth());
+            modal.setHeight(ownerStage.getHeight());
+        } else {
+            modal.setWidth(460);
+            modal.setHeight(560);
+        }
+
+        double pad = Math.min(60, Math.min(modal.getWidth(), modal.getHeight()) * 0.06);
+        double scale = Math.min(1.0, Math.min(
+            (modal.getWidth() - pad * 2) / 540,
+            (modal.getHeight() - pad * 2) / 640
+        ));
+
+        VBox dialog = new VBox();
+        dialog.setPadding(new Insets(28));
+        dialog.setSpacing(20);
+        dialog.setMaxWidth(460);
+        String dialogBg = theme.isDark() ? "#1E293B" : "#FFFFFF";
+        dialog.setStyle("-fx-background-color: " + dialogBg + "; -fx-background-radius: 20; " +
+            "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 30, 0, 0, 8);");
+
+        LanguageManager lang = LanguageManager.getInstance();
+
+        HBox topBar = new HBox();
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        Text modalTitle = new Text(lang.get("config.changePassword.title"));
+        modalTitle.setFont(Font.font("Inter", FontWeight.BOLD, 20));
+        modalTitle.setFill(Color.web(theme.text()));
+        Region sp = new Region();
+        HBox.setHgrow(sp, Priority.ALWAYS);
+        Button closeBtn = new Button("X");
+        closeBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        closeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: " + theme.muted() + "; " +
+            "-fx-cursor: hand; -fx-padding: 4 8; -fx-background-radius: 8;");
+        closeBtn.setOnMouseEntered(e -> closeBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "#334155" : "#F1F5F9") + "; " +
+            "-fx-text-fill: " + theme.text() + "; -fx-cursor: hand; -fx-padding: 4 8; -fx-background-radius: 8;"));
+        closeBtn.setOnMouseExited(e -> closeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: " + theme.muted() + "; " +
+            "-fx-cursor: hand; -fx-padding: 4 8; -fx-background-radius: 8;"));
+        closeBtn.setOnMouseClicked(e -> modal.close());
+        topBar.getChildren().addAll(modalTitle, sp, closeBtn);
+
+        VBox fields = new VBox(16);
+        VBox oldPwdField = createPasswordField(lang.get("config.changePassword.actual"), lang.get("config.changePassword.actual"));
+        VBox newPwdField = createPasswordField(lang.get("config.changePassword.new"), lang.get("config.changePassword.new"));
+        VBox confirmPwdField = createPasswordField(lang.get("config.changePassword.confirm"), lang.get("config.changePassword.confirm"));
+
+        PasswordField oldPf = (PasswordField) oldPwdField.getChildren().get(1);
+        PasswordField newPf = (PasswordField) newPwdField.getChildren().get(1);
+        PasswordField confirmPf = (PasswordField) confirmPwdField.getChildren().get(1);
+        addFocusBorder(oldPf);
+        addFocusBorder(newPf);
+        addFocusBorder(confirmPf);
+
+        fields.getChildren().addAll(oldPwdField, newPwdField, confirmPwdField);
+
+        HBox buttonBox = new HBox(12);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+        Button saveBtn = new Button(lang.get("config.changePassword.update"));
+        saveBtn.setPrefWidth(180);
+        saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 13));
+        saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0;");
+        Runnable savePwdAction = () -> {
+            modal.close();
+            showToast(lang.get("config.toast.passwordUpdated"));
+        };
+
+        oldPf.setOnAction(e -> savePwdAction.run());
+        newPf.setOnAction(e -> savePwdAction.run());
+        confirmPf.setOnAction(e -> savePwdAction.run());
+        saveBtn.setOnMouseClicked(e -> savePwdAction.run());
+
+        Button cancelBtn = new Button(lang.get("config.changePassword.cancel"));
+        cancelBtn.setPrefWidth(140);
+        cancelBtn.setFont(Font.font("Inter", FontWeight.BOLD, 13));
+        cancelBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "#334155" : "white") + "; " +
+            "-fx-text-fill: " + theme.text() + "; -fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0; " +
+            "-fx-border-color: " + (theme.isDark() ? "#475569" : "#E2E8F0") + "; -fx-border-radius: 10; -fx-border-width: 1;");
+        cancelBtn.setOnMouseClicked(e -> modal.close());
+
+        buttonBox.getChildren().addAll(saveBtn, cancelBtn);
+
+        dialog.getChildren().addAll(topBar, fields, buttonBox);
+
+        Group dialogGroup = new Group(dialog);
+        dialogGroup.setScaleX(scale);
+        dialogGroup.setScaleY(scale);
+
+        StackPane backdrop = new StackPane(dialogGroup);
+        backdrop.setPadding(new Insets(pad));
+        backdrop.setStyle("-fx-background-color: rgba(0,0,0,0.5);");
+
+        Scene scene = new Scene(backdrop);
+        scene.setFill(Color.TRANSPARENT);
+        modal.setScene(scene);
+        modal.showAndWait();
+    }
+
+    private void showResetPasswordModal() {
+        Stage modal = new Stage();
+        modal.initModality(Modality.APPLICATION_MODAL);
+        modal.initStyle(StageStyle.TRANSPARENT);
+        if (ownerStage != null) {
+            modal.initOwner(ownerStage);
+            modal.setX(ownerStage.getX());
+            modal.setY(ownerStage.getY());
+            modal.setWidth(ownerStage.getWidth());
+            modal.setHeight(ownerStage.getHeight());
+        } else {
+            modal.setWidth(460);
+            modal.setHeight(520);
+        }
+
+        double pad = Math.min(60, Math.min(modal.getWidth(), modal.getHeight()) * 0.06);
+        double scale = Math.min(1.0, Math.min(
+            (modal.getWidth() - pad * 2) / 540,
+            (modal.getHeight() - pad * 2) / 640
+        ));
+
+        VBox dialog = new VBox();
+        dialog.setPadding(new Insets(28));
+        dialog.setSpacing(20);
+        dialog.setMaxWidth(460);
+        String dialogBg = theme.isDark() ? "#1E293B" : "#FFFFFF";
+        dialog.setStyle("-fx-background-color: " + dialogBg + "; -fx-background-radius: 20; " +
+            "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 30, 0, 0, 8);");
+
+        LanguageManager lang = LanguageManager.getInstance();
+
+        HBox topBar = new HBox();
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        Text modalTitle = new Text(lang.get("config.resetPwd.title"));
+        modalTitle.setFont(Font.font("Inter", FontWeight.BOLD, 20));
+        modalTitle.setFill(Color.web(theme.text()));
+        Region sp = new Region();
+        HBox.setHgrow(sp, Priority.ALWAYS);
+        Button closeBtn = new Button("X");
+        closeBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        closeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: " + theme.muted() + "; " +
+            "-fx-cursor: hand; -fx-padding: 4 8; -fx-background-radius: 8;");
+        closeBtn.setOnMouseEntered(e -> closeBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "#334155" : "#F1F5F9") + "; " +
+            "-fx-text-fill: " + theme.text() + "; -fx-cursor: hand; -fx-padding: 4 8; -fx-background-radius: 8;"));
+        closeBtn.setOnMouseExited(e -> closeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: " + theme.muted() + "; " +
+            "-fx-cursor: hand; -fx-padding: 4 8; -fx-background-radius: 8;"));
+        closeBtn.setOnMouseClicked(e -> modal.close());
+        topBar.getChildren().addAll(modalTitle, sp, closeBtn);
+
+        Text forgotText = new Text(lang.get("config.security.forgotPwd"));
+        forgotText.setFont(Font.font("Inter", 13));
+        forgotText.setFill(Color.web(theme.muted()));
+
+        VBox fields = new VBox(12);
+        VBox emailField = createInputField(lang.get("config.resetPwd.email"), "");
+        VBox codeField = createInputField(lang.get("config.resetPwd.code"), "");
+        fields.getChildren().addAll(emailField, codeField);
+
+        TextField emailTf = (TextField) emailField.getChildren().get(1);
+        TextField codeTf = (TextField) codeField.getChildren().get(1);
+        addFocusBorder(emailTf);
+        addFocusBorder(codeTf);
+
+        HBox buttonBox = new HBox(12);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+        Button sendBtn = new Button(lang.get("config.resetPwd.send"));
+        sendBtn.setPrefWidth(160);
+        sendBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        sendBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0;");
+        sendBtn.setOnMouseClicked(e -> {
+            modal.close();
+            showToast(lang.get("config.toast.codeSent"));
+        });
+
+        Button verifyBtn = new Button(lang.get("config.resetPwd.verify"));
+        verifyBtn.setPrefWidth(160);
+        verifyBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        verifyBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0;");
+        verifyBtn.setOnMouseClicked(e -> {
+            modal.close();
+            showToast(lang.get("config.toast.codeVerified"));
+        });
+
+        Button cancelBtn = new Button(lang.get("config.editProfile.cancel"));
+        cancelBtn.setPrefWidth(140);
+        cancelBtn.setFont(Font.font("Inter", FontWeight.BOLD, 13));
+        cancelBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "#334155" : "white") + "; " +
+            "-fx-text-fill: " + theme.text() + "; -fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0; " +
+            "-fx-border-color: " + (theme.isDark() ? "#475569" : "#E2E8F0") + "; -fx-border-radius: 10; -fx-border-width: 1;");
+        cancelBtn.setOnMouseClicked(e -> modal.close());
+
+        buttonBox.getChildren().addAll(sendBtn, verifyBtn, cancelBtn);
+
+        emailTf.setOnAction(e -> sendBtn.fire());
+        codeTf.setOnAction(e -> verifyBtn.fire());
+
+        dialog.getChildren().addAll(topBar, forgotText, fields, buttonBox);
+
+        Group dialogGroup = new Group(dialog);
+        dialogGroup.setScaleX(scale);
+        dialogGroup.setScaleY(scale);
+
+        StackPane backdrop = new StackPane(dialogGroup);
+        backdrop.setPadding(new Insets(pad));
+        backdrop.setStyle("-fx-background-color: rgba(0,0,0,0.5);");
+
+        Scene scene = new Scene(backdrop);
+        scene.setFill(Color.TRANSPARENT);
+        modal.setScene(scene);
+        modal.showAndWait();
+    }
+
+    private VBox createPasswordField(String label, String placeholder) {
+        VBox field = new VBox(6);
+        Text lbl = new Text(label);
+        lbl.setFont(Font.font("Inter", FontWeight.SEMI_BOLD, 13));
+        lbl.setFill(Color.web(theme.muted()));
+        PasswordField pf = new PasswordField();
+        pf.setPromptText(placeholder);
+        pf.setFont(Font.font("Inter", 14));
+        pf.setStyle("-fx-background-color: " + (theme.isDark() ? "#0F172A" : "#F8FAFC") + "; " +
+            "-fx-border-color: " + (theme.isDark() ? "#334155" : "#E2E8F0") + "; " +
+            "-fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12 16; " +
+            "-fx-text-fill: " + theme.text() + ";");
+        field.getChildren().addAll(lbl, pf);
+        return field;
     }
  
     private VBox createInputField(String label, String value) {
@@ -463,35 +932,123 @@ public class Configuracion {
         return field;
     }
 
+    private void loadProfileImage() {
+        String path = prefs.get(PROFILE_IMAGE_KEY, "");
+        if (!path.isEmpty()) {
+            applyProfileImage(path);
+        }
+    }
+
+    private void storeProfileImage(String path) {
+        prefs.put(PROFILE_IMAGE_KEY, path);
+    }
+
+    private void applyProfileImage(String path) {
+        try {
+            Image img = new Image(new File(path).toURI().toString(), false);
+            avatarBg.setFill(new ImagePattern(img));
+            profileAvatarIcon.setVisible(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showToast(String message) {
+        Stage toastStage = new Stage();
+        toastStage.initStyle(StageStyle.TRANSPARENT);
+        toastStage.initOwner(ownerStage);
+
+        Label label = new Label(message);
+        label.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        label.setTextFill(Color.WHITE);
+        label.setPadding(new Insets(12, 24, 12, 24));
+        label.setStyle("-fx-background-color: #059669; -fx-background-radius: 10;");
+
+        StackPane pane = new StackPane(label);
+        pane.setStyle("-fx-background-color: transparent;");
+        pane.setPadding(new Insets(20));
+
+        Scene scene = new Scene(pane);
+        scene.setFill(Color.TRANSPARENT);
+        toastStage.setScene(scene);
+        toastStage.setAlwaysOnTop(true);
+
+        if (ownerStage != null) {
+            toastStage.setX(ownerStage.getX() + ownerStage.getWidth() - 320);
+            toastStage.setY(ownerStage.getY() + ownerStage.getHeight() - 80);
+        }
+
+        toastStage.show();
+
+        PauseTransition delay = new PauseTransition(Duration.seconds(2));
+        delay.setOnFinished(e -> toastStage.close());
+        delay.play();
+    }
+
+    private void addFocusBorder(Control input) {
+        String baseStyle = input.getStyle();
+        input.focusedProperty().addListener((obs, old, focused) -> {
+            if (focused) {
+                input.setStyle(baseStyle + "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-width: 2;");
+            } else {
+                input.setStyle(baseStyle);
+            }
+        });
+    }
+
+    private void setupDateMask(TextField tf) {
+        tf.textProperty().addListener((obs, old, text) -> {
+            if (text.equals(old)) return;
+            String digits = text.replaceAll("[^\\d]", "");
+            StringBuilder formatted = new StringBuilder();
+            for (int i = 0; i < digits.length() && i < 8; i++) {
+                if (i == 2 || i == 4) formatted.append("/");
+                formatted.append(digits.charAt(i));
+            }
+            tf.setText(formatted.toString());
+            tf.positionCaret(tf.getText().length());
+        });
+    }
+
+    private void setupPhoneMask(TextField tf) {
+        tf.textProperty().addListener((obs, old, text) -> {
+            if (text.equals(old)) return;
+            String digits = text.replaceAll("[^\\d]", "");
+            StringBuilder formatted = new StringBuilder();
+            for (int i = 0; i < digits.length() && i < 10; i++) {
+                if (i == 3 || i == 6) formatted.append("-");
+                formatted.append(digits.charAt(i));
+            }
+            tf.setText(formatted.toString());
+            tf.positionCaret(tf.getText().length());
+        });
+    }
+
     private VBox createLogoutSection() {
         VBox section = new VBox();
         VBox.setMargin(section, new Insets(8, 0, 0, 0));
 
-        Button logoutBtn = new Button("Cerrar Sesion");
+        logoutBtn = new Button("Cerrar Sesion");
         logoutBtn.setMaxWidth(Double.MAX_VALUE);
         logoutBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         logoutBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_RED + "; -fx-text-fill: white; " +
-            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(220,38,38,0.3), 15, 0, 0, 8);");
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0;");
 
         logoutBtn.setOnMouseEntered(e -> logoutBtn.setStyle(
             "-fx-background-color: " + ThemeManager.COLOR_RED_HOVER + "; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
-            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(220,38,38,0.4), 20, 0, 0, 10);"));
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0;"));
         logoutBtn.setOnMouseExited(e -> logoutBtn.setStyle(
             "-fx-background-color: " + ThemeManager.COLOR_RED + "; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
-            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
-            "-fx-effect: dropshadow(three-pass-box, rgba(220,38,38,0.3), 15, 0, 0, 8);"));
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0;"));
 
         section.getChildren().add(logoutBtn);
 
         theme.addListener(() -> {
             logoutBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_RED + "; -fx-text-fill: white; " +
                 "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
-                "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
-                "-fx-effect: dropshadow(three-pass-box, rgba(220,38,38,0.3), 15, 0, 0, 8);");
+                "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0;");
         });
 
         return section;

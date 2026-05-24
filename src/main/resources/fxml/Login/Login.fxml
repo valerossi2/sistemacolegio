@@ -22,7 +22,7 @@
 <HBox xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
       styleClass="root-bg"
-      fx:controller="LoginController"
+      fx:controller="controller.LoginController"
       styleClass=""
 
       minWidth="820"

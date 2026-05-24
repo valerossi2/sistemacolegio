@@ -248,10 +248,29 @@ public class MainController {
         
         mainCanvas.widthProperty().addListener((obs, oldVal, newVal) -> {
             double width = newVal.doubleValue();
-            double contentWidth = width - 80; // 40 left and 40 right padding in mainCanvas
+            double contentWidth = width - 80;
+            boolean compact = contentWidth < 700;
+            
+            kpiGrid.setSpacing(compact ? 8 : 16);
+            for (Node node : kpiGrid.getChildren()) {
+                if (node instanceof VBox) {
+                    VBox wrapper = (VBox) node;
+                    wrapper.setPadding(new Insets(compact ? 2 : 0));
+                    if (!wrapper.getChildren().isEmpty() && wrapper.getChildren().get(0) instanceof HBox) {
+                        HBox card = (HBox) wrapper.getChildren().get(0);
+                        card.setPadding(new Insets(compact ? 8 : 12));
+                    }
+                }
+            }
+            
+            scheduleBox.setPadding(new Insets(compact ? 8 : 12));
+            scheduleBox.setSpacing(compact ? 4 : 8);
+            coursesBox.setPadding(new Insets(compact ? 8 : 0));
+            coursesBox.setSpacing(compact ? 8 : 0);
+            performanceBox.setPadding(new Insets(compact ? 8 : 12));
+            performanceBox.setSpacing(compact ? 6 : 8);
             
             if (contentWidth < 900) {
-                // Stack vertically
                 if (middleSection.getChildren().contains(middleSectionHBox)) {
                     middleSection.getChildren().clear();
                 }
@@ -261,7 +280,6 @@ public class MainController {
                 coursesBox.setPrefWidth(contentWidth);
                 performanceBox.setPrefWidth(contentWidth);
             } else {
-                // Side-by-side
                 if (middleSection.getChildren().contains(coursesBox)) {
                     middleSection.getChildren().clear();
                 }

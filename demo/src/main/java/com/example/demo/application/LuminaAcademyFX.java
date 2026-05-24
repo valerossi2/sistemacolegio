@@ -26,12 +26,12 @@ public class LuminaAcademyFX extends Application {
             controller.setupEverything();
 
             Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-            double width = Math.min(1400, screenBounds.getWidth());
-            double height = Math.min(900, screenBounds.getHeight());
+            double width = Math.min(1050, screenBounds.getWidth() * 0.7);
+            double height = Math.min(700, screenBounds.getHeight() * 0.7);
             Scene scene = new Scene(rootNode, width, height);
 
-            primaryStage.setMinWidth(1024);
-            primaryStage.setMinHeight(700);
+            primaryStage.setMinWidth(700);
+            primaryStage.setMinHeight(450);
 
             theme.addListener(() -> {
                 scene.getStylesheets().clear();

@@ -421,8 +421,6 @@ public class Configuracion {
         String lastName = prefs.get(USER_LAST_NAME_KEY, "");
         String fullName = (firstName + " " + lastName).trim();
         userName.setText(!fullName.isEmpty() ? fullName : lang.get("config.profile.name"));
-        String storedEmail = prefs.get(USER_EMAIL_KEY, "");
-        userEmail.setText(!storedEmail.isEmpty() ? storedEmail : lang.get("config.profile.email"));
         editBtn.setText(lang.get("config.profile.editBtn"));
         prefsTitle.setText(lang.get("config.prefs.title"));
         langLabel.setText(lang.get("config.prefs.language"));

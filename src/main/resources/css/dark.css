@@ -139,3 +139,24 @@
 .window-btn-close:hover {
     -fx-background-color: #e81123;
 }
+
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 6px;
+}
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #475569;
+    -fx-background-radius: 3px;
+}
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #64748B;
+}
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-pref-height: 0;
+}
+.scroll-bar:horizontal {
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
+}

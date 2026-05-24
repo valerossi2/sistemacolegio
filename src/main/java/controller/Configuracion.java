@@ -281,7 +281,7 @@ public class Configuracion {
         sunBtn.setPrefSize(28, 28);
         sunBtn.setStyle("-fx-background-radius: 32; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 4, 0, 0, 2);");
         SVGPath sunSmall = new SVGPath();
-        sunSmall.setContent("M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12z");
+        sunSmall.setContent("M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM11 2h2v3h-2zM11 19h2v3h-2zM2 11h3v2H2zM19 11h3v2h-3zM5.64 5.64l1.41-1.41 2.12 2.12-1.41 1.41zM14.83 16.24l1.41-1.41 2.12 2.12-1.41 1.41zM5.64 18.36l2.12-2.12 1.41 1.41-2.12 2.12zM14.83 7.76l2.12-2.12 1.41 1.41-2.12 2.12z");
         sunSmall.setFill(Color.web(ThemeManager.COLOR_PRIMARY));
         sunSmall.setScaleX(0.7);
         sunSmall.setScaleY(0.7);

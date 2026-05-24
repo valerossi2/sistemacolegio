@@ -16,6 +16,7 @@ public class Configuracion {
 
     private ThemeManager theme;
     private VBox root;
+    private Stage ownerStage;
 
     private Runnable updateTheme;
 
@@ -60,6 +61,10 @@ public class Configuracion {
         return root;
     }
 
+    public void setOwnerStage(Stage stage) {
+        this.ownerStage = stage;
+    }
+
     private String cardStyle() {
         return "-fx-background-color: " + theme.card() + "; -fx-background-radius: 16; " +
             "-fx-border-color: " + theme.border() + "; -fx-border-radius: 16; " +
@@ -75,18 +80,18 @@ public class Configuracion {
         leftBox.setAlignment(Pos.CENTER_LEFT);
 
         StackPane avatarStack = new StackPane();
-        Circle avatarBg = new Circle(32, Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
+        Circle avatarBg = new Circle(22, Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
         SVGPath avatarIcon = new SVGPath();
         avatarIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
-        avatarIcon.setScaleX(1.2);
-        avatarIcon.setScaleY(1.2);
+        avatarIcon.setScaleX(0.9);
+        avatarIcon.setScaleY(0.9);
         avatarIcon.setFill(Color.web(theme.textSec()));
         avatarStack.getChildren().addAll(avatarBg, avatarIcon);
 
-        Circle onlineDot = new Circle(5, Color.web(ThemeManager.COLOR_GREEN));
-        onlineDot.setTranslateX(22);
-        onlineDot.setTranslateY(22);
-        onlineDot.setStrokeWidth(2);
+        Circle onlineDot = new Circle(4, Color.web(ThemeManager.COLOR_GREEN));
+        onlineDot.setTranslateX(15);
+        onlineDot.setTranslateY(15);
+        onlineDot.setStrokeWidth(1.5);
         StackPane avatarWrapper = new StackPane(avatarStack, onlineDot);
 
         VBox nameBox = new VBox(0);
@@ -328,6 +333,11 @@ public class Configuracion {
         modal.initStyle(StageStyle.UNDECORATED);
         modal.setWidth(460);
         modal.setHeight(560);
+        if (ownerStage != null) {
+            modal.initOwner(ownerStage);
+            modal.setX(ownerStage.getX() + (ownerStage.getWidth() - 460) / 2);
+            modal.setY(ownerStage.getY() + (ownerStage.getHeight() - 560) / 2);
+        }
 
         VBox dialog = new VBox();
         dialog.setPadding(new Insets(28));
@@ -359,25 +369,25 @@ public class Configuracion {
         avatarSection.setAlignment(Pos.CENTER);
         
         StackPane avatarOuter = new StackPane();
-        Circle avatarBig = new Circle(50, Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
+        Circle avatarBig = new Circle(36, Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
         SVGPath avatarBigIcon = new SVGPath();
         avatarBigIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
-        avatarBigIcon.setScaleX(2);
-        avatarBigIcon.setScaleY(2);
+        avatarBigIcon.setScaleX(1.3);
+        avatarBigIcon.setScaleY(1.3);
         avatarBigIcon.setFill(Color.web(theme.textSec()));
         
         StackPane cameraOverlay = new StackPane();
-        cameraOverlay.setPrefSize(30, 30);
-        cameraOverlay.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-background-radius: 15; " +
+        cameraOverlay.setPrefSize(24, 24);
+        cameraOverlay.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-background-radius: 12; " +
             "-fx-cursor: hand;");
         SVGPath cameraIcon = new SVGPath();
         cameraIcon.setContent("M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z");
-        cameraIcon.setScaleX(0.6);
-        cameraIcon.setScaleY(0.6);
+        cameraIcon.setScaleX(0.5);
+        cameraIcon.setScaleY(0.5);
         cameraIcon.setFill(Color.WHITE);
         cameraOverlay.getChildren().add(cameraIcon);
-        cameraOverlay.setTranslateX(35);
-        cameraOverlay.setTranslateY(35);
+        cameraOverlay.setTranslateX(25);
+        cameraOverlay.setTranslateY(25);
         
         avatarOuter.getChildren().addAll(avatarBig, avatarBigIcon, cameraOverlay);
         Text changePhotoText = new Text("Cambiar Foto");
@@ -433,6 +443,7 @@ public class Configuracion {
         backdrop.setStyle("-fx-background-color: " + backdropBg + ";");
 
         Scene scene = new Scene(backdrop);
+        scene.setFill(Color.TRANSPARENT);
         modal.setScene(scene);
         modal.showAndWait();
     }

@@ -251,6 +251,7 @@ public class MainController {
             setCenterView(mainCanvas);
         } else if (index == 5) {
             com.example.demo.controller.Configuracion config = new com.example.demo.controller.Configuracion(theme);
+            config.setOwnerStage(stage);
             setCenterView(config.getView());
         } else {
             System.out.println("Navegando a sección: " + index + " (No implementada)");

@@ -426,12 +426,15 @@ public class Configuracion {
         Stage modal = new Stage();
         modal.initModality(Modality.APPLICATION_MODAL);
         modal.initStyle(StageStyle.TRANSPARENT);
-        modal.setWidth(460);
-        modal.setHeight(560);
         if (ownerStage != null) {
             modal.initOwner(ownerStage);
-            modal.setX(ownerStage.getX() + (ownerStage.getWidth() - 460) / 2);
-            modal.setY(ownerStage.getY() + (ownerStage.getHeight() - 560) / 2);
+            modal.setX(ownerStage.getX());
+            modal.setY(ownerStage.getY());
+            modal.setWidth(ownerStage.getWidth());
+            modal.setHeight(ownerStage.getHeight());
+        } else {
+            modal.setWidth(460);
+            modal.setHeight(560);
         }
 
         VBox dialog = new VBox();
@@ -532,8 +535,7 @@ public class Configuracion {
 
         StackPane backdrop = new StackPane(dialog);
         backdrop.setPadding(new Insets(80));
-        String backdropBg = "transparent";
-        backdrop.setStyle("-fx-background-color: " + backdropBg + ";");
+        backdrop.setStyle("-fx-background-color: rgba(0,0,0,0.5);");
 
         Scene scene = new Scene(backdrop);
         scene.setFill(Color.TRANSPARENT);
@@ -545,12 +547,15 @@ public class Configuracion {
         Stage modal = new Stage();
         modal.initModality(Modality.APPLICATION_MODAL);
         modal.initStyle(StageStyle.TRANSPARENT);
-        modal.setWidth(460);
-        modal.setHeight(560);
         if (ownerStage != null) {
             modal.initOwner(ownerStage);
-            modal.setX(ownerStage.getX() + (ownerStage.getWidth() - 460) / 2);
-            modal.setY(ownerStage.getY() + (ownerStage.getHeight() - 560) / 2);
+            modal.setX(ownerStage.getX());
+            modal.setY(ownerStage.getY());
+            modal.setWidth(ownerStage.getWidth());
+            modal.setHeight(ownerStage.getHeight());
+        } else {
+            modal.setWidth(460);
+            modal.setHeight(560);
         }
 
         VBox dialog = new VBox();
@@ -617,7 +622,7 @@ public class Configuracion {
 
         StackPane backdrop = new StackPane(dialog);
         backdrop.setPadding(new Insets(60));
-        backdrop.setStyle("-fx-background-color: transparent;");
+        backdrop.setStyle("-fx-background-color: rgba(0,0,0,0.5);");
 
         Scene scene = new Scene(backdrop);
         scene.setFill(Color.TRANSPARENT);

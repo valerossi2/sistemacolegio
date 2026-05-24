@@ -343,11 +343,10 @@ public class LuminaAcademyFX extends Application {
         row.getChildren().addAll(
             new HBox(tName), new HBox(new Text(prof)), new HBox(new Text(st)), progBox
         );
-        row.getChildren().get(0).setPrefWidth(200);
-        row.getChildren().get(1).setPrefWidth(200);
-        row.getChildren().get(2).setPrefWidth(150);
-        row.getChildren().get(3).setPrefWidth(150);
-
+        ((HBox) row.getChildren().get(0)).setPrefWidth(200);
+        ((HBox) row.getChildren().get(1)).setPrefWidth(200);
+        ((HBox) row.getChildren().get(2)).setPrefWidth(150);
+        ((HBox) row.getChildren().get(3)).setPrefWidth(150);
         return row;
     }
 

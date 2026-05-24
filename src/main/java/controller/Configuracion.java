@@ -213,16 +213,17 @@ public class Configuracion {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         langCombo = new ComboBox<>();
-        langCombo.getItems().addAll("Español", "Ingles");
+        langCombo.getItems().addAll("Español", "Inglés");
         String currentLang = LanguageManager.getInstance().getCurrentLanguageCode();
-        langCombo.setValue(currentLang.equals("en") ? "Ingles" : "Español");
+        langCombo.setValue(currentLang.equals("en") ? "Inglés" : "Español");
         langCombo.setPrefWidth(160);
         langCombo.setOnAction(e -> {
             String selected = langCombo.getValue();
-            if ("Ingles".equals(selected)) {
-                LanguageManager.getInstance().setLanguage("en");
+            LanguageManager lm = LanguageManager.getInstance();
+            if (lm.get("config.prefs.lang.en").equals(selected)) {
+                lm.setLanguage("en");
             } else {
-                LanguageManager.getInstance().setLanguage("es");
+                lm.setLanguage("es");
             }
         });
 
@@ -302,7 +303,7 @@ public class Configuracion {
 
         row.getChildren().addAll(iconStack, textBox, spacer, toggleGroup);
 
-        theme.addListener(() -> {
+        Runnable updateTemaRow = () -> {
             row.setStyle("-fx-border-color: transparent transparent " + theme.divider() + " transparent;");
             iconCircle.setFill(Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
             sunIcon.setFill(Color.web(theme.textSec()));
@@ -315,7 +316,10 @@ public class Configuracion {
                 "-fx-background-radius: 32; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 4, 0, 0, 2);");
             moonIcon.setFill(Color.web(theme.isDark() ? ThemeManager.COLOR_PRIMARY : theme.muted()));
             sunSmall.setFill(Color.web(theme.isDark() ? theme.muted() : ThemeManager.COLOR_PRIMARY));
-        });
+        };
+
+        theme.addListener(updateTemaRow);
+        updateTemaRow.run();
 
         return row;
     }
@@ -382,6 +386,12 @@ public class Configuracion {
         secTitle.setText(lang.get("config.security.title"));
         changePwdBtn.setText(lang.get("config.security.changePwd"));
         logoutBtn.setText(lang.get("config.security.logout"));
+
+        String selected = lang.getCurrentLanguageCode().equals("en")
+            ? lang.get("config.prefs.lang.en")
+            : lang.get("config.prefs.lang.es");
+        langCombo.getItems().setAll(lang.get("config.prefs.lang.es"), lang.get("config.prefs.lang.en"));
+        langCombo.setValue(selected);
     }
 
     private void setupResponsive() {

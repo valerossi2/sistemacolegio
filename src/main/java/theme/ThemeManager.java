@@ -41,7 +41,7 @@ public class ThemeManager {
     public static final String DARK_ROW_HOVER = "#334155";
     public static final String DARK_ICON_CIRCLE_BG = "#475569";
 
-    private boolean darkMode = false;
+    private boolean darkMode = true;
     private List<Runnable> listeners = new ArrayList<>();
 
     public boolean isDark() { return darkMode; }

@@ -526,7 +526,7 @@ public class MainController {
         courseTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        Button         btnAll = new Button(LanguageManager.getInstance().get("course.viewAll"));
+        btnAll = new Button(LanguageManager.getInstance().get("course.viewAll"));
         btnAll.getStyleClass().add("text-button");
         head.getChildren().addAll(courseTitleText, spacer, btnAll);
 

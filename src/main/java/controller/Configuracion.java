@@ -15,6 +15,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.*;
 import javafx.scene.text.*;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -39,8 +41,11 @@ public class Configuracion {
     private static final double COMPACT_THRESHOLD = 700;
     private Preferences prefs = Preferences.userNodeForPackage(Configuracion.class);
     private static final String PROFILE_IMAGE_KEY = "profileImagePath";
-    private static final String USER_NAME_KEY = "userName";
+    private static final String USER_FIRST_NAME_KEY = "userFirstName";
+    private static final String USER_LAST_NAME_KEY = "userLastName";
     private static final String USER_EMAIL_KEY = "userEmail";
+    private static final String USER_DOB_KEY = "userDob";
+    private static final String USER_PHONE_KEY = "userPhone";
 
     private Text prefsTitle, langLabel, langDesc, themeLabel, themeDesc;
     private Text secTitle;
@@ -388,9 +393,11 @@ public class Configuracion {
         LanguageManager lang = LanguageManager.getInstance();
         title.setText(lang.get("config.title"));
         subtitle.setText(lang.get("config.subtitle"));
-        String storedName = prefs.get(USER_NAME_KEY, "");
+        String firstName = prefs.get(USER_FIRST_NAME_KEY, "");
+        String lastName = prefs.get(USER_LAST_NAME_KEY, "");
+        String fullName = (firstName + " " + lastName).trim();
+        userName.setText(!fullName.isEmpty() ? fullName : lang.get("config.profile.name"));
         String storedEmail = prefs.get(USER_EMAIL_KEY, "");
-        userName.setText(!storedName.isEmpty() ? storedName : lang.get("config.profile.name"));
         userEmail.setText(!storedEmail.isEmpty() ? storedEmail : lang.get("config.profile.email"));
         editBtn.setText(lang.get("config.profile.editBtn"));
         prefsTitle.setText(lang.get("config.prefs.title"));
@@ -520,19 +527,71 @@ public class Configuracion {
         VBox avatarSection = new VBox(8, avatarOuter, photoText);
         avatarSection.setAlignment(Pos.CENTER);
 
+        String currentFirstName = prefs.get(USER_FIRST_NAME_KEY, "");
+        String currentLastName = prefs.get(USER_LAST_NAME_KEY, "");
+        String currentEmail = prefs.get(USER_EMAIL_KEY, lang.get("config.profile.email"));
+        String currentDob = prefs.get(USER_DOB_KEY, "");
+        String currentPhone = prefs.get(USER_PHONE_KEY, "");
+
         VBox fields = new VBox(12);
-        VBox nameField = createInputField(lang.get("config.editProfile.name"), "Admin User");
-        VBox emailField = createInputField(lang.get("config.editProfile.email"), "admin@lumina.edu");
+
+        HBox nameRow = new HBox(12);
+        VBox firstNameField = createInputField(lang.get("config.editProfile.firstName"), currentFirstName);
+        VBox lastNameField = createInputField(lang.get("config.editProfile.lastName"), currentLastName);
+        HBox.setHgrow(firstNameField, Priority.ALWAYS);
+        HBox.setHgrow(lastNameField, Priority.ALWAYS);
+        nameRow.getChildren().addAll(firstNameField, lastNameField);
+
+        VBox emailField = createInputField(lang.get("config.editProfile.email"), currentEmail);
+
+        HBox extraRow = new HBox(12);
+        VBox dobField = createInputField(lang.get("config.editProfile.dob"), currentDob);
+        VBox phoneField = createInputField(lang.get("config.editProfile.phone"), currentPhone);
+        HBox.setHgrow(dobField, Priority.ALWAYS);
+        HBox.setHgrow(phoneField, Priority.ALWAYS);
+        extraRow.getChildren().addAll(dobField, phoneField);
+
         VBox roleField = createInputField(lang.get("config.editProfile.role"), "Admin");
 
-        TextField nameTf = (TextField) nameField.getChildren().get(1);
+        TextField firstNameTf = (TextField) firstNameField.getChildren().get(1);
+        TextField lastNameTf = (TextField) lastNameField.getChildren().get(1);
         TextField emailTf = (TextField) emailField.getChildren().get(1);
+        TextField dobTf = (TextField) dobField.getChildren().get(1);
+        TextField phoneTf = (TextField) phoneField.getChildren().get(1);
         TextField roleTf = (TextField) roleField.getChildren().get(1);
-        addFocusBorder(nameTf);
+
+        addFocusBorder(firstNameTf);
+        addFocusBorder(lastNameTf);
         addFocusBorder(emailTf);
+        addFocusBorder(dobTf);
+        addFocusBorder(phoneTf);
         addFocusBorder(roleTf);
 
-        fields.getChildren().addAll(nameField, emailField, roleField);
+        Runnable saveAction = () -> {
+            String fn = firstNameTf.getText().trim();
+            String ln = lastNameTf.getText().trim();
+            String em = emailTf.getText().trim();
+            String dob = dobTf.getText().trim();
+            String ph = phoneTf.getText().trim();
+            if (!fn.isEmpty()) prefs.put(USER_FIRST_NAME_KEY, fn);
+            if (!ln.isEmpty()) prefs.put(USER_LAST_NAME_KEY, ln);
+            if (!em.isEmpty()) prefs.put(USER_EMAIL_KEY, em);
+            if (!dob.isEmpty()) prefs.put(USER_DOB_KEY, dob);
+            if (!ph.isEmpty()) prefs.put(USER_PHONE_KEY, ph);
+            String fullName = (fn + " " + ln).trim();
+            userName.setText(!fullName.isEmpty() ? fullName : lang.get("config.profile.name"));
+            userEmail.setText(em);
+            modal.close();
+            showToast(lang.get("config.toast.saved"));
+        };
+
+        firstNameTf.setOnAction(e -> saveAction.run());
+        lastNameTf.setOnAction(e -> saveAction.run());
+        emailTf.setOnAction(e -> saveAction.run());
+        dobTf.setOnAction(e -> saveAction.run());
+        phoneTf.setOnAction(e -> saveAction.run());
+
+        fields.getChildren().addAll(nameRow, emailField, extraRow, roleField);
 
         HBox buttonBox = new HBox(12);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
@@ -541,15 +600,7 @@ public class Configuracion {
         saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
             "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0;");
-        saveBtn.setOnMouseClicked(e -> {
-            String name = nameTf.getText().trim();
-            String email = emailTf.getText().trim();
-            if (!name.isEmpty()) prefs.put(USER_NAME_KEY, name);
-            if (!email.isEmpty()) prefs.put(USER_EMAIL_KEY, email);
-            userName.setText(name);
-            userEmail.setText(email);
-            modal.close();
-        });
+        saveBtn.setOnMouseClicked(e -> saveAction.run());
 
         Button cancelBtn = new Button(lang.get("config.editProfile.cancel"));
         cancelBtn.setPrefWidth(160);
@@ -647,7 +698,15 @@ public class Configuracion {
         saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 13));
         saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
             "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0;");
-        saveBtn.setOnMouseClicked(e -> modal.close());
+        Runnable savePwdAction = () -> {
+            modal.close();
+            showToast(lang.get("config.toast.passwordUpdated"));
+        };
+
+        oldPf.setOnAction(e -> savePwdAction.run());
+        newPf.setOnAction(e -> savePwdAction.run());
+        confirmPf.setOnAction(e -> savePwdAction.run());
+        saveBtn.setOnMouseClicked(e -> savePwdAction.run());
 
         Button cancelBtn = new Button(lang.get("config.changePassword.cancel"));
         cancelBtn.setPrefWidth(140);
@@ -725,6 +784,38 @@ public class Configuracion {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void showToast(String message) {
+        Stage toastStage = new Stage();
+        toastStage.initStyle(StageStyle.TRANSPARENT);
+        toastStage.initOwner(ownerStage);
+
+        Label label = new Label(message);
+        label.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        label.setTextFill(Color.WHITE);
+        label.setPadding(new Insets(12, 24, 12, 24));
+        label.setStyle("-fx-background-color: #059669; -fx-background-radius: 10;");
+
+        StackPane pane = new StackPane(label);
+        pane.setStyle("-fx-background-color: transparent;");
+        pane.setPadding(new Insets(20));
+
+        Scene scene = new Scene(pane);
+        scene.setFill(Color.TRANSPARENT);
+        toastStage.setScene(scene);
+        toastStage.setAlwaysOnTop(true);
+
+        if (ownerStage != null) {
+            toastStage.setX(ownerStage.getX() + ownerStage.getWidth() - 320);
+            toastStage.setY(ownerStage.getY() + ownerStage.getHeight() - 80);
+        }
+
+        toastStage.show();
+
+        PauseTransition delay = new PauseTransition(Duration.seconds(2));
+        delay.setOnFinished(e -> toastStage.close());
+        delay.play();
     }
 
     private void addFocusBorder(Control input) {

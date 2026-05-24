@@ -62,7 +62,7 @@ public class Configuracion {
         this.theme = theme;
         root = new VBox();
         root.setPadding(new Insets(16, 24, 16, 24));
-        root.setMaxWidth(900);
+        root.setAlignment(Pos.TOP_CENTER);
 
         title = new Text("Configuracion del Sistema");
         title.setFont(Font.font("Inter", FontWeight.BOLD, 22));

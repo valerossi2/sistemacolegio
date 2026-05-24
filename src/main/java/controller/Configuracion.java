@@ -61,20 +61,20 @@ public class Configuracion {
     public Configuracion(ThemeManager theme) {
         this.theme = theme;
         root = new VBox();
-        root.setPadding(new Insets(20, 28, 20, 28));
+        root.setPadding(new Insets(16, 24, 16, 24));
         root.setAlignment(Pos.TOP_CENTER);
- 
-         title = new Text("Configuracion del Sistema");
-         title.setFont(Font.font("Inter", FontWeight.BOLD, 22));
- 
-         subtitle = new Text("Bienvenido de nuevo. Aqui tienes un resumen del estado institucional hoy.");
-         subtitle.setFont(Font.font("Inter", 12));
- 
-         headerBox = new VBox(4);
-         headerBox.getChildren().addAll(title, subtitle);
-         VBox.setMargin(headerBox, new Insets(0, 0, 16, 0));
- 
-         content = new VBox(20);
+  
+          title = new Text("Configuracion del Sistema");
+          title.setFont(Font.font("Inter", FontWeight.BOLD, 22));
+  
+          subtitle = new Text("Bienvenido de nuevo. Aqui tienes un resumen del estado institucional hoy.");
+          subtitle.setFont(Font.font("Inter", 12));
+  
+          headerBox = new VBox(4);
+          headerBox.getChildren().addAll(title, subtitle);
+          VBox.setMargin(headerBox, new Insets(0, 0, 12, 0));
+  
+          content = new VBox(14);
          content.setMaxWidth(820);
 
         profileSection = createProfileSection();
@@ -117,7 +117,7 @@ public class Configuracion {
 
     private VBox createProfileSection() {
         VBox section = new VBox();
-        section.setPadding(new Insets(18, 24, 18, 24));
+        section.setPadding(new Insets(14, 20, 14, 20));
         section.setStyle(cardStyle());
 
         profileTitle = new Text("Perfil del Usuario");
@@ -199,7 +199,7 @@ public class Configuracion {
 
     private VBox createPreferencesSection() {
         VBox section = new VBox();
-        section.setPadding(new Insets(18, 24, 18, 24));
+        section.setPadding(new Insets(14, 20, 14, 20));
         section.setStyle(cardStyle());
 
         prefsTitle = new Text("Preferencias de la Cuenta");
@@ -359,7 +359,7 @@ public class Configuracion {
 
     private VBox createSecuritySection() {
         VBox section = new VBox();
-        section.setPadding(new Insets(18, 24, 18, 24));
+        section.setPadding(new Insets(14, 20, 14, 20));
         section.setStyle(cardStyle());
 
         secTitle = new Text("Seguridad");
@@ -473,11 +473,11 @@ public class Configuracion {
 
         title.setFont(Font.font("Inter", FontWeight.BOLD, 22 * s));
         subtitle.setFont(Font.font("Inter", 12 * s));
-        VBox.setMargin(headerBox, new Insets(0, 0, 16 * s, 0));
-        content.setSpacing(20 * s);
-        root.setPadding(new Insets(20 * s, 28 * s, 20 * s, 28 * s));
+        VBox.setMargin(headerBox, new Insets(0, 0, 12 * s, 0));
+        content.setSpacing(14 * s);
+        root.setPadding(new Insets(16 * s, 24 * s, 16 * s, 24 * s));
 
-        profileSection.setPadding(new Insets(18 * s, 24 * s, 18 * s, 24 * s));
+        profileSection.setPadding(new Insets(14 * s, 20 * s, 14 * s, 20 * s));
         userName.setFont(Font.font("Inter", FontWeight.BOLD, 16 * s));
         avatarBg.setRadius(28 * s);
         String btnPad = (int)(8 * s) + " " + (int)(24 * s);

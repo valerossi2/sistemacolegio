@@ -49,7 +49,7 @@ public class Configuracion {
 
     private Text prefsTitle, langLabel, langDesc, themeLabel, themeDesc;
     private Text secTitle;
-    private Button changePwdBtn, logoutBtn;
+    private Button changePwdBtn, resetPwdBtn, logoutBtn;
     private Button editModalTitle, editSaveBtn, editCancelBtn, editCloseBtn, editPhotoText;
     private VBox editNameField, editEmailField, editRoleField;
     private Text changePwdModalTitle, changePwdCloseBtn;
@@ -374,12 +374,40 @@ public class Configuracion {
             "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-radius: 10; -fx-border-width: 1.5;"));
         changePwdBtn.setOnMouseClicked(e -> showChangePasswordModal());
 
-        section.getChildren().addAll(secTitle, changePwdBtn);
+        resetPwdBtn = new Button("Restablecer Contrasena");
+        resetPwdBtn.setMaxWidth(Double.MAX_VALUE);
+        resetPwdBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        resetPwdBtn.setStyle("-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
+            "-fx-border-radius: 10; -fx-border-width: 1.5; " +
+            "-fx-background-color: transparent; -fx-text-fill: " + ThemeManager.COLOR_PRIMARY + "; " +
+            "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + ";");
+        VBox.setMargin(resetPwdBtn, new Insets(6, 0, 0, 0));
+
+        resetPwdBtn.setOnMouseEntered(e -> resetPwdBtn.setStyle(
+            "-fx-background-color: " + (theme.isDark() ? "#1E3A5F" : "#EFF6FF") + "; " +
+            "-fx-text-fill: " + ThemeManager.COLOR_PRIMARY + "; " +
+            "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
+            "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-radius: 10; -fx-border-width: 1.5;"));
+        resetPwdBtn.setOnMouseExited(e -> resetPwdBtn.setStyle(
+            "-fx-background-color: transparent; " +
+            "-fx-text-fill: " + ThemeManager.COLOR_PRIMARY + "; " +
+            "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
+            "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-radius: 10; -fx-border-width: 1.5;"));
+        resetPwdBtn.setOnMouseClicked(e -> showResetPasswordModal());
+
+        section.getChildren().addAll(secTitle, changePwdBtn, resetPwdBtn);
 
         theme.addListener(() -> {
             section.setStyle(cardStyle());
             secTitle.setFill(Color.web(theme.text()));
             changePwdBtn.setStyle("-fx-background-color: transparent; " +
+                "-fx-text-fill: " + ThemeManager.COLOR_PRIMARY + "; " +
+                "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
+                "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
+                "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-radius: 10; -fx-border-width: 1.5;");
+            resetPwdBtn.setStyle("-fx-background-color: transparent; " +
                 "-fx-text-fill: " + ThemeManager.COLOR_PRIMARY + "; " +
                 "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
                 "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
@@ -407,6 +435,7 @@ public class Configuracion {
         themeDesc.setText(lang.get("config.prefs.themeDesc"));
         secTitle.setText(lang.get("config.security.title"));
         changePwdBtn.setText(lang.get("config.security.changePwd"));
+        resetPwdBtn.setText(lang.get("config.security.resetPwd"));
         logoutBtn.setText(lang.get("config.security.logout"));
 
         String selected = lang.getCurrentLanguageCode().equals("en")
@@ -551,21 +580,22 @@ public class Configuracion {
         HBox.setHgrow(phoneField, Priority.ALWAYS);
         extraRow.getChildren().addAll(dobField, phoneField);
 
-        VBox roleField = createInputField(lang.get("config.editProfile.role"), "Admin");
-
         TextField firstNameTf = (TextField) firstNameField.getChildren().get(1);
         TextField lastNameTf = (TextField) lastNameField.getChildren().get(1);
         TextField emailTf = (TextField) emailField.getChildren().get(1);
         TextField dobTf = (TextField) dobField.getChildren().get(1);
         TextField phoneTf = (TextField) phoneField.getChildren().get(1);
-        TextField roleTf = (TextField) roleField.getChildren().get(1);
 
         addFocusBorder(firstNameTf);
         addFocusBorder(lastNameTf);
         addFocusBorder(emailTf);
         addFocusBorder(dobTf);
         addFocusBorder(phoneTf);
-        addFocusBorder(roleTf);
+
+        dobTf.setPromptText("DD/MM/AA");
+        setupDateMask(dobTf);
+        phoneTf.setPromptText("000-000-0000");
+        setupPhoneMask(phoneTf);
 
         Runnable saveAction = () -> {
             String fn = firstNameTf.getText().trim();
@@ -591,7 +621,7 @@ public class Configuracion {
         dobTf.setOnAction(e -> saveAction.run());
         phoneTf.setOnAction(e -> saveAction.run());
 
-        fields.getChildren().addAll(nameRow, emailField, extraRow, roleField);
+        fields.getChildren().addAll(nameRow, emailField, extraRow);
 
         HBox buttonBox = new HBox(12);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
@@ -734,6 +764,120 @@ public class Configuracion {
         modal.showAndWait();
     }
 
+    private void showResetPasswordModal() {
+        Stage modal = new Stage();
+        modal.initModality(Modality.APPLICATION_MODAL);
+        modal.initStyle(StageStyle.TRANSPARENT);
+        if (ownerStage != null) {
+            modal.initOwner(ownerStage);
+            modal.setX(ownerStage.getX());
+            modal.setY(ownerStage.getY());
+            modal.setWidth(ownerStage.getWidth());
+            modal.setHeight(ownerStage.getHeight());
+        } else {
+            modal.setWidth(460);
+            modal.setHeight(520);
+        }
+
+        double pad = Math.min(60, Math.min(modal.getWidth(), modal.getHeight()) * 0.06);
+        double scale = Math.min(1.0, Math.min(
+            (modal.getWidth() - pad * 2) / 540,
+            (modal.getHeight() - pad * 2) / 640
+        ));
+
+        VBox dialog = new VBox();
+        dialog.setPadding(new Insets(28));
+        dialog.setSpacing(20);
+        dialog.setMaxWidth(460);
+        String dialogBg = theme.isDark() ? "#1E293B" : "#FFFFFF";
+        dialog.setStyle("-fx-background-color: " + dialogBg + "; -fx-background-radius: 20; " +
+            "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 30, 0, 0, 8);");
+
+        LanguageManager lang = LanguageManager.getInstance();
+
+        HBox topBar = new HBox();
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        Text modalTitle = new Text(lang.get("config.resetPwd.title"));
+        modalTitle.setFont(Font.font("Inter", FontWeight.BOLD, 20));
+        modalTitle.setFill(Color.web(theme.text()));
+        Region sp = new Region();
+        HBox.setHgrow(sp, Priority.ALWAYS);
+        Button closeBtn = new Button("X");
+        closeBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        closeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: " + theme.muted() + "; " +
+            "-fx-cursor: hand; -fx-padding: 4 8; -fx-background-radius: 8;");
+        closeBtn.setOnMouseEntered(e -> closeBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "#334155" : "#F1F5F9") + "; " +
+            "-fx-text-fill: " + theme.text() + "; -fx-cursor: hand; -fx-padding: 4 8; -fx-background-radius: 8;"));
+        closeBtn.setOnMouseExited(e -> closeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: " + theme.muted() + "; " +
+            "-fx-cursor: hand; -fx-padding: 4 8; -fx-background-radius: 8;"));
+        closeBtn.setOnMouseClicked(e -> modal.close());
+        topBar.getChildren().addAll(modalTitle, sp, closeBtn);
+
+        Text forgotText = new Text(lang.get("config.security.forgotPwd"));
+        forgotText.setFont(Font.font("Inter", 13));
+        forgotText.setFill(Color.web(theme.muted()));
+
+        VBox fields = new VBox(12);
+        VBox emailField = createInputField(lang.get("config.resetPwd.email"), "");
+        VBox codeField = createInputField(lang.get("config.resetPwd.code"), "");
+        fields.getChildren().addAll(emailField, codeField);
+
+        TextField emailTf = (TextField) emailField.getChildren().get(1);
+        TextField codeTf = (TextField) codeField.getChildren().get(1);
+        addFocusBorder(emailTf);
+        addFocusBorder(codeTf);
+
+        HBox buttonBox = new HBox(12);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+        Button sendBtn = new Button(lang.get("config.resetPwd.send"));
+        sendBtn.setPrefWidth(160);
+        sendBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        sendBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0;");
+        sendBtn.setOnMouseClicked(e -> {
+            modal.close();
+            showToast(lang.get("config.toast.codeSent"));
+        });
+
+        Button verifyBtn = new Button(lang.get("config.resetPwd.verify"));
+        verifyBtn.setPrefWidth(160);
+        verifyBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        verifyBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0;");
+        verifyBtn.setOnMouseClicked(e -> {
+            modal.close();
+            showToast(lang.get("config.toast.codeVerified"));
+        });
+
+        Button cancelBtn = new Button(lang.get("config.editProfile.cancel"));
+        cancelBtn.setPrefWidth(140);
+        cancelBtn.setFont(Font.font("Inter", FontWeight.BOLD, 13));
+        cancelBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "#334155" : "white") + "; " +
+            "-fx-text-fill: " + theme.text() + "; -fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0; " +
+            "-fx-border-color: " + (theme.isDark() ? "#475569" : "#E2E8F0") + "; -fx-border-radius: 10; -fx-border-width: 1;");
+        cancelBtn.setOnMouseClicked(e -> modal.close());
+
+        buttonBox.getChildren().addAll(sendBtn, verifyBtn, cancelBtn);
+
+        emailTf.setOnAction(e -> sendBtn.fire());
+        codeTf.setOnAction(e -> verifyBtn.fire());
+
+        dialog.getChildren().addAll(topBar, forgotText, fields, buttonBox);
+
+        Group dialogGroup = new Group(dialog);
+        dialogGroup.setScaleX(scale);
+        dialogGroup.setScaleY(scale);
+
+        StackPane backdrop = new StackPane(dialogGroup);
+        backdrop.setPadding(new Insets(pad));
+        backdrop.setStyle("-fx-background-color: rgba(0,0,0,0.5);");
+
+        Scene scene = new Scene(backdrop);
+        scene.setFill(Color.TRANSPARENT);
+        modal.setScene(scene);
+        modal.showAndWait();
+    }
+
     private VBox createPasswordField(String label, String placeholder) {
         VBox field = new VBox(6);
         Text lbl = new Text(label);
@@ -826,6 +970,34 @@ public class Configuracion {
             } else {
                 input.setStyle(baseStyle);
             }
+        });
+    }
+
+    private void setupDateMask(TextField tf) {
+        tf.textProperty().addListener((obs, old, text) -> {
+            if (text.equals(old)) return;
+            String digits = text.replaceAll("[^\\d]", "");
+            StringBuilder formatted = new StringBuilder();
+            for (int i = 0; i < digits.length() && i < 8; i++) {
+                if (i == 2 || i == 4) formatted.append("/");
+                formatted.append(digits.charAt(i));
+            }
+            tf.setText(formatted.toString());
+            tf.positionCaret(tf.getText().length());
+        });
+    }
+
+    private void setupPhoneMask(TextField tf) {
+        tf.textProperty().addListener((obs, old, text) -> {
+            if (text.equals(old)) return;
+            String digits = text.replaceAll("[^\\d]", "");
+            StringBuilder formatted = new StringBuilder();
+            for (int i = 0; i < digits.length() && i < 10; i++) {
+                if (i == 3 || i == 6) formatted.append("-");
+                formatted.append(digits.charAt(i));
+            }
+            tf.setText(formatted.toString());
+            tf.positionCaret(tf.getText().length());
         });
     }
 

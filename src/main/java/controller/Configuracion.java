@@ -1,6 +1,7 @@
 package controller;
 
 import theme.ThemeManager;
+import util.LanguageManager;
 import javafx.geometry.*;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -28,6 +29,17 @@ public class Configuracion {
     private Button editBtn;
     private Circle avatarBg;
     private static final double COMPACT_THRESHOLD = 700;
+
+    private Text prefsTitle, langLabel, langDesc, themeLabel, themeDesc;
+    private Text secTitle;
+    private Button changePwdBtn, logoutBtn;
+    private Button editModalTitle, editSaveBtn, editCancelBtn, editCloseBtn, editPhotoText;
+    private VBox editNameField, editEmailField, editRoleField;
+    private Text changePwdModalTitle, changePwdCloseBtn;
+    private Button changePwdSaveBtn, changePwdCancelBtn;
+    private VBox changePwdOldField, changePwdNewField, changePwdConfirmField;
+    private ComboBox<String> langCombo;
+    private Runnable languageUpdater;
 
     public Configuracion(ThemeManager theme) {
         this.theme = theme;
@@ -65,6 +77,10 @@ public class Configuracion {
         root.getChildren().addAll(headerBox, content);
         theme.addListener(updateTheme);
         updateTheme.run();
+
+        languageUpdater = this::updateTexts;
+        LanguageManager.getInstance().addListener(languageUpdater);
+        updateTexts();
     }
 
     public VBox getView() {
@@ -153,19 +169,19 @@ public class Configuracion {
         section.setPadding(new Insets(14, 20, 14, 20));
         section.setStyle(cardStyle());
 
-        Text sectionTitle = new Text("Preferencias de la Cuenta");
-        sectionTitle.setFont(Font.font("Inter", FontWeight.BOLD, 14));
-        sectionTitle.setFill(Color.web(theme.text()));
-        VBox.setMargin(sectionTitle, new Insets(0, 0, 8, 0));
+        prefsTitle = new Text("Preferencias de la Cuenta");
+        prefsTitle.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        prefsTitle.setFill(Color.web(theme.text()));
+        VBox.setMargin(prefsTitle, new Insets(0, 0, 8, 0));
 
         HBox idiomaRow = createIdiomaRow();
         HBox temaRow = createTemaRow();
 
-        section.getChildren().addAll(sectionTitle, idiomaRow, temaRow);
+        section.getChildren().addAll(prefsTitle, idiomaRow, temaRow);
 
         theme.addListener(() -> {
             section.setStyle(cardStyle());
-            sectionTitle.setFill(Color.web(theme.text()));
+            prefsTitle.setFill(Color.web(theme.text()));
         });
 
         return section;
@@ -185,29 +201,37 @@ public class Configuracion {
         StackPane iconStack = new StackPane(iconCircle, globeIcon);
 
         VBox textBox = new VBox(0);
-        Text label = new Text("Idioma");
-        label.setFont(Font.font("Inter", FontWeight.BOLD, 13));
-        label.setFill(Color.web(theme.text()));
-        Text desc = new Text("Cambia la configuracion del idioma de la cuenta");
-        desc.setFont(Font.font("Inter", 11));
-        desc.setFill(Color.web(theme.muted()));
-        textBox.getChildren().addAll(label, desc);
+        langLabel = new Text("Idioma");
+        langLabel.setFont(Font.font("Inter", FontWeight.BOLD, 13));
+        langLabel.setFill(Color.web(theme.text()));
+        langDesc = new Text("Cambia la configuracion del idioma de la cuenta");
+        langDesc.setFont(Font.font("Inter", 11));
+        langDesc.setFill(Color.web(theme.muted()));
+        textBox.getChildren().addAll(langLabel, langDesc);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        ComboBox<String> langCombo = new ComboBox<>();
-        langCombo.getItems().addAll("Español", "Ingles", "Frances");
+        langCombo = new ComboBox<>();
+        langCombo.getItems().addAll("Español", "Ingles");
         langCombo.setValue("Español");
         langCombo.setPrefWidth(160);
+        langCombo.setOnAction(e -> {
+            String selected = langCombo.getValue();
+            if ("Ingles".equals(selected)) {
+                LanguageManager.getInstance().setLanguage("en");
+            } else {
+                LanguageManager.getInstance().setLanguage("es");
+            }
+        });
 
         row.getChildren().addAll(iconStack, textBox, spacer, langCombo);
 
         Runnable updateRowTheme = () -> {
             row.setStyle("-fx-border-color: transparent transparent " + theme.divider() + " transparent;");
             iconCircle.setFill(Color.web(theme.isDark() ? "#1E3A5F" : "#dbe1ff"));
-            label.setFill(Color.web(theme.text()));
-            desc.setFill(Color.web(theme.muted()));
+            langLabel.setFill(Color.web(theme.text()));
+            langDesc.setFill(Color.web(theme.muted()));
             langCombo.setStyle("-fx-background-color: " + theme.inputBg() + "; " +
                 "-fx-border-color: " + theme.inputBorder() + "; -fx-border-radius: 8; " +
                 "-fx-background-radius: 8; -fx-font-family: 'Inter'; -fx-font-size: 13; " +
@@ -235,13 +259,13 @@ public class Configuracion {
         StackPane iconStack = new StackPane(iconCircle, sunIcon);
 
         VBox textBox = new VBox(0);
-        Text label = new Text("Tema");
-        label.setFont(Font.font("Inter", FontWeight.BOLD, 13));
-        label.setFill(Color.web(theme.text()));
-        Text desc = new Text("Personaliza la apariencia de tu interfaz");
-        desc.setFont(Font.font("Inter", 11));
-        desc.setFill(Color.web(theme.muted()));
-        textBox.getChildren().addAll(label, desc);
+        themeLabel = new Text("Tema");
+        themeLabel.setFont(Font.font("Inter", FontWeight.BOLD, 13));
+        themeLabel.setFill(Color.web(theme.text()));
+        themeDesc = new Text("Personaliza la apariencia de tu interfaz");
+        themeDesc.setFont(Font.font("Inter", 11));
+        themeDesc.setFill(Color.web(theme.muted()));
+        textBox.getChildren().addAll(themeLabel, themeDesc);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -281,8 +305,8 @@ public class Configuracion {
             row.setStyle("-fx-border-color: transparent transparent " + theme.divider() + " transparent;");
             iconCircle.setFill(Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
             sunIcon.setFill(Color.web(theme.textSec()));
-            label.setFill(Color.web(theme.text()));
-            desc.setFill(Color.web(theme.muted()));
+            themeLabel.setFill(Color.web(theme.text()));
+            themeDesc.setFill(Color.web(theme.muted()));
             toggleGroup.setStyle("-fx-background-color: " + theme.toggleGroupBg() + "; -fx-background-radius: 32;");
             sunBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "transparent" : "white") + "; " +
                 "-fx-background-radius: 32; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 4, 0, 0, 2);");
@@ -300,12 +324,12 @@ public class Configuracion {
         section.setPadding(new Insets(14, 20, 14, 20));
         section.setStyle(cardStyle());
 
-        Text sectionTitle = new Text("Seguridad");
-        sectionTitle.setFont(Font.font("Inter", FontWeight.BOLD, 14));
-        sectionTitle.setFill(Color.web(theme.text()));
-        VBox.setMargin(sectionTitle, new Insets(0, 0, 8, 0));
+        secTitle = new Text("Seguridad");
+        secTitle.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        secTitle.setFill(Color.web(theme.text()));
+        VBox.setMargin(secTitle, new Insets(0, 0, 8, 0));
 
-        Button changePwdBtn = new Button("Cambiar Contrasena");
+        changePwdBtn = new Button("Cambiar Contrasena");
         changePwdBtn.setMaxWidth(Double.MAX_VALUE);
         changePwdBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         changePwdBtn.setStyle("-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
@@ -327,11 +351,11 @@ public class Configuracion {
             "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-radius: 10; -fx-border-width: 1.5;"));
         changePwdBtn.setOnMouseClicked(e -> showChangePasswordModal());
 
-        section.getChildren().addAll(sectionTitle, changePwdBtn);
+        section.getChildren().addAll(secTitle, changePwdBtn);
 
         theme.addListener(() -> {
             section.setStyle(cardStyle());
-            sectionTitle.setFill(Color.web(theme.text()));
+            secTitle.setFill(Color.web(theme.text()));
             changePwdBtn.setStyle("-fx-background-color: transparent; " +
                 "-fx-text-fill: " + ThemeManager.COLOR_PRIMARY + "; " +
                 "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
@@ -340,6 +364,23 @@ public class Configuracion {
         });
 
         return section;
+    }
+
+    private void updateTexts() {
+        LanguageManager lang = LanguageManager.getInstance();
+        title.setText(lang.get("config.title"));
+        subtitle.setText(lang.get("config.subtitle"));
+        userName.setText(lang.get("config.profile.name"));
+        userEmail.setText(lang.get("config.profile.email"));
+        editBtn.setText(lang.get("config.profile.editBtn"));
+        prefsTitle.setText(lang.get("config.prefs.title"));
+        langLabel.setText(lang.get("config.prefs.language"));
+        langDesc.setText(lang.get("config.prefs.languageDesc"));
+        themeLabel.setText(lang.get("config.prefs.theme"));
+        themeDesc.setText(lang.get("config.prefs.themeDesc"));
+        secTitle.setText(lang.get("config.security.title"));
+        changePwdBtn.setText(lang.get("config.security.changePwd"));
+        logoutBtn.setText(lang.get("config.security.logout"));
     }
 
     private void setupResponsive() {
@@ -392,7 +433,8 @@ public class Configuracion {
 
         HBox topBar = new HBox();
         topBar.setAlignment(Pos.CENTER_LEFT);
-        Text modalTitle = new Text("Editar Perfil");
+        LanguageManager lang = LanguageManager.getInstance();
+        Text modalTitle = new Text(lang.get("config.editProfile.title"));
         modalTitle.setFont(Font.font("Inter", FontWeight.BOLD, 20));
         modalTitle.setFill(Color.web(theme.text()));
         Region sp = new Region();
@@ -433,26 +475,26 @@ public class Configuracion {
         cameraOverlay.setTranslateY(24);
         
         avatarOuter.getChildren().addAll(avatarBig, avatarBigIcon, cameraOverlay);
-        Text changePhotoText = new Text("Cambiar Foto");
+        Text changePhotoText = new Text(lang.get("config.editProfile.photo"));
         changePhotoText.setFont(Font.font("Inter", FontWeight.MEDIUM, 12));
         changePhotoText.setFill(Color.web(theme.muted()));
         avatarSection.getChildren().addAll(avatarOuter, changePhotoText);
         VBox.setMargin(avatarSection, new Insets(0, 0, 4, 0));
 
         VBox fields = new VBox(12);
-        VBox nameField = createInputField("Nombre Completo", "Admin User");
+        VBox nameField = createInputField(lang.get("config.editProfile.name"), "Admin User");
         TextField nameTf = (TextField) nameField.getChildren().get(1);
         nameTf.setStyle(nameTf.getStyle() + "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-width: 2;");
         
         fields.getChildren().addAll(
             nameField,
-            createInputField("Correo Electrónico", "admin@lumina.edu"),
-            createInputField("Cargo/Rol", "Admin")
+            createInputField(lang.get("config.editProfile.email"), "admin@lumina.edu"),
+            createInputField(lang.get("config.editProfile.role"), "Admin")
         );
 
         HBox buttonBox = new HBox(12);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
-        Button saveBtn = new Button("Guardar Cambios");
+        Button saveBtn = new Button(lang.get("config.editProfile.save"));
         saveBtn.setPrefWidth(160);
         saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
@@ -468,7 +510,7 @@ public class Configuracion {
             "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.3), 15, 0, 0, 8);"));
         saveBtn.setOnMouseClicked(e -> modal.close());
 
-        Button cancelBtn = new Button("Cancelar");
+        Button cancelBtn = new Button(lang.get("config.editProfile.cancel"));
         cancelBtn.setPrefWidth(160);
         cancelBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         cancelBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "#334155" : "white") + "; " +
@@ -511,9 +553,11 @@ public class Configuracion {
         dialog.setStyle("-fx-background-color: " + dialogBg + "; -fx-background-radius: 20; " +
             "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 30, 0, 0, 8);");
 
+        LanguageManager lang = LanguageManager.getInstance();
+
         HBox topBar = new HBox();
         topBar.setAlignment(Pos.CENTER_LEFT);
-        Text modalTitle = new Text("Cambiar Contraseña");
+        Text modalTitle = new Text(lang.get("config.changePassword.title"));
         modalTitle.setFont(Font.font("Inter", FontWeight.BOLD, 20));
         modalTitle.setFill(Color.web(theme.text()));
         Region sp = new Region();
@@ -530,15 +574,15 @@ public class Configuracion {
         topBar.getChildren().addAll(modalTitle, sp, closeBtn);
 
         VBox fields = new VBox(16);
-        VBox oldPwdField = createPasswordField("Contraseña Actual", "Escribe tu contraseña actual");
-        VBox newPwdField = createPasswordField("Nueva Contraseña", "Escribe tu nueva contraseña");
-        VBox confirmPwdField = createPasswordField("Confirmar Nueva Contraseña", "Confirma tu nueva contraseña");
+        VBox oldPwdField = createPasswordField(lang.get("config.changePassword.actual"), lang.get("config.changePassword.actual"));
+        VBox newPwdField = createPasswordField(lang.get("config.changePassword.new"), lang.get("config.changePassword.new"));
+        VBox confirmPwdField = createPasswordField(lang.get("config.changePassword.confirm"), lang.get("config.changePassword.confirm"));
 
         fields.getChildren().addAll(oldPwdField, newPwdField, confirmPwdField);
 
         HBox buttonBox = new HBox(12);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
-        Button saveBtn = new Button("Actualizar Contraseña");
+        Button saveBtn = new Button(lang.get("config.changePassword.update"));
         saveBtn.setPrefWidth(180);
         saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 13));
         saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
@@ -554,7 +598,7 @@ public class Configuracion {
             "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.3), 15, 0, 0, 8);"));
         saveBtn.setOnMouseClicked(e -> modal.close());
 
-        Button cancelBtn = new Button("Cancelar");
+        Button cancelBtn = new Button(lang.get("config.changePassword.cancel"));
         cancelBtn.setPrefWidth(140);
         cancelBtn.setFont(Font.font("Inter", FontWeight.BOLD, 13));
         cancelBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "#334155" : "white") + "; " +
@@ -611,7 +655,7 @@ public class Configuracion {
         VBox section = new VBox();
         VBox.setMargin(section, new Insets(8, 0, 0, 0));
 
-        Button logoutBtn = new Button("Cerrar Sesion");
+        logoutBtn = new Button("Cerrar Sesion");
         logoutBtn.setMaxWidth(Double.MAX_VALUE);
         logoutBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         logoutBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_RED + "; -fx-text-fill: white; " +

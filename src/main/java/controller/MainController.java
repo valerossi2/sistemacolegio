@@ -1,6 +1,7 @@
 package controller;
 
 import theme.ThemeManager;
+import util.LanguageManager;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.*;
 import javafx.scene.*;
@@ -67,6 +68,7 @@ public class MainController {
     private Text perfTitleText;
     private Text perfSubText;
     private Text scheduleTitleText;
+    private Button btnAll;
     private final List<HBox> colHeaderList = new ArrayList<>();
     private final List<List<HBox>> courseRowCells = new ArrayList<>();
     private final List<Circle> scheduleCircleList = new ArrayList<>();
@@ -458,11 +460,12 @@ public class MainController {
     }
 
     private void setupKpis() {
+        LanguageManager lang = LanguageManager.getInstance();
         kpiGrid.getChildren().addAll(
-            createKpiCard("Total Estudiantes", "1,250", L_SECONDARY_FIXED, L_SECONDARY, ICON_PERSON_PIN),
-            createKpiCard("Total Cursos", "35", L_PRIMARY_FIXED, L_PRIMARY, ICON_TRENDING_UP),
-            createKpiCard("Profesores", "42", L_TERTIARY_FIXED, L_TERTIARY, ICON_SCHOOL),
-            createKpiCard("Asistencia Estudiantes", "92%", L_SECONDARY_FIXED, L_SECONDARY, ICON_CHECK_CIRCLE)
+            createKpiCard(lang.get("kpi.totalStudents"), "1,250", L_SECONDARY_FIXED, L_SECONDARY, ICON_PERSON_PIN),
+            createKpiCard(lang.get("kpi.totalCourses"), "35", L_PRIMARY_FIXED, L_PRIMARY, ICON_TRENDING_UP),
+            createKpiCard(lang.get("kpi.totalTeachers"), "42", L_TERTIARY_FIXED, L_TERTIARY, ICON_SCHOOL),
+            createKpiCard(lang.get("kpi.attendance"), "92%", L_SECONDARY_FIXED, L_SECONDARY, ICON_CHECK_CIRCLE)
         );
     }
 
@@ -518,12 +521,12 @@ public class MainController {
         HBox head = new HBox();
         head.setPadding(new Insets(12));
         head.setAlignment(Pos.CENTER_LEFT);
-        courseTitleText = new Text("Gestion de Cursos");
+        courseTitleText = new Text(LanguageManager.getInstance().get("course.title"));
         courseTitleText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
         courseTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        Button btnAll = new Button("Ver todos");
+        Button         btnAll = new Button(LanguageManager.getInstance().get("course.viewAll"));
         btnAll.getStyleClass().add("text-button");
         head.getChildren().addAll(courseTitleText, spacer, btnAll);
 
@@ -628,7 +631,7 @@ public class MainController {
 
     private void setupPerformancePanel() {
         HBox head = new HBox();
-        perfTitleText = new Text("Desempeno");
+        perfTitleText = new Text(LanguageManager.getInstance().get("performance.title"));
         perfTitleText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
         perfTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
         Region spacer = new Region();
@@ -640,7 +643,7 @@ public class MainController {
         moreBtn.getChildren().add(moreDots);
         head.getChildren().addAll(perfTitleText, spacer, moreBtn);
 
-        perfSubText = new Text("Promedio general mensual (6 meses)");
+        perfSubText = new Text(LanguageManager.getInstance().get("performance.subtitle"));
         perfSubText.setFont(Font.font("Plus Jakarta Sans", 12));
         perfSubText.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
 
@@ -669,7 +672,7 @@ public class MainController {
         }
 
         HBox footer = new HBox();
-        Text fT = new Text("Crecimiento Semestral");
+        Text fT = new Text(LanguageManager.getInstance().get("performance.growth"));
         fT.setFont(Font.font("Plus Jakarta Sans", 12));
         fT.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
         Region s2 = new Region();
@@ -696,7 +699,7 @@ public class MainController {
     }
 
     private void setupSchedulePanel() {
-        scheduleTitleText = new Text("Horario de Hoy");
+        scheduleTitleText = new Text(LanguageManager.getInstance().get("schedule.title"));
         scheduleTitleText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
         scheduleTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
 
@@ -851,10 +854,31 @@ public class MainController {
         sub.setFont(Font.font("Plus Jakarta Sans", 16));
         sub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
 
+        LanguageManager.getInstance().addListener(this::updateLanguageTexts);
+        updateLanguageTexts();
+
         theme.addListener(() -> {
             for (Runnable r : themeUpdaters) r.run();
         });
         
         for (Runnable r : themeUpdaters) r.run();
+    }
+
+    private void updateLanguageTexts() {
+        LanguageManager lang = LanguageManager.getInstance();
+        h1.setText(lang.get("dashboard.title"));
+        sub.setText(lang.get("dashboard.subtitle"));
+        courseTitleText.setText(lang.get("course.title"));
+        perfTitleText.setText(lang.get("performance.title"));
+        perfSubText.setText(lang.get("performance.subtitle"));
+        scheduleTitleText.setText(lang.get("schedule.title"));
+        btnAll.setText(lang.get("course.viewAll"));
+        // Update KPI labels
+        if (kpiLabelList.size() >= 4) {
+            kpiLabelList.get(0).setText(lang.get("kpi.totalStudents").toUpperCase());
+            kpiLabelList.get(1).setText(lang.get("kpi.totalCourses").toUpperCase());
+            kpiLabelList.get(2).setText(lang.get("kpi.totalTeachers").toUpperCase());
+            kpiLabelList.get(3).setText(lang.get("kpi.attendance").toUpperCase());
+        }
     }
 }

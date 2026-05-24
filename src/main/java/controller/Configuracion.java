@@ -142,10 +142,7 @@ public class Configuracion {
         userName = new Text("Admin User");
         userName.setFont(Font.font("Inter", FontWeight.BOLD, 16));
         userName.setFill(Color.web(theme.text()));
-        userEmail = new Text("admin@lumina.edu");
-        userEmail.setFont(Font.font("Inter", 12));
-        userEmail.setFill(Color.web(theme.muted()));
-        nameBox.getChildren().addAll(userName, userEmail);
+        nameBox.getChildren().add(userName);
 
         leftBox.getChildren().addAll(avatarWrapper, nameBox);
 
@@ -174,7 +171,6 @@ public class Configuracion {
             if (profileAvatarIcon.isVisible()) profileAvatarIcon.setFill(Color.web(theme.textSec()));
             onlineDot.setStroke(Color.WHITE);
             userName.setFill(Color.web(theme.text()));
-            userEmail.setFill(Color.web(theme.muted()));
             editBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
                 "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: " + (int)(8 * compactScale) + " " + (int)(24 * compactScale) + ";");
         });

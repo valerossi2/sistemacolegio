@@ -172,7 +172,7 @@ public class Configuracion {
     }
 
     private HBox createIdiomaRow() {
-        HBox row = new HBox();
+        HBox row = new HBox(12);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(8, 0, 8, 0));
 
@@ -203,7 +203,7 @@ public class Configuracion {
 
         row.getChildren().addAll(iconStack, textBox, spacer, langCombo);
 
-        theme.addListener(() -> {
+        Runnable updateRowTheme = () -> {
             row.setStyle("-fx-border-color: transparent transparent " + theme.divider() + " transparent;");
             iconCircle.setFill(Color.web(theme.isDark() ? "#1E3A5F" : "#dbe1ff"));
             label.setFill(Color.web(theme.text()));
@@ -212,13 +212,16 @@ public class Configuracion {
                 "-fx-border-color: " + theme.inputBorder() + "; -fx-border-radius: 8; " +
                 "-fx-background-radius: 8; -fx-font-family: 'Inter'; -fx-font-size: 13; " +
                 "-fx-padding: 4 8;");
-        });
+        };
+
+        theme.addListener(updateRowTheme);
+        updateRowTheme.run();
 
         return row;
     }
 
     private HBox createTemaRow() {
-        HBox row = new HBox();
+        HBox row = new HBox(12);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(12, 0, 0, 0));
 
@@ -322,6 +325,7 @@ public class Configuracion {
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
             "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0; " +
             "-fx-border-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-border-radius: 10; -fx-border-width: 1.5;"));
+        changePwdBtn.setOnMouseClicked(e -> showChangePasswordModal());
 
         section.getChildren().addAll(sectionTitle, changePwdBtn);
 
@@ -485,6 +489,107 @@ public class Configuracion {
         scene.setFill(Color.TRANSPARENT);
         modal.setScene(scene);
         modal.showAndWait();
+    }
+
+    private void showChangePasswordModal() {
+        Stage modal = new Stage();
+        modal.initModality(Modality.APPLICATION_MODAL);
+        modal.initStyle(StageStyle.TRANSPARENT);
+        modal.setWidth(460);
+        modal.setHeight(560);
+        if (ownerStage != null) {
+            modal.initOwner(ownerStage);
+            modal.setX(ownerStage.getX() + (ownerStage.getWidth() - 460) / 2);
+            modal.setY(ownerStage.getY() + (ownerStage.getHeight() - 560) / 2);
+        }
+
+        VBox dialog = new VBox();
+        dialog.setPadding(new Insets(28));
+        dialog.setSpacing(20);
+        dialog.setMaxWidth(460);
+        String dialogBg = theme.isDark() ? "#1E293B" : "#FFFFFF";
+        dialog.setStyle("-fx-background-color: " + dialogBg + "; -fx-background-radius: 20; " +
+            "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 30, 0, 0, 8);");
+
+        HBox topBar = new HBox();
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        Text modalTitle = new Text("Cambiar Contraseña");
+        modalTitle.setFont(Font.font("Inter", FontWeight.BOLD, 20));
+        modalTitle.setFill(Color.web(theme.text()));
+        Region sp = new Region();
+        HBox.setHgrow(sp, Priority.ALWAYS);
+        Button closeBtn = new Button("X");
+        closeBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
+        closeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: " + theme.muted() + "; " +
+            "-fx-cursor: hand; -fx-padding: 4 8; -fx-background-radius: 8;");
+        closeBtn.setOnMouseEntered(e -> closeBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "#334155" : "#F1F5F9") + "; " +
+            "-fx-text-fill: " + theme.text() + "; -fx-cursor: hand; -fx-padding: 4 8; -fx-background-radius: 8;"));
+        closeBtn.setOnMouseExited(e -> closeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: " + theme.muted() + "; " +
+            "-fx-cursor: hand; -fx-padding: 4 8; -fx-background-radius: 8;"));
+        closeBtn.setOnMouseClicked(e -> modal.close());
+        topBar.getChildren().addAll(modalTitle, sp, closeBtn);
+
+        VBox fields = new VBox(16);
+        VBox oldPwdField = createPasswordField("Contraseña Actual", "Escribe tu contraseña actual");
+        VBox newPwdField = createPasswordField("Nueva Contraseña", "Escribe tu nueva contraseña");
+        VBox confirmPwdField = createPasswordField("Confirmar Nueva Contraseña", "Confirma tu nueva contraseña");
+
+        fields.getChildren().addAll(oldPwdField, newPwdField, confirmPwdField);
+
+        HBox buttonBox = new HBox(12);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+        Button saveBtn = new Button("Actualizar Contraseña");
+        saveBtn.setPrefWidth(180);
+        saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 13));
+        saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
+            "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0; " +
+            "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.3), 15, 0, 0, 8);");
+        saveBtn.setOnMouseEntered(e -> saveBtn.setStyle("-fx-background-color: #1D4ED8; -fx-text-fill: white; " +
+            "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 13; -fx-background-radius: 10; " +
+            "-fx-cursor: hand; -fx-padding: 12 0; " +
+            "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.4), 20, 0, 0, 10);"));
+        saveBtn.setOnMouseExited(e -> saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
+            "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 13; -fx-background-radius: 10; " +
+            "-fx-cursor: hand; -fx-padding: 12 0; " +
+            "-fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.3), 15, 0, 0, 8);"));
+        saveBtn.setOnMouseClicked(e -> modal.close());
+
+        Button cancelBtn = new Button("Cancelar");
+        cancelBtn.setPrefWidth(140);
+        cancelBtn.setFont(Font.font("Inter", FontWeight.BOLD, 13));
+        cancelBtn.setStyle("-fx-background-color: " + (theme.isDark() ? "#334155" : "white") + "; " +
+            "-fx-text-fill: " + theme.text() + "; -fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0; " +
+            "-fx-border-color: " + (theme.isDark() ? "#475569" : "#E2E8F0") + "; -fx-border-radius: 10; -fx-border-width: 1;");
+        cancelBtn.setOnMouseClicked(e -> modal.close());
+
+        buttonBox.getChildren().addAll(saveBtn, cancelBtn);
+
+        dialog.getChildren().addAll(topBar, fields, buttonBox);
+
+        StackPane backdrop = new StackPane(dialog);
+        backdrop.setPadding(new Insets(60));
+        backdrop.setStyle("-fx-background-color: transparent;");
+
+        Scene scene = new Scene(backdrop);
+        scene.setFill(Color.TRANSPARENT);
+        modal.setScene(scene);
+        modal.showAndWait();
+    }
+
+    private VBox createPasswordField(String label, String placeholder) {
+        VBox field = new VBox(6);
+        Text lbl = new Text(label);
+        lbl.setFont(Font.font("Inter", FontWeight.SEMI_BOLD, 13));
+        lbl.setFill(Color.web(theme.muted()));
+        PasswordField pf = new PasswordField();
+        pf.setPromptText(placeholder);
+        pf.setFont(Font.font("Inter", 14));
+        pf.setStyle("-fx-background-color: " + (theme.isDark() ? "#0F172A" : "#F8FAFC") + "; " +
+            "-fx-border-color: " + (theme.isDark() ? "#334155" : "#E2E8F0") + "; " +
+            "-fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12 16; " +
+            "-fx-text-fill: " + theme.text() + ";");
+        field.getChildren().addAll(lbl, pf);
+        return field;
     }
  
     private VBox createInputField(String label, String value) {

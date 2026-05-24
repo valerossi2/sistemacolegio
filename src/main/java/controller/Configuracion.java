@@ -150,12 +150,16 @@ public class Configuracion {
         onlineDot.setTranslateY(19);
         onlineDot.setStrokeWidth(2);
         StackPane avatarWrapper = new StackPane(avatarStack, onlineDot);
+        VBox avatarBox = new VBox(avatarWrapper);
+        avatarBox.setAlignment(Pos.CENTER);
 
         userName = new Text("Admin User");
         userName.setFont(Font.font("Inter", FontWeight.BOLD, 16));
         userName.setFill(Color.web(theme.text()));
+        VBox nameBox = new VBox(userName);
+        nameBox.setAlignment(Pos.CENTER);
 
-        leftBox.getChildren().addAll(avatarWrapper, userName);
+        leftBox.getChildren().addAll(avatarBox, nameBox);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);

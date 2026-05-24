@@ -150,11 +150,8 @@ public class Configuracion {
         onlineDot.setTranslateY(19);
         onlineDot.setStrokeWidth(2);
         StackPane avatarWrapper = new StackPane(avatarStack, onlineDot);
-        avatarWrapper.setCursor(Cursor.HAND);
         VBox avatarBox = new VBox(avatarWrapper);
         avatarBox.setAlignment(Pos.CENTER);
-        avatarBox.setCursor(Cursor.HAND);
-        avatarBox.setOnMouseClicked(e -> showEditProfileModal());
 
         userName = new Text("Admin User");
         userName.setFont(Font.font("Inter", FontWeight.BOLD, 16));

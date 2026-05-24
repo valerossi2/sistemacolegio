@@ -41,6 +41,7 @@ public class MainController {
     @FXML private Rectangle headerSeparator;
     @FXML private HBox userBox;
     @FXML private Text uName;
+    @FXML private Text uRole;
     @FXML private StackPane avatarStack;
     @FXML private StackPane centerWrapper;
     @FXML private VBox mainCanvas;
@@ -444,6 +445,8 @@ public class MainController {
 
         uName.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 14));
         uName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+        uRole.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
+        uRole.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
 
         headerAvatar = new Circle(20, Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
         headerAvatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
@@ -467,7 +470,7 @@ public class MainController {
             String key = e.getKey();
             if ("profileImagePath".equals(key)) {
                 loadHeaderProfileImage();
-            } else if ("userName".equals(key)) {
+            } else if ("userName".equals(key) || "userRole".equals(key)) {
                 loadHeaderUserName();
             }
         });
@@ -481,6 +484,7 @@ public class MainController {
             helpIcon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
             headerSeparator.setFill(Color.web(c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
             uName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            uRole.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
             if (headerAvatarSvg.isVisible()) {
                 headerAvatar.setFill(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
                 headerAvatarSvg.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
@@ -507,7 +511,9 @@ public class MainController {
 
     private void loadHeaderUserName() {
         String name = prefs.get("userName", "");
+        String role = prefs.get("userRole", "");
         if (!name.isEmpty()) uName.setText(name);
+        if (!role.isEmpty()) uRole.setText(role);
     }
 
     private void setupKpis() {

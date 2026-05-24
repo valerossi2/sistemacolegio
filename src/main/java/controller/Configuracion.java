@@ -35,6 +35,7 @@ public class Configuracion {
     private VBox profileSection;
     private VBox headerBox;
     private Text userName;
+    private Text userRole;
     private Button editBtn;
     private Circle avatarBg;
     private SVGPath profileAvatarIcon;
@@ -43,7 +44,7 @@ public class Configuracion {
     private static final String PROFILE_IMAGE_KEY = "profileImagePath";
     private static final String USER_FIRST_NAME_KEY = "userFirstName";
     private static final String USER_LAST_NAME_KEY = "userLastName";
-    private static final String USER_EMAIL_KEY = "userEmail";
+    private static final String USER_ROLE_KEY = "userRole";
     private static final String USER_DOB_KEY = "userDob";
     private static final String USER_PHONE_KEY = "userPhone";
 
@@ -157,7 +158,10 @@ public class Configuracion {
         userName.setFont(Font.font("Inter", FontWeight.BOLD, 16));
         userName.setFill(Color.web(theme.text()));
         userName.setBoundsType(TextBoundsType.VISUAL);
-        VBox nameBox = new VBox(userName);
+        userRole = new Text(prefs.get(USER_ROLE_KEY, LanguageManager.getInstance().get("config.profile.role")));
+        userRole.setFont(Font.font("Inter", FontWeight.NORMAL, 12));
+        userRole.setFill(Color.web(theme.textSec()));
+        VBox nameBox = new VBox(2, userName, userRole);
         nameBox.setAlignment(Pos.CENTER);
 
         leftBox.getChildren().addAll(avatarBox, nameBox);
@@ -190,6 +194,7 @@ public class Configuracion {
             if (profileAvatarIcon.isVisible()) profileAvatarIcon.setFill(Color.web(theme.textSec()));
             onlineDot.setStroke(Color.WHITE);
             userName.setFill(Color.web(theme.text()));
+            userRole.setFill(Color.web(theme.textSec()));
             editBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
                 "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: " + (int)(8 * compactScale) + " " + (int)(24 * compactScale) + ";");
         });
@@ -440,6 +445,7 @@ public class Configuracion {
         String lastName = prefs.get(USER_LAST_NAME_KEY, "");
         String fullName = (firstName + " " + lastName).trim();
         userName.setText(!fullName.isEmpty() ? fullName : lang.get("config.profile.name"));
+        userRole.setText(prefs.get(USER_ROLE_KEY, lang.get("config.profile.role")));
         editBtn.setText(lang.get("config.profile.editBtn"));
         profileTitle.setText(lang.get("config.profile.title"));
         prefsTitle.setText(lang.get("config.prefs.title"));
@@ -582,7 +588,7 @@ public class Configuracion {
 
         String currentFirstName = prefs.get(USER_FIRST_NAME_KEY, "");
         String currentLastName = prefs.get(USER_LAST_NAME_KEY, "");
-        String currentEmail = prefs.get(USER_EMAIL_KEY, lang.get("config.profile.email"));
+        String currentRole = prefs.get(USER_ROLE_KEY, lang.get("config.profile.role"));
         String currentDob = prefs.get(USER_DOB_KEY, "");
         String currentPhone = prefs.get(USER_PHONE_KEY, "");
 
@@ -595,7 +601,7 @@ public class Configuracion {
         HBox.setHgrow(lastNameField, Priority.ALWAYS);
         nameRow.getChildren().addAll(firstNameField, lastNameField);
 
-        VBox emailField = createInputField(lang.get("config.editProfile.email"), currentEmail);
+        VBox roleField = createInputField(lang.get("config.editProfile.role"), currentRole);
 
         HBox extraRow = new HBox(12);
         VBox dobField = createInputField(lang.get("config.editProfile.dob"), currentDob);
@@ -606,13 +612,13 @@ public class Configuracion {
 
         TextField firstNameTf = (TextField) firstNameField.getChildren().get(1);
         TextField lastNameTf = (TextField) lastNameField.getChildren().get(1);
-        TextField emailTf = (TextField) emailField.getChildren().get(1);
+        TextField roleTf = (TextField) roleField.getChildren().get(1);
         TextField dobTf = (TextField) dobField.getChildren().get(1);
         TextField phoneTf = (TextField) phoneField.getChildren().get(1);
 
         addFocusBorder(firstNameTf);
         addFocusBorder(lastNameTf);
-        addFocusBorder(emailTf);
+        addFocusBorder(roleTf);
         addFocusBorder(dobTf);
         addFocusBorder(phoneTf);
 
@@ -624,27 +630,28 @@ public class Configuracion {
         Runnable saveAction = () -> {
             String fn = firstNameTf.getText().trim();
             String ln = lastNameTf.getText().trim();
-            String em = emailTf.getText().trim();
+            String role = roleTf.getText().trim();
             String dob = dobTf.getText().trim();
             String ph = phoneTf.getText().trim();
             if (!fn.isEmpty()) prefs.put(USER_FIRST_NAME_KEY, fn);
             if (!ln.isEmpty()) prefs.put(USER_LAST_NAME_KEY, ln);
-            if (!em.isEmpty()) prefs.put(USER_EMAIL_KEY, em);
+            if (!role.isEmpty()) prefs.put(USER_ROLE_KEY, role);
             if (!dob.isEmpty()) prefs.put(USER_DOB_KEY, dob);
             if (!ph.isEmpty()) prefs.put(USER_PHONE_KEY, ph);
             String fullName = (fn + " " + ln).trim();
             userName.setText(!fullName.isEmpty() ? fullName : lang.get("config.profile.name"));
+            userRole.setText(!role.isEmpty() ? role : lang.get("config.profile.role"));
             modal.close();
             showToast(lang.get("config.toast.saved"));
         };
 
         firstNameTf.setOnAction(e -> saveAction.run());
         lastNameTf.setOnAction(e -> saveAction.run());
-        emailTf.setOnAction(e -> saveAction.run());
+        roleTf.setOnAction(e -> saveAction.run());
         dobTf.setOnAction(e -> saveAction.run());
         phoneTf.setOnAction(e -> saveAction.run());
 
-        fields.getChildren().addAll(nameRow, emailField, extraRow);
+        fields.getChildren().addAll(nameRow, roleField, extraRow);
 
         HBox buttonBox = new HBox(12);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);

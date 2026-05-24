@@ -6,6 +6,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
 import java.io.IOException;
 
 public class LuminaAcademyFX extends Application {
@@ -18,9 +21,18 @@ public class LuminaAcademyFX extends Application {
             Parent rootNode = loader.load();
             com.example.demo.controller.MainController controller = loader.getController();
             controller.setThemeManager(theme);
+            controller.setStage(primaryStage);
             controller.setupEverything();
 
-            Scene scene = new Scene(rootNode, 1400, 900);
+            primaryStage.initStyle(StageStyle.UNDECORATED);
+
+            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+            double width = Math.min(1400, screenBounds.getWidth());
+            double height = Math.min(900, screenBounds.getHeight());
+            Scene scene = new Scene(rootNode, width, height);
+
+            primaryStage.setMinWidth(1024);
+            primaryStage.setMinHeight(700);
 
             theme.addListener(() -> {
                 scene.getStylesheets().clear();

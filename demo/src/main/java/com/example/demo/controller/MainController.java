@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.theme.ThemeManager;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.*;
+import javafx.stage.Screen;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -11,6 +12,7 @@ import javafx.scene.shape.*;
 import javafx.scene.text.*;
 import javafx.util.Duration;
 import javafx.fxml.FXML;
+import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -42,12 +44,22 @@ public class MainController {
     @FXML private Text h1;
     @FXML private Text sub;
     @FXML private HBox kpiGrid;
-    @FXML private HBox middleSection;
+    @FXML private VBox middleSection;
+    private HBox middleSectionHBox;
     @FXML private VBox coursesBox;
     @FXML private VBox performanceBox;
     @FXML private VBox scheduleBox;
+    @FXML private HBox titleBar;
+    @FXML private Text titleBarTitle;
+    @FXML private StackPane minimizeBtn;
+    @FXML private StackPane maximizeBtn;
+    @FXML private StackPane closeBtn;
 
     private ThemeManager theme;
+    private Stage stage;
+    private boolean maximized = false;
+    private double dragOffsetX, dragOffsetY;
+    private Rectangle2D previousBounds;
     private List<Runnable> themeUpdaters = new ArrayList<>();
 
     private final String L_PRIMARY = "#004ac6";
@@ -109,6 +121,10 @@ public class MainController {
         this.theme = theme;
     }
 
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
     @FXML
     public void initialize() {
         // Dejamos vacío o solo configuraciones que no dependan del theme
@@ -122,11 +138,13 @@ public class MainController {
     private void setupUI() {
         setupLogo();
         setupNavigation();
+        setupTitleBar();
         setupHeader();
         setupKpis();
         setupCourseManagement();
         setupPerformancePanel();
         setupSchedulePanel();
+        setupResponsiveLayout();
     }
 
     private void setupLogo() {
@@ -218,12 +236,180 @@ public class MainController {
 
     private void handleNavigation(int index) {
         if (index == 0) {
-            centerWrapper.getChildren().setAll(mainCanvas);
+            setCenterView(mainCanvas);
         } else if (index == 5) {
             com.example.demo.controller.Configuracion config = new com.example.demo.controller.Configuracion(theme);
-            centerWrapper.getChildren().setAll(config.getView());
+            setCenterView(config.getView());
         } else {
             System.out.println("Navegando a sección: " + index + " (No implementada)");
+        }
+    }
+
+    private void setupResponsiveLayout() {
+        middleSectionHBox = new HBox(24);
+        HBox.setHgrow(coursesBox, Priority.ALWAYS);
+        
+        mainCanvas.widthProperty().addListener((obs, oldVal, newVal) -> {
+            double width = newVal.doubleValue();
+            double contentWidth = width - 80; // 40 left and 40 right padding in mainCanvas
+            
+            if (contentWidth < 900) {
+                // Stack vertically
+                if (middleSection.getChildren().contains(middleSectionHBox)) {
+                    middleSection.getChildren().clear();
+                }
+                if (!middleSection.getChildren().contains(coursesBox)) {
+                    middleSection.getChildren().addAll(coursesBox, performanceBox);
+                }
+                coursesBox.setPrefWidth(contentWidth);
+                performanceBox.setPrefWidth(contentWidth);
+            } else {
+                // Side-by-side
+                if (middleSection.getChildren().contains(coursesBox)) {
+                    middleSection.getChildren().clear();
+                }
+                if (!middleSection.getChildren().contains(middleSectionHBox)) {
+                    middleSectionHBox.getChildren().setAll(coursesBox, performanceBox);
+                    middleSection.getChildren().add(middleSectionHBox);
+                }
+                coursesBox.setPrefWidth(contentWidth - 320 - 24);
+                performanceBox.setPrefWidth(320);
+            }
+        });
+        
+        // Trigger initial layout
+        setCenterView(mainCanvas);
+    }
+
+    private void setCenterView(Node node) {
+        ScrollPane sp = new ScrollPane();
+        sp.setFitToWidth(true);
+        sp.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent; -fx-padding: 0;");
+        sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        sp.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        
+        // Center content
+        StackPane container = new StackPane(node);
+        container.setAlignment(Pos.TOP_CENTER);
+        container.setStyle("-fx-background-color: transparent;");
+        sp.setContent(container);
+        
+        centerWrapper.getChildren().setAll(sp);
+    }
+
+    private void setupTitleBar() {
+        titleBarTitle.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 13));
+
+        // Minimize icon
+        SVGPath minIcon = new SVGPath();
+        minIcon.setContent("M4 14h16v2H4z");
+        minIcon.setScaleX(0.5);
+        minIcon.setScaleY(0.5);
+        minimizeBtn.getChildren().add(minIcon);
+
+        // Maximize icon
+        SVGPath maxIcon = new SVGPath();
+        maxIcon.setContent("M5 5h14v14H5z");
+        maxIcon.setScaleX(0.5);
+        maxIcon.setScaleY(0.5);
+        maxIcon.setFill(null);
+        maxIcon.setStrokeWidth(1.8);
+        maximizeBtn.getChildren().add(maxIcon);
+
+        // Close icon
+        SVGPath closeIcon = new SVGPath();
+        closeIcon.setContent("M6 6l12 12M18 6L6 18");
+        closeIcon.setScaleX(0.5);
+        closeIcon.setScaleY(0.5);
+        closeIcon.setStrokeWidth(1.8);
+        closeBtn.getChildren().add(closeIcon);
+
+        // Window controls hover effects
+        minimizeBtn.setOnMouseEntered(e -> minIcon.setFill(Color.web(c(L_PRIMARY, D_PRIMARY))));
+        minimizeBtn.setOnMouseExited(e -> minIcon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT))));
+
+        maximizeBtn.setOnMouseEntered(e -> maxIcon.setStroke(Color.web(c(L_PRIMARY, D_PRIMARY))));
+        maximizeBtn.setOnMouseExited(e -> maxIcon.setStroke(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT))));
+
+        closeBtn.setOnMouseEntered(e -> closeIcon.setStroke(Color.WHITE));
+        closeBtn.setOnMouseExited(e -> closeIcon.setStroke(Color.web(c(L_OUTLINE, D_OUTLINE))));
+
+        // Window controls - minimize
+        minimizeBtn.setOnMouseClicked(e -> {
+            if (stage != null) stage.setIconified(true);
+        });
+
+        // Window controls - maximize/restore
+        maximizeBtn.setOnMouseClicked(e -> toggleMaximize());
+
+        // Window controls - close
+        closeBtn.setOnMouseClicked(e -> {
+            if (stage != null) stage.close();
+        });
+
+        // Double-click title bar to toggle maximize
+        titleBar.setOnMouseClicked(e -> {
+            if (e.getClickCount() == 2) toggleMaximize();
+        });
+
+        // Window dragging
+        titleBar.setOnMousePressed(e -> {
+            if (stage != null) {
+                dragOffsetX = e.getScreenX() - stage.getX();
+                dragOffsetY = e.getScreenY() - stage.getY();
+            }
+        });
+        titleBar.setOnMouseDragged(e -> {
+            if (stage != null) {
+                if (maximized) {
+                    // Restore first, then drag
+                    toggleMaximize();
+                    dragOffsetX = e.getScreenX() - stage.getX();
+                    dragOffsetY = e.getScreenY() - stage.getY();
+                }
+                stage.setX(e.getScreenX() - dragOffsetX);
+                stage.setY(e.getScreenY() - dragOffsetY);
+            }
+        });
+
+        themeUpdaters.add(() -> {
+            String tbBg = c(L_WHITE, D_WHITE);
+            String tbText = c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT);
+            String tbBorder = c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH);
+
+            titleBar.setStyle("-fx-background-color: " + tbBg + ";");
+            titleBarTitle.setFill(Color.web(tbText));
+
+            minIcon.setFill(Color.web(tbText));
+            maxIcon.setStroke(Color.web(tbText));
+            maxIcon.setFill(null);
+            closeIcon.setStroke(Color.web(c(L_OUTLINE, D_OUTLINE)));
+        });
+    }
+
+    private void toggleMaximize() {
+        if (stage == null) return;
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getVisualBounds();
+        if (maximized) {
+            stage.setX(previousBounds.getMinX());
+            stage.setY(previousBounds.getMinY());
+            stage.setWidth(previousBounds.getWidth());
+            stage.setHeight(previousBounds.getHeight());
+            maximized = false;
+            // Restore maximize icon
+            SVGPath icon = (SVGPath) maximizeBtn.getChildren().get(0);
+            icon.setContent("M5 5h14v14H5z");
+        } else {
+            previousBounds = new Rectangle2D(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+            stage.setX(bounds.getMinX());
+            stage.setY(bounds.getMinY());
+            stage.setWidth(bounds.getWidth());
+            stage.setHeight(bounds.getHeight());
+            maximized = true;
+            // Change to restore icon (overlapping squares)
+            SVGPath icon = (SVGPath) maximizeBtn.getChildren().get(0);
+            icon.setContent("M8 3v5h13V3H8zm-5 8v10h10V11H3z");
         }
     }
 

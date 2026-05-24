@@ -102,3 +102,35 @@
     -fx-scale-x: 1.1; 
     -fx-scale-y: 1.1; 
 }
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.title-bar-text {
+    -fx-fill: #CBD5E1;
+}
+
+.window-btn {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+.window-btn:hover {
+    -fx-background-color: #334155;
+}
+
+.window-btn-close {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+.window-btn-close:hover {
+    -fx-background-color: #e81123;
+}

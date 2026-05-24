@@ -2,14 +2,20 @@ package controller;
 
 import theme.ThemeManager;
 import util.LanguageManager;
+import java.io.File;
+import java.util.prefs.Preferences;
 import javafx.geometry.*;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.*;
 import javafx.scene.text.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -29,7 +35,10 @@ public class Configuracion {
     private Text userName, userEmail;
     private Button editBtn;
     private Circle avatarBg;
+    private SVGPath profileAvatarIcon;
     private static final double COMPACT_THRESHOLD = 700;
+    private Preferences prefs = Preferences.userNodeForPackage(Configuracion.class);
+    private static final String PROFILE_IMAGE_KEY = "profileImagePath";
 
     private Text prefsTitle, langLabel, langDesc, themeLabel, themeDesc;
     private Text secTitle;
@@ -82,6 +91,7 @@ public class Configuracion {
         languageUpdater = this::updateTexts;
         LanguageManager.getInstance().addListener(languageUpdater);
         updateTexts();
+        loadProfileImage();
     }
 
     public VBox getView() {
@@ -108,12 +118,12 @@ public class Configuracion {
 
         StackPane avatarStack = new StackPane();
         avatarBg = new Circle(22, Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
-        SVGPath avatarIcon = new SVGPath();
-        avatarIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
-        avatarIcon.setScaleX(0.9);
-        avatarIcon.setScaleY(0.9);
-        avatarIcon.setFill(Color.web(theme.textSec()));
-        avatarStack.getChildren().addAll(avatarBg, avatarIcon);
+        profileAvatarIcon = new SVGPath();
+        profileAvatarIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
+        profileAvatarIcon.setScaleX(0.9);
+        profileAvatarIcon.setScaleY(0.9);
+        profileAvatarIcon.setFill(Color.web(theme.textSec()));
+        avatarStack.getChildren().addAll(avatarBg, profileAvatarIcon);
 
         Circle onlineDot = new Circle(4, Color.web(ThemeManager.COLOR_GREEN));
         onlineDot.setTranslateX(15);
@@ -154,7 +164,7 @@ public class Configuracion {
         theme.addListener(() -> {
             section.setStyle(cardStyle());
             avatarBg.setFill(Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
-            avatarIcon.setFill(Color.web(theme.textSec()));
+            if (profileAvatarIcon.isVisible()) profileAvatarIcon.setFill(Color.web(theme.textSec()));
             onlineDot.setStroke(Color.WHITE);
             userName.setFill(Color.web(theme.text()));
             userEmail.setFill(Color.web(theme.muted()));
@@ -471,13 +481,35 @@ public class Configuracion {
         closeBtn.setOnMouseClicked(e -> modal.close());
         topBar.getChildren().addAll(modalTitle, sp, closeBtn);
 
-        Circle avatarCircle = new Circle(16, Color.web(theme.isDark() ? "#1E3A5F" : "#dbe1ff"));
-        SVGPath avatarIcon = new SVGPath();
-        avatarIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
-        avatarIcon.setScaleX(0.7);
-        avatarIcon.setScaleY(0.7);
-        avatarIcon.setFill(Color.web(ThemeManager.COLOR_PRIMARY));
-        StackPane avatarOuter = new StackPane(avatarCircle, avatarIcon);
+        String storedPath = prefs.get(PROFILE_IMAGE_KEY, "");
+        Circle avatarCircle = new Circle(24, Color.web(theme.isDark() ? "#1E3A5F" : "#dbe1ff"));
+        if (!storedPath.isEmpty()) {
+            try {
+                avatarCircle.setFill(new ImagePattern(new Image(new File(storedPath).toURI().toString(), true)));
+            } catch (Exception e) { e.printStackTrace(); }
+        }
+        SVGPath avatarEditIcon = new SVGPath();
+        avatarEditIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
+        avatarEditIcon.setScaleX(0.8);
+        avatarEditIcon.setScaleY(0.8);
+        avatarEditIcon.setFill(Color.web(ThemeManager.COLOR_PRIMARY));
+        if (!storedPath.isEmpty()) avatarEditIcon.setVisible(false);
+        StackPane avatarOuter = new StackPane(avatarCircle, avatarEditIcon);
+        avatarOuter.setCursor(Cursor.HAND);
+        avatarOuter.setOnMouseClicked(e -> {
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Seleccionar foto de perfil");
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg", "*.gif"));
+            File file = fc.showOpenDialog(modal);
+            if (file != null) {
+                String path = file.getAbsolutePath();
+                Image img = new Image(file.toURI().toString(), true);
+                avatarCircle.setFill(new ImagePattern(img));
+                avatarEditIcon.setVisible(false);
+                storeProfileImage(path);
+                applyProfileImage(path);
+            }
+        });
 
         VBox fields = new VBox(12);
         VBox nameField = createInputField(lang.get("config.editProfile.name"), "Admin User");
@@ -655,6 +687,27 @@ public class Configuracion {
             "-fx-text-fill: " + theme.text() + ";");
         field.getChildren().addAll(lbl, tf);
         return field;
+    }
+
+    private void loadProfileImage() {
+        String path = prefs.get(PROFILE_IMAGE_KEY, "");
+        if (!path.isEmpty()) {
+            applyProfileImage(path);
+        }
+    }
+
+    private void storeProfileImage(String path) {
+        prefs.put(PROFILE_IMAGE_KEY, path);
+    }
+
+    private void applyProfileImage(String path) {
+        try {
+            Image img = new Image(new File(path).toURI().toString(), true);
+            avatarBg.setFill(new ImagePattern(img));
+            profileAvatarIcon.setVisible(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void addFocusBorder(Control input) {

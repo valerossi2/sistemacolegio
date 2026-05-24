@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
+
+
+<!--
+    VISTA 2 — DETALLE DEL CURSO
+    Se carga dinámicamente desde CursoController y se inyecta
+    en el contentStack del padre (Cursos.fxml).
+    Controller propio: com.edugrade.controllers.DetalleCursoController
+-->
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.edugrade.controllers.DetalleCursoController"
+            fx:id="vistaDetalleCurso"
+            styleClass="main-scroll-pane"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED">
+
+    <VBox styleClass="content-area" spacing="32">
+
+        <!-- ════════════════════════════════════════
+             Page Header — Breadcrumb + Acciones
+        ════════════════════════════════════════ -->
+        <HBox styleClass="page-header" alignment="CENTER_LEFT" spacing="16">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <HBox spacing="6" alignment="CENTER_LEFT">
+                    <Label fx:id="breadcrumbCursos"
+                           text="Cursos"
+                           styleClass="breadcrumb__parent breadcrumb__link"
+                           onMouseClicked="#onBreadcrumbCursos"/>
+                    <Label text="›" styleClass="breadcrumb__separator"/>
+                    <Label fx:id="breadcrumbCursoActual"
+                           text="5to E"
+                           styleClass="breadcrumb__current"/>
+                </HBox>
+                <Label fx:id="pageTitle"
+                       text="Detalles del Curso: 5to E"
+                       styleClass="page-title"/>
+            </VBox>
+
+            <!-- Botón Imprimir -->
+            <Button fx:id="btnPrint" styleClass="btn-outlined"
+                    mnemonicParsing="false" onAction="#onImprimirReporte">
+                <graphic>
+                    <HBox spacing="8" alignment="CENTER">
+                        <SVGPath styleClass="btn-svg-icon"
+                                 content="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"
+                                 scaleX="0.8" scaleY="0.8"/>
+                        <Label text="Imprimir Reporte"/>
+                    </HBox>
+                </graphic>
+            </Button>
+
+            <!-- Botón Editar -->
+            <Button fx:id="btnEditCourse" styleClass="btn-primary"
+                    mnemonicParsing="false" onAction="#onEditarCurso">
+                <graphic>
+                    <HBox spacing="8" alignment="CENTER">
+                        <SVGPath styleClass="btn-svg-icon btn-svg-icon--white"
+                                 content="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                                 scaleX="0.8" scaleY="0.8"/>
+                        <Label text="Editar Curso" styleClass="btn-primary__label"/>
+                    </HBox>
+                </graphic>
+            </Button>
+        </HBox>
+
+        <!-- ════════════════════════════════════════
+             Bento Grid 33 / 67
+        ════════════════════════════════════════ -->
+        <GridPane fx:id="bentoGrid" styleClass="bento-grid" hgap="24" vgap="24">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="33.33"/>
+                <ColumnConstraints percentWidth="66.67"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints vgrow="ALWAYS"/>
+            </rowConstraints>
+
+            <!-- ─── Columna izquierda: Overview Card ──────────── -->
+            <VBox fx:id="courseOverviewCard" styleClass="card" spacing="16"
+                  GridPane.columnIndex="0" GridPane.rowIndex="0">
+
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Resumen" styleClass="card__title" HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="badgeNivel" text="SECUNDARIA"
+                           styleClass="badge badge--surface"/>
+                </HBox>
+
+                <!-- Imagen / placeholder del curso -->
+                <StackPane styleClass="course-image-container" prefHeight="192">
+                    <Pane styleClass="course-image-placeholder"/>
+                    <Pane styleClass="course-image-overlay"/>
+                    <VBox styleClass="course-image-caption"
+                          StackPane.alignment="BOTTOM_LEFT">
+                        <Label text="Tutor Principal" styleClass="caption-subtitle"/>
+                        <Label fx:id="lblTutorPrincipal"
+                               text="Prof. Laura Méndez"
+                               styleClass="caption-title"/>
+                    </VBox>
+                </StackPane>
+
+                <!-- Stats -->
+                <VBox spacing="8">
+
+                    <!-- Stat: Total Estudiantes -->
+                    <HBox styleClass="stat-row" spacing="12" alignment="CENTER_LEFT">
+                        <StackPane styleClass="stat-icon stat-icon--primary">
+                            <SVGPath styleClass="stat-svg-icon"
+                                     content="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"
+                                     scaleX="0.7" scaleY="0.7"/>
+                        </StackPane>
+                        <VBox>
+                            <Label text="Total Estudiantes" styleClass="stat-label"/>
+                            <Label fx:id="totalStudents" text="32" styleClass="stat-value"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Stat: Total Profesores -->
+                    <HBox styleClass="stat-row" spacing="12" alignment="CENTER_LEFT">
+                        <StackPane styleClass="stat-icon stat-icon--secondary">
+                            <SVGPath styleClass="stat-svg-icon"
+                                     content="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"
+                                     scaleX="0.7" scaleY="0.7"/>
+                        </StackPane>
+                        <VBox>
+                            <Label text="Total Profesores" styleClass="stat-label"/>
+                            <Label fx:id="totalTeachers" text="8" styleClass="stat-value"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Stat: Aula Asignada -->
+                    <HBox styleClass="stat-row" spacing="12" alignment="CENTER_LEFT">
+                        <StackPane styleClass="stat-icon stat-icon--neutral">
+                            <SVGPath styleClass="stat-svg-icon stat-svg-icon--dark"
+                                     content="M12 3L4 9v12h16V9l-8-6zm0 2.35L18 9.86V19h-3v-4H9v4H6V9.86L12 5.35z"
+                                     scaleX="0.7" scaleY="0.7"/>
+                        </StackPane>
+                        <VBox>
+                            <Label text="Aula Asignada" styleClass="stat-label"/>
+                            <Label fx:id="assignedRoom"
+                                   text="Pabellón B - Aula 204"
+                                   styleClass="stat-value"/>
+                        </VBox>
+                    </HBox>
+
+                </VBox>
+            </VBox>
+
+            <!-- ─── Columna derecha ──────────── -->
+            <VBox spacing="24"
+                  GridPane.columnIndex="1" GridPane.rowIndex="0"
+                  VBox.vgrow="ALWAYS">
+
+                <!-- Equipo Docente -->
+                <VBox styleClass="card" spacing="16">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Equipo Docente" styleClass="card__title"
+                               HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnVerTodosDocentes" text="Ver Todos"
+                                styleClass="btn-link" mnemonicParsing="false"
+                                onAction="#onVerTodosDocentes"/>
+                    </HBox>
+                    <GridPane hgap="16" vgap="12">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50"/>
+                            <ColumnConstraints percentWidth="50"/>
+                        </columnConstraints>
+
+                        <HBox styleClass="teacher-card" spacing="12" alignment="CENTER_LEFT"
+                              GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <StackPane styleClass="avatar avatar--md avatar--blue">
+                                <Label text="CR" styleClass="avatar__initials"/>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <Label text="Carlos Ruiz"             styleClass="teacher-name"/>
+                                <Label text="Matemáticas Avanzadas"   styleClass="teacher-subject"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox styleClass="teacher-card" spacing="12" alignment="CENTER_LEFT"
+                              GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <StackPane styleClass="avatar avatar--md avatar--green">
+                                <Label text="ET" styleClass="avatar__initials"/>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <Label text="Elena Torres"    styleClass="teacher-name"/>
+                                <Label text="Física y Química" styleClass="teacher-subject"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox styleClass="teacher-card" spacing="12" alignment="CENTER_LEFT"
+                              GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <StackPane styleClass="avatar avatar--md avatar--amber">
+                                <Label text="MS" styleClass="avatar__initials"/>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <Label text="Miguel Ángel Soto"       styleClass="teacher-name"/>
+                                <Label text="Literatura Hispanoam."    styleClass="teacher-subject"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox styleClass="teacher-card" spacing="12" alignment="CENTER_LEFT"
+                              GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <StackPane styleClass="avatar avatar--md avatar--teal">
+                                <Label text="AS" styleClass="avatar__initials"/>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <Label text="Ana Silva"         styleClass="teacher-name"/>
+                                <Label text="Historia Universal" styleClass="teacher-subject"/>
+                            </VBox>
+                        </HBox>
+
+                    </GridPane>
+                </VBox>
+
+                <!-- Lista de Estudiantes -->
+                <VBox styleClass="card students-card" spacing="0" VBox.vgrow="ALWAYS">
+                    <HBox styleClass="students-card__header"
+                          alignment="CENTER_LEFT" spacing="16">
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Lista de Estudiantes" styleClass="card__title"/>
+                            <Label fx:id="studentsSubtitle"
+                                   text="32 alumnos inscritos en el ciclo actual"
+                                   styleClass="card__subtitle"/>
+                        </VBox>
+                        <HBox styleClass="view-toggle" spacing="0">
+                            <ToggleButton fx:id="btnViewTable" text="Tabla"
+                                          styleClass="view-toggle__btn view-toggle__btn--active"
+                                          selected="true" mnemonicParsing="false"/>
+                            <ToggleButton fx:id="btnViewGrid" text="Cuadrícula"
+                                          styleClass="view-toggle__btn"
+                                          mnemonicParsing="false"/>
+                        </HBox>
+                    </HBox>
+
+                    <TableView fx:id="studentsTable"
+                               styleClass="students-table"
+                               VBox.vgrow="ALWAYS"
+                               columnResizePolicy="CONSTRAINED_RESIZE_POLICY">
+                        <columns>
+                            <TableColumn fx:id="colStudent"    text="ESTUDIANTE"   prefWidth="240"/>
+                            <TableColumn fx:id="colMatricula"  text="ID MATRÍCULA" prefWidth="140"/>
+                            <TableColumn fx:id="colAsistencia" text="ASISTENCIA"   prefWidth="160"/>
+                            <TableColumn fx:id="colAcciones"   text="ACCIONES"     prefWidth="80"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No hay estudiantes registrados."
+                                   styleClass="table-placeholder-label"/>
+                        </placeholder>
+                    </TableView>
+
+                    <HBox styleClass="students-card__footer" alignment="CENTER">
+                        <Button fx:id="btnLoadMore"
+                                text="Cargar más estudiantes"
+                                styleClass="btn-link-primary"
+                                mnemonicParsing="false"
+                                onAction="#onCargarMas"/>
+                    </HBox>
+                </VBox>
+
+            </VBox>
+        </GridPane>
+
+    </VBox>
+</ScrollPane>

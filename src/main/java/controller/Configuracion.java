@@ -17,8 +17,17 @@ public class Configuracion {
     private ThemeManager theme;
     private VBox root;
     private Stage ownerStage;
-
     private Runnable updateTheme;
+
+    private double compactScale = 1.0;
+    private VBox content;
+    private Text title, subtitle;
+    private HBox profileSection;
+    private VBox headerBox;
+    private Text userName, userEmail;
+    private Button editBtn;
+    private Circle avatarBg;
+    private static final double COMPACT_THRESHOLD = 700;
 
     public Configuracion(ThemeManager theme) {
         this.theme = theme;
@@ -26,20 +35,20 @@ public class Configuracion {
         root.setPadding(new Insets(16, 24, 16, 24));
         root.setMaxWidth(900);
 
-        Text title = new Text("Configuracion del Sistema");
+        title = new Text("Configuracion del Sistema");
         title.setFont(Font.font("Inter", FontWeight.BOLD, 22));
 
-        Text subtitle = new Text("Bienvenido de nuevo. Aqui tienes un resumen del estado institucional hoy.");
+        subtitle = new Text("Bienvenido de nuevo. Aqui tienes un resumen del estado institucional hoy.");
         subtitle.setFont(Font.font("Inter", 12));
 
-        VBox headerBox = new VBox(2);
+        headerBox = new VBox(2);
         headerBox.getChildren().addAll(title, subtitle);
         VBox.setMargin(headerBox, new Insets(0, 0, 10, 0));
 
-        VBox content = new VBox(10);
+        content = new VBox(10);
         content.setMaxWidth(820);
 
-        HBox profileSection = createProfileSection();
+        profileSection = createProfileSection();
         VBox preferencesSection = createPreferencesSection();
         VBox securitySection = createSecuritySection();
         VBox logoutSection = createLogoutSection();
@@ -52,6 +61,7 @@ public class Configuracion {
             subtitle.setFill(Color.web(theme.muted()));
         };
 
+        setupResponsive();
         root.getChildren().addAll(headerBox, content);
         theme.addListener(updateTheme);
         updateTheme.run();
@@ -80,7 +90,7 @@ public class Configuracion {
         leftBox.setAlignment(Pos.CENTER_LEFT);
 
         StackPane avatarStack = new StackPane();
-        Circle avatarBg = new Circle(22, Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
+        avatarBg = new Circle(22, Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
         SVGPath avatarIcon = new SVGPath();
         avatarIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
         avatarIcon.setScaleX(0.9);
@@ -95,10 +105,10 @@ public class Configuracion {
         StackPane avatarWrapper = new StackPane(avatarStack, onlineDot);
 
         VBox nameBox = new VBox(0);
-        Text userName = new Text("Admin User");
+        userName = new Text("Admin User");
         userName.setFont(Font.font("Inter", FontWeight.BOLD, 16));
         userName.setFill(Color.web(theme.text()));
-        Text userEmail = new Text("admin@lumina.edu");
+        userEmail = new Text("admin@lumina.edu");
         userEmail.setFont(Font.font("Inter", 12));
         userEmail.setFill(Color.web(theme.muted()));
         nameBox.getChildren().addAll(userName, userEmail);
@@ -108,17 +118,18 @@ public class Configuracion {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Button editBtn = new Button("Editar Perfil");
+        editBtn = new Button("Editar Perfil");
         editBtn.setFont(Font.font("Inter", FontWeight.BOLD, 12));
+        String btnPad = (int)(8 * compactScale) + " " + (int)(24 * compactScale);
         editBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
-            "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 8 24;");
+            "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: " + btnPad + ";");
 
         editBtn.setOnMouseEntered(e -> editBtn.setStyle(
             "-fx-background-color: #1D4ED8; -fx-text-fill: white; " +
-            "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 8 24;"));
+            "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: " + (int)(8 * compactScale) + " " + (int)(24 * compactScale) + ";"));
         editBtn.setOnMouseExited(e -> editBtn.setStyle(
             "-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
-            "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 8 24;"));
+            "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: " + (int)(8 * compactScale) + " " + (int)(24 * compactScale) + ";"));
         editBtn.setOnMouseClicked(e -> showEditProfileModal());
 
         section.getChildren().addAll(leftBox, spacer, editBtn);
@@ -131,7 +142,7 @@ public class Configuracion {
             userName.setFill(Color.web(theme.text()));
             userEmail.setFill(Color.web(theme.muted()));
             editBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
-                "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 8 24;");
+                "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: " + (int)(8 * compactScale) + " " + (int)(24 * compactScale) + ";");
         });
 
         return section;
@@ -167,7 +178,7 @@ public class Configuracion {
 
         Circle iconCircle = new Circle(16, Color.web(theme.isDark() ? "#1E3A5F" : "#dbe1ff"));
         SVGPath globeIcon = new SVGPath();
-        globeIcon.setContent("M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9h18");
+        globeIcon.setContent("M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z");
         globeIcon.setFill(Color.web(ThemeManager.COLOR_PRIMARY));
         globeIcon.setScaleX(0.7);
         globeIcon.setScaleY(0.7);
@@ -214,7 +225,7 @@ public class Configuracion {
         Circle iconCircle = new Circle(16);
         iconCircle.setFill(Color.web("#dbe1ff"));
         SVGPath sunIcon = new SVGPath();
-        sunIcon.setContent("M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z");
+        sunIcon.setContent("M12 3a9 9 0 0 0 0 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z");
         sunIcon.setScaleX(0.6);
         sunIcon.setScaleY(0.6);
         sunIcon.setFill(Color.web(theme.textSec()));
@@ -325,6 +336,34 @@ public class Configuracion {
         });
 
         return section;
+    }
+
+    private void setupResponsive() {
+        root.widthProperty().addListener((obs, oldVal, newVal) -> {
+            double w = newVal.doubleValue();
+            applyCompactScale(w < COMPACT_THRESHOLD);
+        });
+    }
+
+    private void applyCompactScale(boolean compact) {
+        double s = compact ? 0.7 : 1.0;
+        if (Math.abs(s - compactScale) < 0.01) return;
+        compactScale = s;
+
+        title.setFont(Font.font("Inter", FontWeight.BOLD, 22 * s));
+        subtitle.setFont(Font.font("Inter", 12 * s));
+        VBox.setMargin(headerBox, new Insets(0, 0, 10 * s, 0));
+        content.setSpacing(10 * s);
+        root.setPadding(new Insets(16 * s, 24 * s, 16 * s, 24 * s));
+
+        profileSection.setPadding(new Insets(14 * s, 20 * s, 14 * s, 20 * s));
+        userName.setFont(Font.font("Inter", FontWeight.BOLD, 16 * s));
+        userEmail.setFont(Font.font("Inter", 12 * s));
+        avatarBg.setRadius(22 * s);
+        String btnPad = (int)(8 * s) + " " + (int)(24 * s);
+        editBtn.setFont(Font.font("Inter", FontWeight.BOLD, 12 * s));
+        editBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
+            "-fx-background-radius: 8; -fx-cursor: hand; -fx-padding: " + btnPad + ";");
     }
 
     private void showEditProfileModal() {

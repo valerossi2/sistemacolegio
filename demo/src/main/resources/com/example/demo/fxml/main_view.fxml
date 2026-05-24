@@ -7,23 +7,12 @@
 <?import javafx.geometry.*?>
 
 <VBox fx:id="root" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.MainController" prefWidth="1400" prefHeight="900">
-    <!-- Custom Title Bar -->
-    <HBox fx:id="titleBar" prefHeight="32" alignment="CENTER">
-        <padding>
-            <Insets left="0" right="0"/>
-        </padding>
-        <Region prefWidth="260" />
-        <HBox alignment="CENTER_LEFT" spacing="0" HBox.hgrow="ALWAYS">
-            <padding>
-                <Insets left="20" right="0"/>
-            </padding>
-            <Text fx:id="titleBarTitle" text="Lumina Academy" styleClass="title-bar-text" />
-            <Region HBox.hgrow="ALWAYS" />
-            <HBox fx:id="windowControls" alignment="CENTER_RIGHT" spacing="0">
-                <StackPane fx:id="minimizeBtn" prefWidth="46" prefHeight="32" styleClass="window-btn" />
-                <StackPane fx:id="maximizeBtn" prefWidth="46" prefHeight="32" styleClass="window-btn" />
-                <StackPane fx:id="closeBtn" prefWidth="46" prefHeight="32" styleClass="window-btn-close" />
-            </HBox>
+    <HBox fx:id="titleBar" prefHeight="36" alignment="BOTTOM_CENTER">
+        <Region HBox.hgrow="ALWAYS" />
+        <HBox fx:id="windowControls" alignment="CENTER_RIGHT" spacing="0">
+            <StackPane fx:id="minimizeBtn" prefWidth="46" prefHeight="32" styleClass="window-btn" />
+            <StackPane fx:id="maximizeBtn" prefWidth="46" prefHeight="32" styleClass="window-btn" />
+            <StackPane fx:id="closeBtn" prefWidth="46" prefHeight="32" styleClass="window-btn-close" />
         </HBox>
     </HBox>
 

@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import com.example.demo.theme.ThemeManager;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.*;
-import javafx.stage.Screen;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -50,7 +49,6 @@ public class MainController {
     @FXML private VBox performanceBox;
     @FXML private VBox scheduleBox;
     @FXML private HBox titleBar;
-    @FXML private Text titleBarTitle;
     @FXML private StackPane minimizeBtn;
     @FXML private StackPane maximizeBtn;
     @FXML private StackPane closeBtn;
@@ -59,7 +57,6 @@ public class MainController {
     private Stage stage;
     private boolean maximized = false;
     private double dragOffsetX, dragOffsetY;
-    private Rectangle2D previousBounds;
     private List<Runnable> themeUpdaters = new ArrayList<>();
 
     private final String L_PRIMARY = "#004ac6";
@@ -298,8 +295,6 @@ public class MainController {
     }
 
     private void setupTitleBar() {
-        titleBarTitle.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 13));
-
         // Minimize icon
         SVGPath minIcon = new SVGPath();
         minIcon.setContent("M4 14h16v2H4z");
@@ -347,12 +342,12 @@ public class MainController {
             if (stage != null) stage.close();
         });
 
-        // Double-click title bar to toggle maximize
+        // Double-click title bar to toggle fullscreen
         titleBar.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2) toggleMaximize();
         });
 
-        // Window dragging
+        // Window dragging (only when not fullscreen)
         titleBar.setOnMousePressed(e -> {
             if (stage != null) {
                 dragOffsetX = e.getScreenX() - stage.getX();
@@ -362,7 +357,6 @@ public class MainController {
         titleBar.setOnMouseDragged(e -> {
             if (stage != null) {
                 if (maximized) {
-                    // Restore first, then drag
                     toggleMaximize();
                     dragOffsetX = e.getScreenX() - stage.getX();
                     dragOffsetY = e.getScreenY() - stage.getY();
@@ -372,13 +366,28 @@ public class MainController {
             }
         });
 
+        // Hide/show title bar on fullscreen change
+        stage.fullScreenProperty().addListener((obs, wasFull, isFull) -> {
+            if (isFull) {
+                titleBar.setVisible(false);
+                titleBar.setManaged(false);
+                maximized = true;
+                SVGPath icon = (SVGPath) maximizeBtn.getChildren().get(0);
+                icon.setContent("M8 3v5h13V3H8zm-5 8v10h10V11H3z");
+            } else {
+                titleBar.setVisible(true);
+                titleBar.setManaged(true);
+                maximized = false;
+                SVGPath icon = (SVGPath) maximizeBtn.getChildren().get(0);
+                icon.setContent("M5 5h14v14H5z");
+            }
+        });
+
         themeUpdaters.add(() -> {
             String tbBg = c(L_WHITE, D_WHITE);
             String tbText = c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT);
-            String tbBorder = c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH);
 
             titleBar.setStyle("-fx-background-color: " + tbBg + ";");
-            titleBarTitle.setFill(Color.web(tbText));
 
             minIcon.setFill(Color.web(tbText));
             maxIcon.setStroke(Color.web(tbText));
@@ -389,28 +398,7 @@ public class MainController {
 
     private void toggleMaximize() {
         if (stage == null) return;
-        Screen screen = Screen.getPrimary();
-        Rectangle2D bounds = screen.getVisualBounds();
-        if (maximized) {
-            stage.setX(previousBounds.getMinX());
-            stage.setY(previousBounds.getMinY());
-            stage.setWidth(previousBounds.getWidth());
-            stage.setHeight(previousBounds.getHeight());
-            maximized = false;
-            // Restore maximize icon
-            SVGPath icon = (SVGPath) maximizeBtn.getChildren().get(0);
-            icon.setContent("M5 5h14v14H5z");
-        } else {
-            previousBounds = new Rectangle2D(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-            stage.setX(bounds.getMinX());
-            stage.setY(bounds.getMinY());
-            stage.setWidth(bounds.getWidth());
-            stage.setHeight(bounds.getHeight());
-            maximized = true;
-            // Change to restore icon (overlapping squares)
-            SVGPath icon = (SVGPath) maximizeBtn.getChildren().get(0);
-            icon.setContent("M8 3v5h13V3H8zm-5 8v10h10V11H3z");
-        }
+        stage.setFullScreen(!stage.isFullScreen());
     }
 
     private void setupHeader() {

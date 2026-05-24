@@ -22,20 +22,20 @@ public class Configuracion {
     public Configuracion(ThemeManager theme) {
         this.theme = theme;
         root = new VBox();
-        root.setPadding(new Insets(24, 32, 24, 32));
+        root.setPadding(new Insets(16, 24, 16, 24));
         root.setMaxWidth(900);
 
         Text title = new Text("Configuracion del Sistema");
-        title.setFont(Font.font("Inter", FontWeight.BOLD, 24));
+        title.setFont(Font.font("Inter", FontWeight.BOLD, 22));
 
         Text subtitle = new Text("Bienvenido de nuevo. Aqui tienes un resumen del estado institucional hoy.");
-        subtitle.setFont(Font.font("Inter", 13));
+        subtitle.setFont(Font.font("Inter", 12));
 
         VBox headerBox = new VBox(2);
         headerBox.getChildren().addAll(title, subtitle);
-        VBox.setMargin(headerBox, new Insets(0, 0, 16, 0));
+        VBox.setMargin(headerBox, new Insets(0, 0, 10, 0));
 
-        VBox content = new VBox(16);
+        VBox content = new VBox(10);
         content.setMaxWidth(820);
 
         HBox profileSection = createProfileSection();
@@ -68,7 +68,7 @@ public class Configuracion {
 
     private HBox createProfileSection() {
         HBox section = new HBox();
-        section.setPadding(new Insets(20, 24, 20, 24));
+        section.setPadding(new Insets(14, 20, 14, 20));
         section.setStyle(cardStyle());
 
         HBox leftBox = new HBox(12);
@@ -134,13 +134,13 @@ public class Configuracion {
 
     private VBox createPreferencesSection() {
         VBox section = new VBox();
-        section.setPadding(new Insets(20, 24, 20, 24));
+        section.setPadding(new Insets(14, 20, 14, 20));
         section.setStyle(cardStyle());
 
         Text sectionTitle = new Text("Preferencias de la Cuenta");
         sectionTitle.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         sectionTitle.setFill(Color.web(theme.text()));
-        VBox.setMargin(sectionTitle, new Insets(0, 0, 12, 0));
+        VBox.setMargin(sectionTitle, new Insets(0, 0, 8, 0));
 
         HBox idiomaRow = createIdiomaRow();
         HBox temaRow = createTemaRow();
@@ -158,7 +158,7 @@ public class Configuracion {
     private HBox createIdiomaRow() {
         HBox row = new HBox();
         row.setAlignment(Pos.CENTER_LEFT);
-        row.setPadding(new Insets(12, 0, 12, 0));
+        row.setPadding(new Insets(8, 0, 8, 0));
 
         Circle iconCircle = new Circle(16, Color.web(theme.isDark() ? "#1E3A5F" : "#dbe1ff"));
         SVGPath globeIcon = new SVGPath();
@@ -278,13 +278,13 @@ public class Configuracion {
 
     private VBox createSecuritySection() {
         VBox section = new VBox();
-        section.setPadding(new Insets(20, 24, 20, 24));
+        section.setPadding(new Insets(14, 20, 14, 20));
         section.setStyle(cardStyle());
 
         Text sectionTitle = new Text("Seguridad");
         sectionTitle.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         sectionTitle.setFill(Color.web(theme.text()));
-        VBox.setMargin(sectionTitle, new Insets(0, 0, 12, 0));
+        VBox.setMargin(sectionTitle, new Insets(0, 0, 8, 0));
 
         Button changePwdBtn = new Button("Cambiar Contrasena");
         changePwdBtn.setMaxWidth(Double.MAX_VALUE);

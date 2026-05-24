@@ -493,7 +493,7 @@ public class MainController {
         String path = prefs.get("profileImagePath", "");
         if (!path.isEmpty()) {
             try {
-                Image img = new Image(new File(path).toURI().toString(), true);
+                Image img = new Image(new File(path).toURI().toString(), false);
                 headerAvatar.setFill(new ImagePattern(img));
                 headerAvatarSvg.setVisible(false);
             } catch (Exception e) {

@@ -485,7 +485,7 @@ public class Configuracion {
         Circle avatarCircle = new Circle(36, Color.web(theme.isDark() ? "#1E3A5F" : "#dbe1ff"));
         if (!storedPath.isEmpty()) {
             try {
-                avatarCircle.setFill(new ImagePattern(new Image(new File(storedPath).toURI().toString(), true)));
+                avatarCircle.setFill(new ImagePattern(new Image(new File(storedPath).toURI().toString(), false)));
             } catch (Exception e) { e.printStackTrace(); }
         }
         SVGPath avatarEditIcon = new SVGPath();
@@ -503,7 +503,7 @@ public class Configuracion {
             File file = fc.showOpenDialog(modal);
             if (file != null) {
                 String path = file.getAbsolutePath();
-                Image img = new Image(file.toURI().toString(), true);
+                Image img = new Image(file.toURI().toString(), false);
                 avatarCircle.setFill(new ImagePattern(img));
                 avatarEditIcon.setVisible(false);
                 storeProfileImage(path);
@@ -707,7 +707,7 @@ public class Configuracion {
 
     private void applyProfileImage(String path) {
         try {
-            Image img = new Image(new File(path).toURI().toString(), true);
+            Image img = new Image(new File(path).toURI().toString(), false);
             avatarBg.setFill(new ImagePattern(img));
             profileAvatarIcon.setVisible(false);
         } catch (Exception e) {

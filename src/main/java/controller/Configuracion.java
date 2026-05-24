@@ -156,6 +156,7 @@ public class Configuracion {
         userName = new Text("Admin User");
         userName.setFont(Font.font("Inter", FontWeight.BOLD, 16));
         userName.setFill(Color.web(theme.text()));
+        userName.setBoundsType(TextBoundsType.VISUAL);
         VBox nameBox = new VBox(userName);
         nameBox.setAlignment(Pos.CENTER);
 

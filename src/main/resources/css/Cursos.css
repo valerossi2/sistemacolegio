@@ -675,7 +675,7 @@
     -fx-font-weight: 700;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.09), 3, 0, 0, 1);
 }
-.view-toggle__btn:hover:!selected { -fx-text-fill: #1E293B; }
+.view-toggle__btn:hover:selected { -fx-text-fill: #1E293B; }
 
 /* Students TableView */
 .students-table {

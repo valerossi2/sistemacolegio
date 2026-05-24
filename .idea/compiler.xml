@@ -7,10 +7,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="LuminaAcademy" />
+        <module name="sistema_colegio" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="LuminaAcademy" target="21" />
+      <module name="sistema_colegio" target="21" />
     </bytecodeTargetLevel>
   </component>
 </project>

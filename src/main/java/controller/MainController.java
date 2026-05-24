@@ -2,12 +2,16 @@ package controller;
 
 import theme.ThemeManager;
 import util.LanguageManager;
+import java.io.File;
+import java.util.prefs.Preferences;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.*;
 import javafx.scene.text.*;
 import javafx.util.Duration;
@@ -82,6 +86,9 @@ public class MainController {
     private final List<Text> scheduleDetList = new ArrayList<>();
     private final List<Rectangle> perfBarsList = new ArrayList<>();
     private final List<Text> perfBarLabelList = new ArrayList<>();
+    private Circle headerAvatar;
+    private SVGPath headerAvatarSvg;
+    private Preferences prefs = Preferences.userNodeForPackage(controller.Configuracion.class);
 
     private final String L_PRIMARY = "#004ac6";
     private final String L_PRIMARY_CONTAINER = "#2563eb";
@@ -262,6 +269,7 @@ public class MainController {
     private void handleNavigation(int index) {
         if (index == 0) {
             setCenterView(mainCanvas);
+            loadHeaderProfileImage();
         } else if (index == 5) {
             controller.Configuracion config = new controller.Configuracion(theme);
             config.setOwnerStage(stage);
@@ -440,19 +448,27 @@ public class MainController {
         uEmail.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
         uEmail.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
 
-        Circle avatar = new Circle(20, Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
-        avatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
-        avatar.setStrokeWidth(2);
-        SVGPath avatarSvg = createIcon(ICON_AVATAR, 20, c(L_PRIMARY, D_PRIMARY));
-        avatarStack.getChildren().addAll(avatar, avatarSvg);
+        headerAvatar = new Circle(20, Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+        headerAvatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+        headerAvatar.setStrokeWidth(2);
+        headerAvatarSvg = createIcon(ICON_AVATAR, 20, c(L_PRIMARY, D_PRIMARY));
+        headerAvatarSvg.setId("headerAvatarSvg");
+        avatarStack.getChildren().addAll(headerAvatar, headerAvatarSvg);
 
         userBox.setOnMouseEntered(e -> {
             uName.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
-            avatar.setStroke(Color.web(c(L_PRIMARY, D_PRIMARY)));
+            headerAvatar.setStroke(Color.web(c(L_PRIMARY, D_PRIMARY)));
         });
         userBox.setOnMouseExited(e -> {
             uName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
-            avatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+            headerAvatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+        });
+
+        loadHeaderProfileImage();
+        prefs.addPreferenceChangeListener(e -> {
+            if ("profileImagePath".equals(e.getKey())) {
+                loadHeaderProfileImage();
+            }
         });
 
         themeUpdaters.add(() -> {
@@ -465,10 +481,28 @@ public class MainController {
             headerSeparator.setFill(Color.web(c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
             uName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
             uEmail.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
-            avatar.setFill(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
-            avatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
-            avatarSvg.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
+            if (headerAvatarSvg.isVisible()) {
+                headerAvatar.setFill(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+                headerAvatarSvg.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
+            }
+            headerAvatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
         });
+    }
+
+    private void loadHeaderProfileImage() {
+        String path = prefs.get("profileImagePath", "");
+        if (!path.isEmpty()) {
+            try {
+                Image img = new Image(new File(path).toURI().toString(), true);
+                headerAvatar.setFill(new ImagePattern(img));
+                headerAvatarSvg.setVisible(false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            headerAvatar.setFill(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
+            headerAvatarSvg.setVisible(true);
+        }
     }
 
     private void setupKpis() {

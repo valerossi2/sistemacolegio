@@ -482,7 +482,7 @@ public class Configuracion {
         topBar.getChildren().addAll(modalTitle, sp, closeBtn);
 
         String storedPath = prefs.get(PROFILE_IMAGE_KEY, "");
-        Circle avatarCircle = new Circle(24, Color.web(theme.isDark() ? "#1E3A5F" : "#dbe1ff"));
+        Circle avatarCircle = new Circle(36, Color.web(theme.isDark() ? "#1E3A5F" : "#dbe1ff"));
         if (!storedPath.isEmpty()) {
             try {
                 avatarCircle.setFill(new ImagePattern(new Image(new File(storedPath).toURI().toString(), true)));
@@ -490,8 +490,8 @@ public class Configuracion {
         }
         SVGPath avatarEditIcon = new SVGPath();
         avatarEditIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
-        avatarEditIcon.setScaleX(0.8);
-        avatarEditIcon.setScaleY(0.8);
+        avatarEditIcon.setScaleX(0.9);
+        avatarEditIcon.setScaleY(0.9);
         avatarEditIcon.setFill(Color.web(ThemeManager.COLOR_PRIMARY));
         if (!storedPath.isEmpty()) avatarEditIcon.setVisible(false);
         StackPane avatarOuter = new StackPane(avatarCircle, avatarEditIcon);
@@ -510,6 +510,11 @@ public class Configuracion {
                 applyProfileImage(path);
             }
         });
+        Text photoText = new Text(lang.get("config.editProfile.photo"));
+        photoText.setFont(Font.font("Inter", FontWeight.MEDIUM, 12));
+        photoText.setFill(Color.web(theme.muted()));
+        VBox avatarSection = new VBox(8, avatarOuter, photoText);
+        avatarSection.setAlignment(Pos.CENTER);
 
         VBox fields = new VBox(12);
         VBox nameField = createInputField(lang.get("config.editProfile.name"), "Admin User");
@@ -544,7 +549,7 @@ public class Configuracion {
 
         buttonBox.getChildren().addAll(saveBtn, cancelBtn);
 
-        dialog.getChildren().addAll(topBar, avatarOuter, fields, buttonBox);
+        dialog.getChildren().addAll(topBar, avatarSection, fields, buttonBox);
 
         Group dialogGroup = new Group(dialog);
         dialogGroup.setScaleX(scale);

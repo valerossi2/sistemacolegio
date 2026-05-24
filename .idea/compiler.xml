@@ -6,12 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="demo" />
-        <module name="sistema_colegio (1)" />
+        <module name="LuminaAcademy" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="sistema_colegio" target="17" />
+      <module name="LuminaAcademy" target="21" />
     </bytecodeTargetLevel>
   </component>
 </project>

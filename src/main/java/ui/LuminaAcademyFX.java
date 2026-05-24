@@ -52,31 +52,6 @@ public class LuminaAcademyFX extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
-<<<<<<< HEAD
-
-        return sidebar;
-    }
-
-    private HBox createHeader() {
-        HBox header = new HBox();
-        header.setPadding(new Insets(0, 32, 0, 32));
-        header.setPrefHeight(72);
-        header.setAlignment(Pos.CENTER_LEFT);
-        header.setStyle("-fx-background-color: " + COLOR_WHITE + "; -fx-border-color: transparent transparent " + COLOR_SURFACE_CONTAINER + " transparent;");
-
-        // Search
-        HBox searchBox = new HBox(12);
-        searchBox.setPadding(new Insets(0, 20, 0, 20));
-        searchBox.getStyleClass().add("search-container");
-        searchBox.setAlignment(Pos.CENTER_LEFT);
-        
-        Text searchIcon = new Text("🔍");
-        searchIcon.setFont(Font.font(14));
-        searchIcon.setFill(Color.web(COLOR_OUTLINE));
-
-        TextField searchField = new TextField();
-        searchField.setPromptText("Buscar expedientes, cursos o reportes...");
-        searchField.getStyleClass().add("search-input");
         
         searchBox.getChildren().addAll(searchIcon, searchField);
 
@@ -361,9 +336,7 @@ public class LuminaAcademyFX extends Application {
                ".schedule-row { -fx-border-color: transparent transparent " + COLOR_SURFACE_CONTAINER + " transparent; } " +
                ".text-button { -fx-text-fill: " + COLOR_PRIMARY + "; -fx-background-color: transparent; -fx-underline: false; -fx-cursor: hand; -fx-font-weight: bold; } " +
                ".growth-badge { -fx-background-color: #E8F5E9; -fx-text-fill: #2E7D32; -fx-font-weight: bold; -fx-padding: 4 12 4 12; -fx-background-radius: 16; } " +
-               ".fab-button { -fx-background-color: " + COLOR_PRIMARY + "; -fx-background-radius: 32; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.4), 15, 0, 0, 8); }";
-=======
->>>>>>> 514a3e54e1212fbc2f52fc9b8654554dbadb4d6d
+                ".fab-button { -fx-background-color: " + COLOR_PRIMARY + "; -fx-background-radius: 32; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,74,198,0.4), 15, 0, 0, 8); }";
     }
 
     public static void main(String[] args) {

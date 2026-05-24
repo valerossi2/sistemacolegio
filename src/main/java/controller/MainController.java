@@ -69,12 +69,19 @@ public class MainController {
     private Text perfSubText;
     private Text scheduleTitleText;
     private Button btnAll;
+    private final List<Text> navLabelList = new ArrayList<>();
     private final List<HBox> colHeaderList = new ArrayList<>();
     private final List<List<HBox>> courseRowCells = new ArrayList<>();
+    private final List<Text> courseNameTexts = new ArrayList<>();
+    private final List<Text> courseProfTexts = new ArrayList<>();
+    private final List<Text> courseStudNumTexts = new ArrayList<>();
+    private final List<Text> courseStudLabelTexts = new ArrayList<>();
+    private final List<Text> courseScoreTexts = new ArrayList<>();
     private final List<Circle> scheduleCircleList = new ArrayList<>();
     private final List<Text> scheduleSubjList = new ArrayList<>();
     private final List<Text> scheduleDetList = new ArrayList<>();
     private final List<Rectangle> perfBarsList = new ArrayList<>();
+    private final List<Text> perfBarLabelList = new ArrayList<>();
 
     private final String L_PRIMARY = "#004ac6";
     private final String L_PRIMARY_CONTAINER = "#2563eb";
@@ -173,13 +180,15 @@ public class MainController {
     }
 
     private void setupNavigation() {
+        LanguageManager lang = LanguageManager.getInstance();
+        String[] navKeys = {"sidebar.home", "sidebar.students", "sidebar.teachers", "sidebar.courses", "sidebar.schedule", "sidebar.settings"};
         String[][] items = {
-            {"Inicio", ICON_HOME},
-            {"Estudiantes", ICON_SCHOOL},
-            {"Profesores", ICON_GROUP},
-            {"Cursos", ICON_BOOK},
-            {"Horario", ICON_CALENDAR},
-            {"Configuracion", ICON_SETTINGS}
+            {lang.get("sidebar.home"), ICON_HOME},
+            {lang.get("sidebar.students"), ICON_SCHOOL},
+            {lang.get("sidebar.teachers"), ICON_GROUP},
+            {lang.get("sidebar.courses"), ICON_BOOK},
+            {lang.get("sidebar.schedule"), ICON_CALENDAR},
+            {lang.get("sidebar.settings"), ICON_SETTINGS}
         };
 
         for (int i = 0; i < items.length; i++) {
@@ -191,6 +200,7 @@ public class MainController {
             SVGPath icon = createIcon(items[i][1], 20, L_WHITE);
             Text label = new Text(items[i][0]);
             label.setFont(Font.font("Plus Jakarta Sans", FontWeight.MEDIUM, 15));
+            navLabelList.add(label);
 
             int idx = i;
             if (i == 0) {
@@ -607,7 +617,8 @@ public class MainController {
 
         HBox hName = new HBox(tName);
         hName.setPrefWidth(180);
-        HBox hProf = new HBox(new Text(prof));
+        Text profText = new Text(prof);
+        HBox hProf = new HBox(profText);
         hProf.setPrefWidth(180);
         HBox hStud = new HBox(stBox);
         hStud.setPrefWidth(120);
@@ -616,6 +627,11 @@ public class MainController {
 
         row.getChildren().addAll(hName, hProf, hStud, hPerf);
         courseRowCells.add(List.of(hName, hProf, hStud, hPerf));
+        courseNameTexts.add(tName);
+        courseProfTexts.add(profText);
+        courseStudNumTexts.add(stNum);
+        courseStudLabelTexts.add(stLabel);
+        courseScoreTexts.add(tScore);
 
         themeUpdaters.add(() -> {
             tName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
@@ -669,6 +685,7 @@ public class MainController {
             chart.getChildren().add(barBox);
             bars.add(bar);
             barLabels.add(lbl);
+            perfBarLabelList.add(lbl);
         }
 
         HBox footer = new HBox();
@@ -873,6 +890,52 @@ public class MainController {
         perfSubText.setText(lang.get("performance.subtitle"));
         scheduleTitleText.setText(lang.get("schedule.title"));
         btnAll.setText(lang.get("course.viewAll"));
+        searchField.setPromptText(lang.get("search.prompt"));
+        // Update sidebar labels
+        String[] navKeys = {"sidebar.home", "sidebar.students", "sidebar.teachers", "sidebar.courses", "sidebar.schedule", "sidebar.settings"};
+        for (int i = 0; i < navLabelList.size() && i < navKeys.length; i++) {
+            navLabelList.get(i).setText(lang.get(navKeys[i]));
+        }
+        // Update column headers
+        String[] colKeys = {"course.colCourse", "course.colProfessor", "course.colStudents", "course.colPerformance"};
+        String[] colDefs = {"CURSO", "PROFESOR", "ALUMNOS", "RENDIMIENTO"};
+        for (int i = 0; i < colHeaderList.size() && i < colKeys.length; i++) {
+            Text txt = (Text) colHeaderList.get(i).getChildren().get(0);
+            txt.setText(lang.get(colKeys[i], colDefs[i]));
+        }
+        // Update course rows
+        String[] scoreDefs = {"9.2", "7.8", "8.5", "8.8"};
+        String[] stDefs = {"32", "28", "40", "24"};
+        String[] nameDefs = {"Introduccion a la IA", "Calculo Avanzado", "Literatura Moderna", "Diseno UX/UI"};
+        String[] profDefs = {"Dr. Roberto Sanchez", "Dra. Elena Mendez", "Prof. Juan Carlos Rico", "Mtra. Sofia Valdez"};
+        for (int i = 0; i < courseNameTexts.size(); i++) {
+            String rowKey = "course.row" + (i + 1) + ".name";
+            String profKey = "course.row" + (i + 1) + ".prof";
+            String scoreKey = "course.row" + (i + 1) + ".score";
+            courseNameTexts.get(i).setText(lang.get(rowKey, nameDefs[i]));
+            courseProfTexts.get(i).setText(lang.get(profKey, profDefs[i]));
+            courseStudNumTexts.get(i).setText(lang.get("course.row" + (i + 1) + ".students", stDefs[i]));
+            courseStudLabelTexts.get(i).setText(lang.get("course.studentsLabel", "Estudiantes"));
+            courseScoreTexts.get(i).setText(lang.get(scoreKey, scoreDefs[i]));
+        }
+        // Update performance bar labels
+        String[] perfKeys = {"perf.label1", "perf.label2", "perf.label3", "perf.label4", "perf.label5", "perf.label6"};
+        String[] perfDefs = {"5to E", "6to A", "4to B", "4to C", "5to A", "6to B"};
+        for (int i = 0; i < perfBarLabelList.size() && i < perfKeys.length; i++) {
+            perfBarLabelList.get(i).setText(lang.get(perfKeys[i], perfDefs[i]));
+        }
+        // Update schedule items
+        String[] timeKeys = {"schedule.row1.time", "schedule.row2.time", "schedule.row3.time", "schedule.row4.time", "schedule.row5.time", "schedule.row6.time"};
+        String[] timeDefs = {"08:00", "10:00", "12:00", "14:00", "16:00", "18:00"};
+        String[] subjKeys = {"schedule.row1.subject", "schedule.row2.subject", "schedule.row3.subject", "schedule.row4.subject", "schedule.row5.subject", "schedule.row6.subject"};
+        String[] subjDefs = {"Matematicas Avanzadas", "Historia Universal", "Quimica Organica", "Fisica Cuantica", "Arte Moderno", "Ingles Tecnico"};
+        String[] detKeys = {"schedule.row1.detail", "schedule.row2.detail", "schedule.row3.detail", "schedule.row4.detail", "schedule.row5.detail", "schedule.row6.detail"};
+        String[] detDefs = {"Salon 402 - Prof. Sanchez", "Biblioteca - Dra. Mendez", "Laboratorio B - Prof. Rico", "Laboratorio A - Prof. Einstein", "Galeria - Prof. Picasso", "Aula 10 - Prof. Smith"};
+        for (int i = 0; i < scheduleSubjList.size() && i < subjKeys.length; i++) {
+            String tm = lang.get(timeKeys[i], timeDefs[i]);
+            scheduleSubjList.get(i).setText(tm + " - " + lang.get(subjKeys[i], subjDefs[i]));
+            scheduleDetList.get(i).setText(lang.get(detKeys[i], detDefs[i]));
+        }
         // Update KPI labels
         if (kpiLabelList.size() >= 4) {
             kpiLabelList.get(0).setText(lang.get("kpi.totalStudents").toUpperCase());

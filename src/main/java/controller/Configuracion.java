@@ -214,7 +214,8 @@ public class Configuracion {
 
         langCombo = new ComboBox<>();
         langCombo.getItems().addAll("Español", "Ingles");
-        langCombo.setValue("Español");
+        String currentLang = LanguageManager.getInstance().getCurrentLanguageCode();
+        langCombo.setValue(currentLang.equals("en") ? "Ingles" : "Español");
         langCombo.setPrefWidth(160);
         langCombo.setOnAction(e -> {
             String selected = langCombo.getValue();

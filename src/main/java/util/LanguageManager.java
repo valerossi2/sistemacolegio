@@ -29,6 +29,14 @@ public class LanguageManager {
         }
     }
 
+    public String get(String key, String defaultValue) {
+        try {
+            return bundle.getString(key);
+        } catch (MissingResourceException e) {
+            return defaultValue;
+        }
+    }
+
     public void setLanguage(String langCode) {
         Locale newLocale;
         switch (langCode) {

@@ -58,7 +58,11 @@
 } 
 
 .course-row:hover { 
-    -fx-background-color: #1E293B; 
+    -fx-background-color: #334155; 
+} 
+
+.schedule-row:hover { 
+    -fx-background-color: #334155; 
 } 
 
 .schedule-row { 

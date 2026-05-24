@@ -58,6 +58,21 @@ public class MainController {
     private boolean maximized = false;
     private double dragOffsetX, dragOffsetY;
     private List<Runnable> themeUpdaters = new ArrayList<>();
+    private double compactScale = 1.0;
+    private final List<HBox> kpiCardList = new ArrayList<>();
+    private final List<Text> kpiLabelList = new ArrayList<>();
+    private final List<Text> kpiValueList = new ArrayList<>();
+    private final List<Circle> kpiCircleList = new ArrayList<>();
+    private Text courseTitleText;
+    private Text perfTitleText;
+    private Text perfSubText;
+    private Text scheduleTitleText;
+    private final List<HBox> colHeaderList = new ArrayList<>();
+    private final List<List<HBox>> courseRowCells = new ArrayList<>();
+    private final List<Circle> scheduleCircleList = new ArrayList<>();
+    private final List<Text> scheduleSubjList = new ArrayList<>();
+    private final List<Text> scheduleDetList = new ArrayList<>();
+    private final List<Rectangle> perfBarsList = new ArrayList<>();
 
     private final String L_PRIMARY = "#004ac6";
     private final String L_PRIMARY_CONTAINER = "#2563eb";
@@ -251,24 +266,7 @@ public class MainController {
             double contentWidth = width - 80;
             boolean compact = contentWidth < 700;
             
-            kpiGrid.setSpacing(compact ? 8 : 16);
-            for (Node node : kpiGrid.getChildren()) {
-                if (node instanceof VBox) {
-                    VBox wrapper = (VBox) node;
-                    wrapper.setPadding(new Insets(compact ? 2 : 0));
-                    if (!wrapper.getChildren().isEmpty() && wrapper.getChildren().get(0) instanceof HBox) {
-                        HBox card = (HBox) wrapper.getChildren().get(0);
-                        card.setPadding(new Insets(compact ? 8 : 12));
-                    }
-                }
-            }
-            
-            scheduleBox.setPadding(new Insets(compact ? 8 : 12));
-            scheduleBox.setSpacing(compact ? 4 : 8);
-            coursesBox.setPadding(new Insets(compact ? 8 : 0));
-            coursesBox.setSpacing(compact ? 8 : 0);
-            performanceBox.setPadding(new Insets(compact ? 8 : 12));
-            performanceBox.setSpacing(compact ? 6 : 8);
+            applyCompactScale(compact);
             
             if (contentWidth < 900) {
                 if (middleSection.getChildren().contains(middleSectionHBox)) {
@@ -305,7 +303,7 @@ public class MainController {
         
         // Center content
         StackPane container = new StackPane(node);
-        container.setAlignment(Pos.TOP_CENTER);
+        container.setAlignment(Pos.TOP_LEFT);
         container.setStyle("-fx-background-color: transparent;");
         sp.setContent(container);
         
@@ -513,6 +511,11 @@ public class MainController {
         VBox wrapper = new VBox(card);
         HBox.setHgrow(wrapper, Priority.ALWAYS);
 
+        kpiCardList.add(card);
+        kpiLabelList.add(lbl);
+        kpiValueList.add(val);
+        kpiCircleList.add(iconCircle);
+
         themeUpdaters.add(() -> {
             iconCircle.setFill(Color.web(c(lightBg, D_SURFACE_CONTAINER)));
             iconSvg.setFill(Color.web(c("#FFFFFF", iconColor)));
@@ -527,14 +530,14 @@ public class MainController {
         HBox head = new HBox();
         head.setPadding(new Insets(12));
         head.setAlignment(Pos.CENTER_LEFT);
-        Text title = new Text("Gestion de Cursos");
-        title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
-        title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+        courseTitleText = new Text("Gestion de Cursos");
+        courseTitleText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
+        courseTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         Button btnAll = new Button("Ver todos");
         btnAll.getStyleClass().add("text-button");
-        head.getChildren().addAll(title, spacer, btnAll);
+        head.getChildren().addAll(courseTitleText, spacer, btnAll);
 
         VBox table = new VBox();
         table.setPadding(new Insets(0, 12, 0, 12));
@@ -542,12 +545,13 @@ public class MainController {
         HBox cols = new HBox();
         cols.setPadding(new Insets(8, 0, 8, 0));
         cols.setStyle("-fx-background-color: " + c(L_SURFACE_LOW, D_SURFACE_LOW) + "; -fx-background-radius: 8;");
-        cols.getChildren().addAll(
+        colHeaderList.addAll(List.of(
             createColH("CURSO", 180),
             createColH("PROFESOR", 180),
             createColH("ALUMNOS", 120),
             createColH("RENDIMIENTO", 120)
-        );
+        ));
+        cols.getChildren().addAll(colHeaderList);
 
         table.getChildren().addAll(cols);
         table.getChildren().addAll(
@@ -559,7 +563,7 @@ public class MainController {
 
         coursesBox.getChildren().addAll(head, table);
         themeUpdaters.add(() -> {
-            title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            courseTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
             cols.setStyle("-fx-background-color: " + c(L_SURFACE_LOW, D_SURFACE_LOW) + "; -fx-background-radius: 8;");
         });
     }
@@ -620,6 +624,7 @@ public class MainController {
         hPerf.setPrefWidth(120);
 
         row.getChildren().addAll(hName, hProf, hStud, hPerf);
+        courseRowCells.add(List.of(hName, hProf, hStud, hPerf));
 
         themeUpdaters.add(() -> {
             tName.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
@@ -635,9 +640,9 @@ public class MainController {
 
     private void setupPerformancePanel() {
         HBox head = new HBox();
-        Text title = new Text("Desempeno");
-        title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
-        title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+        perfTitleText = new Text("Desempeno");
+        perfTitleText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
+        perfTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         StackPane moreBtn = new StackPane();
@@ -645,11 +650,11 @@ public class MainController {
         moreBtn.getStyleClass().add("icon-button");
         SVGPath moreDots = createIcon(ICON_MORE_HORIZ, 20, c(L_OUTLINE, D_OUTLINE));
         moreBtn.getChildren().add(moreDots);
-        head.getChildren().addAll(title, spacer, moreBtn);
+        head.getChildren().addAll(perfTitleText, spacer, moreBtn);
 
-        Text sub = new Text("Promedio general mensual (6 meses)");
-        sub.setFont(Font.font("Plus Jakarta Sans", 12));
-        sub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+        perfSubText = new Text("Promedio general mensual (6 meses)");
+        perfSubText.setFont(Font.font("Plus Jakarta Sans", 12));
+        perfSubText.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
 
         HBox chart = new HBox(12);
         chart.setAlignment(Pos.BOTTOM_CENTER);
@@ -685,13 +690,14 @@ public class MainController {
         fV.getStyleClass().add("growth-badge");
         footer.getChildren().addAll(fT, s2, fV);
 
-        performanceBox.getChildren().addAll(head, sub, chart, footer);
+        performanceBox.getChildren().addAll(head, perfSubText, chart, footer);
         performanceBox.setPadding(new Insets(12));
         performanceBox.setSpacing(8);
+        perfBarsList.addAll(bars);
 
         themeUpdaters.add(() -> {
-            title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
-            sub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+            perfTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            perfSubText.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
             moreDots.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
             fT.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
             for (int i = 0; i < bars.size(); i++) {
@@ -702,9 +708,9 @@ public class MainController {
     }
 
     private void setupSchedulePanel() {
-        Text title = new Text("Horario de Hoy");
-        title.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
-        title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+        scheduleTitleText = new Text("Horario de Hoy");
+        scheduleTitleText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
+        scheduleTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
 
         VBox list = new VBox(6);
         list.getChildren().addAll(
@@ -721,11 +727,11 @@ public class MainController {
         sp.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
         sp.setPrefHeight(220);
 
-        scheduleBox.getChildren().addAll(title, sp);
+        scheduleBox.getChildren().addAll(scheduleTitleText, sp);
         scheduleBox.setPadding(new Insets(12));
         scheduleBox.setSpacing(8);
 
-        themeUpdaters.add(() -> title.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE))));
+        themeUpdaters.add(() -> scheduleTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE))));
     }
 
     private HBox createScheduleRow(String time, String subj, String det, boolean isFirst) {
@@ -778,6 +784,10 @@ public class MainController {
         actionBtn.getChildren().add(arrow);
         row.getChildren().addAll(iconStack, text, spacer, actionBtn);
 
+        scheduleCircleList.add(iconCircle);
+        scheduleSubjList.add(t1);
+        scheduleDetList.add(t2);
+
         themeUpdaters.add(() -> {
             iconCircle.setFill(Color.web(c(L_SURFACE_LOW, D_SURFACE_LOW)));
             clockIcon.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
@@ -787,6 +797,59 @@ public class MainController {
         });
 
         return row;
+    }
+
+    private void applyCompactScale(boolean compact) {
+        double s = compact ? 0.65 : 1.0;
+        if (Math.abs(s - compactScale) < 0.01) return;
+        compactScale = s;
+
+        // KPI cards
+        for (int i = 0; i < kpiCardList.size(); i++) {
+            kpiCardList.get(i).setPadding(new Insets(12 * s));
+            kpiCardList.get(i).setSpacing(12 * s);
+            kpiCircleList.get(i).setRadius(16 * s);
+            kpiLabelList.get(i).setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10 * s));
+            kpiValueList.get(i).setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18 * s));
+        }
+        kpiGrid.setSpacing(16 * s);
+
+        // Course table
+        courseTitleText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18 * s));
+        double[] cw = {180 * s, 180 * s, 120 * s, 120 * s};
+        for (int i = 0; i < colHeaderList.size(); i++) {
+            colHeaderList.get(i).setPrefWidth(cw[i]);
+        }
+        for (List<HBox> cells : courseRowCells) {
+            for (int i = 0; i < Math.min(cells.size(), cw.length); i++) {
+                cells.get(i).setPrefWidth(cw[i]);
+            }
+        }
+
+        // Performance
+        perfTitleText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18 * s));
+        perfSubText.setFont(Font.font("Plus Jakarta Sans", 12 * s));
+        for (Rectangle bar : perfBarsList) {
+            bar.setWidth(20 * s);
+            bar.setArcWidth(10 * s);
+            bar.setArcHeight(10 * s);
+        }
+
+        // Container boxes
+        scheduleBox.setPadding(new Insets(12 * s));
+        scheduleBox.setSpacing(8 * s);
+        coursesBox.setPadding(new Insets(compact ? 8 : 0));
+        coursesBox.setSpacing(compact ? 8 : 0);
+        performanceBox.setPadding(new Insets(12 * s));
+        performanceBox.setSpacing(8 * s);
+
+        // Schedule
+        scheduleTitleText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18 * s));
+        for (int i = 0; i < scheduleCircleList.size(); i++) {
+            scheduleCircleList.get(i).setRadius(24 * s);
+            scheduleSubjList.get(i).setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 15 * s));
+            scheduleDetList.get(i).setFont(Font.font("Plus Jakarta Sans", 13 * s));
+        }
     }
 
     private SVGPath createIcon(String pathData, double size, String fill) {

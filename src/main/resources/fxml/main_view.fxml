@@ -55,7 +55,6 @@
                         <HBox fx:id="userBox" alignment="CENTER_RIGHT" spacing="12" style="-fx-cursor: hand;">
                             <VBox alignment="CENTER_RIGHT" spacing="2">
                                 <Text fx:id="uName" text="Admin User" />
-                                <Text fx:id="uEmail" text="ADMIN@LUMINA.EDU" />
                             </VBox>
                             <StackPane fx:id="avatarStack" />
                         </HBox>

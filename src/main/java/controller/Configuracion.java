@@ -520,12 +520,6 @@ public class Configuracion {
         saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 14));
         saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
             "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0;");
-        saveBtn.setOnMouseEntered(e -> saveBtn.setStyle("-fx-background-color: #1D4ED8; -fx-text-fill: white; " +
-            "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 10; " +
-            "-fx-cursor: hand; -fx-padding: 12 0;"));
-        saveBtn.setOnMouseExited(e -> saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
-            "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 10; " +
-            "-fx-cursor: hand; -fx-padding: 12 0;"));
         saveBtn.setOnMouseClicked(e -> modal.close());
 
         Button cancelBtn = new Button(lang.get("config.editProfile.cancel"));
@@ -617,12 +611,6 @@ public class Configuracion {
         saveBtn.setFont(Font.font("Inter", FontWeight.BOLD, 13));
         saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
             "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 12 0;");
-        saveBtn.setOnMouseEntered(e -> saveBtn.setStyle("-fx-background-color: #1D4ED8; -fx-text-fill: white; " +
-            "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 13; -fx-background-radius: 10; " +
-            "-fx-cursor: hand; -fx-padding: 12 0;"));
-        saveBtn.setOnMouseExited(e -> saveBtn.setStyle("-fx-background-color: " + ThemeManager.COLOR_PRIMARY + "; -fx-text-fill: white; " +
-            "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 13; -fx-background-radius: 10; " +
-            "-fx-cursor: hand; -fx-padding: 12 0;"));
         saveBtn.setOnMouseClicked(e -> modal.close());
 
         Button cancelBtn = new Button(lang.get("config.changePassword.cancel"));

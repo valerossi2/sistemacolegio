@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.*?>
+
+<HBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.edugrade.controller.AsistenciaController"
+      stylesheets="@asistencia_styles.css"
+      styleClass="root-container">
+
+    <!-- ═══════════════════════════════════════════
+         SIDEBAR
+    ═══════════════════════════════════════════ -->
+    <VBox styleClass="sidebar" prefWidth="256">
+
+        <!-- Logo / Brand -->
+        <HBox styleClass="sidebar-brand" alignment="CENTER_LEFT">
+            <HBox styleClass="brand-icon-wrapper" alignment="CENTER">
+                <!-- Graduation cap SVG path -->
+                <SVGPath styleClass="brand-icon"
+                         content="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+            </HBox>
+            <VBox HBox.hgrow="ALWAYS">
+                <HBox.margin><Insets left="12"/></HBox.margin>
+                <Label text="EduGrade Admin" styleClass="brand-title"/>
+                <Label text="Academic Management" styleClass="brand-subtitle"/>
+            </VBox>
+        </HBox>
+
+        <!-- Navigation -->
+        <VBox styleClass="sidebar-nav" VBox.vgrow="ALWAYS">
+
+            <Button styleClass="nav-item" maxWidth="Infinity">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <SVGPath styleClass="nav-icon"
+                                 content="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/>
+                        <Label text="Inicio" styleClass="nav-label"/>
+                    </HBox>
+                </graphic>
+            </Button>
+
+            <Button styleClass="nav-item" maxWidth="Infinity">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <SVGPath styleClass="nav-icon"
+                                 content="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                        <Label text="Estudiantes" styleClass="nav-label"/>
+                    </HBox>
+                </graphic>
+            </Button>
+
+            <Button styleClass="nav-item" maxWidth="Infinity">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <SVGPath styleClass="nav-icon"
+                                 content="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 14H8v-2h8v2zm0-4H8v-2h8v2zm0-4H8V6h8v2z"/>
+                        <Label text="Cursos" styleClass="nav-label"/>
+                    </HBox>
+                </graphic>
+            </Button>
+
+            <!-- Active nav item -->
+            <Button styleClass="nav-item, nav-item-active" maxWidth="Infinity">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <SVGPath styleClass="nav-icon-active"
+                                 content="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                        <Label text="Asistencia" styleClass="nav-label-active"/>
+                    </HBox>
+                </graphic>
+            </Button>
+
+            <Button styleClass="nav-item" maxWidth="Infinity">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <SVGPath styleClass="nav-icon"
+                                 content="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                        <Label text="Configuración" styleClass="nav-label"/>
+                    </HBox>
+                </graphic>
+            </Button>
+
+        </VBox>
+
+        <!-- User profile footer -->
+        <HBox styleClass="sidebar-footer" alignment="CENTER_LEFT">
+            <StackPane styleClass="avatar-circle-gray">
+                <Label text="A" styleClass="avatar-initials-gray"/>
+            </StackPane>
+            <VBox HBox.hgrow="ALWAYS">
+                <HBox.margin><Insets left="12"/></HBox.margin>
+                <Label text="Admin User" styleClass="user-name"/>
+                <Label text="admin@edugrade.com" styleClass="user-email"/>
+            </VBox>
+            <Button styleClass="btn-icon-ghost">
+                <graphic>
+                    <SVGPath styleClass="icon-gray"
+                             content="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </graphic>
+            </Button>
+        </HBox>
+
+    </VBox>
+
+    <!-- ═══════════════════════════════════════════
+         MAIN CONTENT
+    ═══════════════════════════════════════════ -->
+    <VBox HBox.hgrow="ALWAYS" styleClass="main-container">
+
+        <!-- HEADER -->
+        <HBox styleClass="top-header" alignment="CENTER_LEFT">
+
+            <!-- Search Bar -->
+            <StackPane HBox.hgrow="ALWAYS" maxWidth="420">
+                <SVGPath styleClass="search-icon"
+                         content="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                         StackPane.alignment="CENTER_LEFT"
+                         translateX="14"/>
+                <TextField fx:id="searchField"
+                           promptText="Buscar..."
+                           styleClass="search-field"/>
+            </StackPane>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Action Buttons -->
+            <HBox alignment="CENTER" spacing="20">
+                <!-- Bell icon with dot indicator -->
+                <StackPane styleClass="btn-icon-ghost-header">
+                    <SVGPath styleClass="icon-gray-lg"
+                             content="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                    <Circle radius="4" styleClass="notification-dot"
+                            StackPane.alignment="TOP_RIGHT" translateX="2" translateY="-2"/>
+                </StackPane>
+
+                <Button styleClass="btn-icon-ghost-header">
+                    <graphic>
+                        <SVGPath styleClass="icon-gray-lg"
+                                 content="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+                    </graphic>
+                </Button>
+            </HBox>
+        </HBox>
+
+        <!-- SCROLLABLE CONTENT -->
+        <ScrollPane fx:id="mainScrollPane" styleClass="main-scroll" fitToWidth="true" VBox.vgrow="ALWAYS">
+
+            <VBox styleClass="content-wrapper" spacing="24">
+                <padding><Insets top="32" right="32" bottom="32" left="32"/></padding>
+
+                <!-- PAGE TITLE ROW -->
+                <HBox alignment="BOTTOM_CENTER">
+
+                    <VBox HBox.hgrow="ALWAYS" spacing="4">
+                        <Label text="Cursos / 5to E" styleClass="breadcrumb-text"/>
+                        <Label text="Registro de Asistencia Estudiantil" styleClass="page-title"/>
+                    </VBox>
+
+                    <!-- Grade / Section selectors -->
+                    <HBox spacing="12" alignment="CENTER_RIGHT">
+
+                        <HBox styleClass="selector-card" alignment="CENTER_LEFT" spacing="6">
+                            <Label text="Grado:" styleClass="selector-label"/>
+                            <ComboBox fx:id="gradeSelector" styleClass="selector-combo">
+                                <items>
+                                    <javafx.collections.FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="5to"/>
+                                        <String fx:value="4to"/>
+                                        <String fx:value="3ro"/>
+                                    </javafx.collections.FXCollections>
+                                </items>
+                                <value><String fx:value="5to"/></value>
+                            </ComboBox>
+                        </HBox>
+
+                        <HBox styleClass="selector-card" alignment="CENTER_LEFT" spacing="6">
+                            <Label text="Sección:" styleClass="selector-label"/>
+                            <ComboBox fx:id="sectionSelector" styleClass="selector-combo">
+                                <items>
+                                    <javafx.collections.FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="E"/>
+                                        <String fx:value="A"/>
+                                        <String fx:value="B"/>
+                                    </javafx.collections.FXCollections>
+                                </items>
+                                <value><String fx:value="E"/></value>
+                            </ComboBox>
+                        </HBox>
+
+                    </HBox>
+                </HBox>
+
+                <!-- ─── MAIN GRID ─── -->
+                <HBox spacing="24" alignment="TOP_LEFT">
+
+                    <!-- ── SUMMARY PANEL (col-span 4/12) ── -->
+                    <VBox styleClass="card" prefWidth="290" minWidth="260">
+                        <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+
+                        <Label text="Resumen" styleClass="card-title"/>
+
+                        <!-- Date badge -->
+                        <HBox styleClass="date-badge" alignment="CENTER_LEFT">
+                            <VBox.margin><Insets top="20" bottom="24"/></VBox.margin>
+                            <Label fx:id="currentDateLabel" text="Fecha actual: " styleClass="date-badge-text"/>
+                            <Label fx:id="currentDateValue" text="24/05/2024" styleClass="date-badge-bold"/>
+                        </HBox>
+
+                        <!-- Stats -->
+                        <VBox spacing="14">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Presentes" styleClass="stat-label" HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="presentesCount" text="28" styleClass="stat-value"/>
+                            </HBox>
+                            <Separator styleClass="stat-divider"/>
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Ausentes" styleClass="stat-label" HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="ausentesCount" text="2" styleClass="stat-value"/>
+                            </HBox>
+                            <Separator styleClass="stat-divider"/>
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Excusas" styleClass="stat-label" HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="excusasCount" text="2" styleClass="stat-value"/>
+                            </HBox>
+                        </VBox>
+
+                        <!-- Tutor card -->
+                        <HBox styleClass="tutor-card" alignment="CENTER_LEFT" spacing="16">
+                            <VBox.margin><Insets top="24"/></VBox.margin>
+                            <StackPane styleClass="avatar-circle-blue">
+                                <Label text="LM" styleClass="avatar-initials-blue"/>
+                            </StackPane>
+                            <VBox>
+                                <Label text="TUTOR" styleClass="tutor-tag"/>
+                                <Label text="Prof. Laura Méndez" styleClass="tutor-name"/>
+                            </VBox>
+                        </HBox>
+
+                    </VBox>
+
+                    <!-- ── TABLE PANEL (col-span 8/12) ── -->
+                    <VBox HBox.hgrow="ALWAYS" spacing="16">
+
+                        <VBox styleClass="card" VBox.vgrow="ALWAYS">
+
+                            <!-- Table header -->
+                            <VBox styleClass="table-header-section">
+                                <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+                                <Label text="Lista de Estudiantes" styleClass="card-title"/>
+                                <Label fx:id="enrolledCountLabel"
+                                       text="32 alumnos inscritos en el ciclo actual"
+                                       styleClass="table-subtitle"/>
+                            </VBox>
+
+                            <!-- TableView -->
+                            <TableView fx:id="attendanceTable"
+                                       styleClass="attendance-table"
+                                       VBox.vgrow="ALWAYS">
+
+                                <columns>
+
+                                    <!-- Estudiante column -->
+                                    <TableColumn fx:id="colEstudiante"
+                                                 text="Estudiante"
+                                                 prefWidth="260"
+                                                 styleClass="col-header"/>
+
+                                    <!-- ID Matrícula column -->
+                                    <TableColumn fx:id="colMatricula"
+                                                 text="ID Matrícula"
+                                                 prefWidth="150"
+                                                 styleClass="col-header"/>
+
+                                    <!-- Fecha column -->
+                                    <TableColumn fx:id="colFecha"
+                                                 text="Fecha"
+                                                 prefWidth="120"
+                                                 styleClass="col-header"/>
+
+                                    <!-- Asistencia column -->
+                                    <TableColumn fx:id="colAsistencia"
+                                                 text="Asistencia"
+                                                 prefWidth="240"
+                                                 styleClass="col-header"/>
+
+                                </columns>
+
+                                <placeholder>
+                                    <Label text="No hay estudiantes cargados."
+                                           styleClass="table-placeholder"/>
+                                </placeholder>
+
+                            </TableView>
+
+                            <!-- Load more footer -->
+                            <HBox styleClass="table-footer" alignment="CENTER">
+                                <padding><Insets top="14" bottom="14"/></padding>
+                                <Button fx:id="loadMoreBtn"
+                                        text="Cargar más estudiantes"
+                                        styleClass="btn-load-more"
+                                        onAction="#handleLoadMore"/>
+                            </HBox>
+
+                        </VBox>
+
+                        <!-- ─── CONFIRM SAVE BUTTON (compact, aligned right) ─── -->
+                        <HBox alignment="CENTER_RIGHT">
+                            <Button fx:id="saveAttendanceBtn"
+                                    styleClass="btn-save-compact"
+                                    onAction="#handleSaveAttendance">
+                                <graphic>
+                                    <HBox alignment="CENTER" spacing="8">
+                                        <SVGPath styleClass="save-icon"
+                                                 content="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                                        <Label text="Confirmar y Guardar Asistencia"
+                                               styleClass="btn-save-label"
+                                               mouseTransparent="true"/>
+                                    </HBox>
+                                </graphic>
+                            </Button>
+                        </HBox>
+
+                    </VBox>
+                </HBox>
+            </VBox>
+        </ScrollPane>
+    </VBox>
+
+</HBox>

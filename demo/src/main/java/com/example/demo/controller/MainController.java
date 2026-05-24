@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 
 public class MainController {
 
-    @FXML private HBox root;
+    @FXML private VBox root;
     @FXML private VBox sidebar;
     @FXML private VBox navItemsContainer;
     @FXML private HBox logo;

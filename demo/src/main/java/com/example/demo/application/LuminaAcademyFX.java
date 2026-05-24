@@ -16,6 +16,7 @@ public class LuminaAcademyFX extends Application {
     private ThemeManager theme = new ThemeManager();
     @Override
     public void start(Stage primaryStage) {
+        primaryStage.initStyle(StageStyle.UNDECORATED);
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/fxml/main_view.fxml"));
             Parent rootNode = loader.load();
@@ -23,8 +24,6 @@ public class LuminaAcademyFX extends Application {
             controller.setThemeManager(theme);
             controller.setStage(primaryStage);
             controller.setupEverything();
-
-            primaryStage.initStyle(StageStyle.UNDECORATED);
 
             Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
             double width = Math.min(1400, screenBounds.getWidth());

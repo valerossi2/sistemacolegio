@@ -1,10 +1,8 @@
-package com.example.demo;
+package com.example.demo.controller;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -45,13 +43,13 @@ public class DashboardController {
         this.scheduleBox = scheduleBox;
     }
 
-    // Método para agregar una nueva KPI Card
+    // Metodo para agregar una nueva KPI Card
     public void addKpiCard(String label, String value, String color, String icon) {
         VBox card = createKpiCard(label, value, color, icon);
         kpiGrid.getChildren().add(card);
     }
 
-    // Método para agregar una nueva sección personalizada
+    // Metodo para agregar una nueva seccion personalizada
     public void addCustomSection(String title, Pane content) {
         VBox section = new VBox(16);
         section.getStyleClass().add("glass-card");
@@ -65,9 +63,9 @@ public class DashboardController {
         mainCanvas.getChildren().add(section);
     }
 
-    // Método para agregar una fila al horario
+    // Metodo para agregar una fila al horario
     public void addScheduleRow(String time, String subject, String details, boolean isFirst) {
-        // Note: This requires access to the list inside scheduleBox. 
+        // Note: This requires access to the list inside scheduleBox.
         // For simplicity, we'll assume the user manages the list or we add to the bottom.
         // A better approach would be to expose the list or have a method to rebuild.
         // Here we just add to the existing structure if possible, or recreate.

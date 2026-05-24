@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.*?>
+
+<VBox fx:id="root" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.controller.MainController" prefWidth="1400" prefHeight="900">
+    <HBox fx:id="titleBar" prefHeight="36" alignment="BOTTOM_CENTER">
+        <Region HBox.hgrow="ALWAYS" />
+        <HBox fx:id="windowControls" alignment="CENTER_RIGHT" spacing="0">
+            <StackPane fx:id="minimizeBtn" prefWidth="46" prefHeight="32" styleClass="window-btn" />
+            <StackPane fx:id="maximizeBtn" prefWidth="46" prefHeight="32" styleClass="window-btn" />
+            <StackPane fx:id="closeBtn" prefWidth="46" prefHeight="32" styleClass="window-btn-close" />
+        </HBox>
+    </HBox>
+
+    <!-- Main Body -->
+    <HBox VBox.vgrow="ALWAYS">
+        <VBox fx:id="sidebar" prefWidth="260" spacing="24" styleClass="sidebar">
+            <padding>
+                <Insets top="16" right="20" bottom="32" left="20"/>
+            </padding>
+            <HBox fx:id="logo" alignment="CENTER_LEFT" spacing="12">
+                <padding>
+                    <Insets bottom="16"/>
+                </padding>
+                <StackPane fx:id="logoStack" />
+                <VBox spacing="2">
+                    <Text fx:id="lTitle" text="Lumina Academy" styleClass="logo-title"/>
+                    <Text fx:id="lSub" text="ADMIN PORTAL" styleClass="logo-subtitle"/>
+                </VBox>
+            </HBox>
+            <VBox fx:id="navItemsContainer" spacing="12" VBox.vgrow="ALWAYS" />
+        </VBox>
+
+        <VBox fx:id="contentArea" HBox.hgrow="ALWAYS">
+            <HBox fx:id="header" prefHeight="64" alignment="CENTER" spacing="0">
+                <HBox alignment="CENTER_LEFT" spacing="0" maxWidth="1200" HBox.hgrow="ALWAYS">
+                    <padding>
+                        <Insets left="40" right="40"/>
+                    </padding>
+                    <HBox fx:id="searchBox" prefWidth="400" alignment="CENTER_LEFT" spacing="10" styleClass="search-container">
+                        <padding>
+                            <Insets top="10" right="20" bottom="10" left="20"/>
+                        </padding>
+                        <StackPane fx:id="searchIconContainer" prefWidth="20" prefHeight="20" />
+                        <TextField fx:id="searchField" promptText="Buscar expedientes, cursos o reportes..." HBox.hgrow="ALWAYS" styleClass="search-input"/>
+                    </HBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <HBox fx:id="rightContainer" alignment="CENTER_RIGHT" spacing="24">
+                        <StackPane fx:id="notifBtn" prefWidth="32" prefHeight="32" styleClass="icon-button" />
+                        <StackPane fx:id="helpBtn" prefWidth="32" prefHeight="32" styleClass="icon-button" />
+                        <Rectangle fx:id="headerSeparator" width="1" height="32" />
+                        <HBox fx:id="userBox" alignment="CENTER_RIGHT" spacing="12" style="-fx-cursor: hand;">
+                            <VBox alignment="CENTER_RIGHT" spacing="2">
+                                <Text fx:id="uName" text="Admin User" />
+                                <Text fx:id="uEmail" text="ADMIN@LUMINA.EDU" />
+                            </VBox>
+                            <StackPane fx:id="avatarStack" />
+                        </HBox>
+                    </HBox>
+                </HBox>
+            </HBox>
+
+            <StackPane fx:id="centerWrapper" alignment="TOP_CENTER" VBox.vgrow="ALWAYS">
+                <VBox fx:id="mainCanvas" spacing="16" alignment="TOP_CENTER" maxWidth="1200">
+                    <padding>
+                        <Insets top="10" right="40" bottom="40" left="40"/>
+                    </padding>
+                    <VBox spacing="8">
+                        <Text fx:id="h1" text="Panel de Administracion Central" />
+                        <Text fx:id="sub" text="Bienvenido de nuevo. Aqui tienes un resumen del estado institucional hoy." />
+                    </VBox>
+                    <HBox fx:id="kpiGrid" alignment="CENTER" spacing="16" />
+                    <fx:define>
+                        <VBox fx:id="coursesBox" styleClass="glass-card" />
+                        <VBox fx:id="performanceBox" prefWidth="320" styleClass="glass-card" />
+                    </fx:define>
+                    <VBox fx:id="middleSection" spacing="24" />
+                    <VBox fx:id="scheduleBox" styleClass="glass-card" />
+                </VBox>
+            </StackPane>
+        </VBox>
+    </HBox>
+</VBox>

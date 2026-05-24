@@ -163,7 +163,7 @@ public class Configuracion {
 
         theme.addListener(() -> {
             section.setStyle(cardStyle());
-            avatarBg.setFill(Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
+            if (profileAvatarIcon.isVisible()) avatarBg.setFill(Color.web(theme.isDark() ? "#475569" : "#dbe1ff"));
             if (profileAvatarIcon.isVisible()) profileAvatarIcon.setFill(Color.web(theme.textSec()));
             onlineDot.setStroke(Color.WHITE);
             userName.setFill(Color.web(theme.text()));

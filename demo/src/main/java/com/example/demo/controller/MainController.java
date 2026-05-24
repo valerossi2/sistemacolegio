@@ -198,20 +198,20 @@ public class MainController {
                 btnContainer.getStyleClass().add("nav-item");
                 icon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
                 label.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
-
-                btnContainer.setOnMouseEntered(e -> {
-                    if (!btnContainer.getStyleClass().contains("sidebar-active")) {
-                        label.setFill(Color.web(L_PRIMARY));
-                        icon.setFill(Color.web(L_PRIMARY));
-                    }
-                });
-                btnContainer.setOnMouseExited(e -> {
-                    if (!btnContainer.getStyleClass().contains("sidebar-active")) {
-                        label.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
-                        icon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
-                    }
-                });
             }
+
+            btnContainer.setOnMouseEntered(e -> {
+                if (!btnContainer.getStyleClass().contains("sidebar-active")) {
+                    label.setFill(Color.web(L_PRIMARY));
+                    icon.setFill(Color.web(L_PRIMARY));
+                }
+            });
+            btnContainer.setOnMouseExited(e -> {
+                if (!btnContainer.getStyleClass().contains("sidebar-active")) {
+                    label.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+                    icon.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+                }
+            });
 
             themeUpdaters.add(() -> {
                 if (!btnContainer.getStyleClass().contains("sidebar-active")) {

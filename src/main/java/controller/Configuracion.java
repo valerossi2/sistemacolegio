@@ -152,6 +152,7 @@ public class Configuracion {
         StackPane avatarWrapper = new StackPane(avatarStack, onlineDot);
 
         VBox nameBox = new VBox(0);
+        nameBox.setAlignment(Pos.CENTER);
         userName = new Text("Admin User");
         userName.setFont(Font.font("Inter", FontWeight.BOLD, 16));
         userName.setFill(Color.web(theme.text()));

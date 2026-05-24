@@ -1,0 +1,839 @@
+.root-pane {
+    -fx-font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #F3F4F6;
+}
+
+
+/* ──────────────────────────────────────────────────────
+   2. SIDEBAR
+────────────────────────────────────────────────────── */
+
+.side-navbar {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 0 1 0 0;
+    -fx-pref-width: 256px;
+    -fx-min-width: 256px;
+<<<<<<< HEAD:demo/src/main/resources/com/example/demo/styles/Cursos.css
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 2, 0);
+=======
+>>>>>>> 514a3e54e1212fbc2f52fc9b8654554dbadb4d6d:src/main/resources/css/Cursos.css
+}
+
+.side-navbar__brand {
+    -fx-padding: 20 24 20 24;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 0 0 1 0;
+    -fx-spacing: 12;
+}
+
+/* Logo square */
+.brand-logo-placeholder {
+    -fx-min-width: 40px;   -fx-max-width: 40px;
+    -fx-min-height: 40px;  -fx-max-height: 40px;
+    -fx-background-color: #3FC2E8;
+    -fx-background-radius: 12px;
+}
+.brand-logo-initial {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 20px;
+    -fx-font-weight: 800;
+}
+
+.brand-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #234E5D;
+}
+.brand-subtitle {
+    -fx-font-size: 11px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #64748B;
+}
+
+/* Nav container */
+.nav-items-container {
+    -fx-padding: 12 10 12 10;
+}
+
+/* Nav item base */
+.nav-item {
+    -fx-padding: 10 16 10 16;
+    -fx-background-radius: 12px;
+    -fx-cursor: hand;
+    -fx-spacing: 12;
+}
+.nav-item:hover {
+    -fx-background-color: #F8FAFC;
+}
+.nav-item:hover .nav-item__label { -fx-text-fill: #3FC2E8; }
+.nav-item:hover .nav-item__icon  { -fx-text-fill: #3FC2E8; }
+
+.nav-item__icon {
+    -fx-text-fill: #64748B;
+    -fx-font-size: 18px;
+    -fx-min-width: 24px;
+}
+.nav-item__label {
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #64748B;
+}
+
+/* Activo — fondo primario Lumina */
+.nav-item--active {
+    -fx-background-color: #3FC2E8;
+}
+.nav-item--active .nav-item__label {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: 700;
+}
+.nav-item--active .nav-item__icon {
+    -fx-text-fill: #ffffff;
+}
+.nav-item--active:hover {
+    -fx-background-color: #2dafd4;
+}
+
+/* Perfil usuario */
+.side-navbar__profile {
+    -fx-padding: 12 16 16 16;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 1 0 0 0;
+    -fx-spacing: 12;
+}
+.profile-name  { -fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #1E293B; }
+.profile-email { -fx-font-size: 11px; -fx-text-fill: #64748B; }
+
+
+/* ──────────────────────────────────────────────────────
+   3. TOP APP BAR
+────────────────────────────────────────────────────── */
+
+.top-app-bar {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 10 24 10 24;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 0 0 1 0;
+<<<<<<< HEAD:demo/src/main/resources/com/example/demo/styles/Cursos.css
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 2);
+    -fx-min-height: 64px;
+=======
+-fx-min-height: 64px;
+>>>>>>> 514a3e54e1212fbc2f52fc9b8654554dbadb4d6d:src/main/resources/css/Cursos.css
+    -fx-pref-height: 64px;
+}
+
+/* Search bar (topbar) */
+.search-bar {
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 8px;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 6 14 6 14;
+    -fx-max-width: 400px;
+}
+.search-bar__icon  { -fx-text-fill: #94A3B8; -fx-font-size: 14px; }
+.search-bar__input {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-font-size: 13px;
+    -fx-text-fill: #1E293B;
+    -fx-prompt-text-fill: #94A3B8;
+    -fx-padding: 0;
+}
+.search-bar__input:focused { -fx-background-color: transparent; }
+
+/* Notif badge */
+.notif-badge { -fx-fill: #EF4444; }
+
+/* Mini-perfil en topbar */
+.topbar-user-name  { -fx-font-size: 13px; -fx-font-weight: 700; -fx-text-fill: #1E293B; }
+.topbar-user-email { -fx-font-size: 11px; -fx-text-fill: #94A3B8; }
+
+
+/* ──────────────────────────────────────────────────────
+   4. SCROLL PANE / CONTENT AREA
+────────────────────────────────────────────────────── */
+
+.main-content { -fx-background-color: #F3F4F6; }
+
+.main-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: #F3F4F6;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+}
+.main-scroll-pane > .viewport { -fx-background-color: transparent; }
+
+.main-scroll-pane .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 6px;
+}
+.main-scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: #CBD5E1;
+    -fx-background-radius: 3px;
+}
+.main-scroll-pane .scroll-bar:vertical .thumb:hover { -fx-background-color: #94A3B8; }
+.main-scroll-pane .scroll-bar:vertical .increment-button,
+.main-scroll-pane .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-pref-height: 0;
+}
+
+.content-area {
+    -fx-padding: 32 32 32 32;
+    -fx-background-color: #F3F4F6;
+}
+
+.scroll-bar:horizontal { -fx-pref-height: 0; -fx-opacity: 0; }
+
+
+/* ──────────────────────────────────────────────────────
+   5. PAGE HEADERS (Vista Listado)
+────────────────────────────────────────────────────── */
+
+.page-title-lg {
+    -fx-font-size: 28px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0F172A;
+}
+.page-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748B;
+}
+
+/* Page Header (Vista Detalle) */
+.page-header { -fx-spacing: 16; }
+
+.breadcrumb__parent  { -fx-font-size: 13px; -fx-font-weight: 500; -fx-text-fill: #64748B; }
+.breadcrumb__link    { -fx-cursor: hand; }
+.breadcrumb__link:hover { -fx-text-fill: #3FC2E8; }
+.breadcrumb__separator { -fx-font-size: 13px; -fx-text-fill: #94A3B8; }
+.breadcrumb__current {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #3FC2E8;
+}
+.page-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #0F172A;
+}
+
+
+/* ──────────────────────────────────────────────────────
+   6. LISTA DE CURSOS — contenedor tipo card
+────────────────────────────────────────────────────── */
+
+.list-table-container {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-border-color: transparent;
+<<<<<<< HEAD:demo/src/main/resources/com/example/demo/styles/Cursos.css
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 16, 0, 0, 4);
+=======
+>>>>>>> 514a3e54e1212fbc2f52fc9b8654554dbadb4d6d:src/main/resources/css/Cursos.css
+}
+
+.list-table__header {
+    -fx-padding: 24 24 16 24;
+    -fx-border-color: #F1F5F9;
+    -fx-border-width: 0 0 1 0;
+}
+
+.list-table__title {
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #1E293B;
+}
+
+/* Filter pills */
+.filter-pill {
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 24px;
+    -fx-border-width: 0;
+    -fx-text-fill: #64748B;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-padding: 6 18 6 18;
+    -fx-cursor: hand;
+}
+.filter-pill:hover { -fx-background-color: #E2E8F0; }
+
+.filter-pill--active {
+    -fx-background-color: #3FC2E8;
+    -fx-text-fill: #ffffff;
+}
+.filter-pill--active:hover { -fx-background-color: #2dafd4; }
+
+
+/* ──────────────────────────────────────────────────────
+   7. TABLA DE CURSOS (courses-table)
+────────────────────────────────────────────────────── */
+
+.courses-table {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-table-cell-border-color: transparent;
+    -fx-padding: 0;
+}
+
+/* Header */
+.courses-table .column-header-background {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #F1F5F9;
+    -fx-border-width: 0 0 1 0;
+}
+.courses-table .column-header {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 14 24 14 24;
+}
+.courses-table .column-header .label {
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+}
+
+/* Filas */
+.courses-table .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #F1F5F9;
+    -fx-border-width: 0 0 1 0;
+    -fx-pref-height: 72px;
+}
+.courses-table .table-row-cell:hover  { -fx-background-color: #F8FAFC; }
+.courses-table .table-row-cell:selected { -fx-background-color: #EEF2FF; }
+
+.courses-table .table-cell {
+    -fx-padding: 10 24 10 24;
+    -fx-border-width: 0;
+    -fx-alignment: CENTER_LEFT;
+    -fx-font-size: 13px;
+    -fx-text-fill: #334155;
+}
+
+/* Celda Grado */
+.cell-grado {
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #1E293B;
+}
+
+/* Celda Encargado */
+.cell-teacher-name {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #334155;
+}
+
+/* Celda Sección */
+.cell-seccion {
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #1E293B;
+    -fx-alignment: CENTER;
+}
+
+/* Celda Alumnos */
+.cell-alumnos-count {
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #1E293B;
+}
+.cell-alumnos-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #94A3B8;
+}
+
+/* Celda Rendimiento */
+.cell-rendimiento {
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #1E293B;
+}
+
+/* Status Pills */
+.status-pill {
+    -fx-background-radius: 24px;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-padding: 4 12 4 12;
+}
+.status-pill--active {
+    -fx-background-color: #DEF7EC;
+    -fx-text-fill: #03543F;
+}
+.status-pill--break {
+    -fx-background-color: #FEF3C7;
+    -fx-text-fill: #92400E;
+}
+
+/* Botón "Ver" */
+.btn-ver {
+    -fx-background-color: #3FC2E8;
+    -fx-background-radius: 8px;
+    -fx-border-width: 0;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+.btn-ver:hover { -fx-background-color: #2dafd4; }
+
+/* Placeholder */
+.table-placeholder-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #94A3B8;
+}
+
+
+/* ──────────────────────────────────────────────────────
+   8. PAGINACIÓN
+────────────────────────────────────────────────────── */
+
+.pagination-bar {
+    -fx-padding: 14 24 14 24;
+    -fx-border-color: #F1F5F9;
+    -fx-border-width: 1 0 0 0;
+    -fx-spacing: 8;
+}
+.pagination-info {
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #94A3B8;
+}
+.page-btn {
+    -fx-min-width: 32px;  -fx-max-width: 32px;
+    -fx-min-height: 32px; -fx-max-height: 32px;
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 6px;
+    -fx-border-width: 0;
+    -fx-text-fill: #64748B;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+.page-btn:hover { -fx-background-color: #E2E8F0; }
+.page-btn--active {
+    -fx-background-color: #3FC2E8;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: 700;
+}
+.page-btn--active:hover { -fx-background-color: #2dafd4; }
+
+
+/* ──────────────────────────────────────────────────────
+   9. BUTTONS (compartidos entre vistas)
+────────────────────────────────────────────────────── */
+
+/* Primario (Detalle) */
+.btn-primary {
+    -fx-background-color: #004ac6;
+    -fx-background-radius: 8px;
+    -fx-border-width: 0;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+<<<<<<< HEAD:demo/src/main/resources/com/example/demo/styles/Cursos.css
+    -fx-effect: dropshadow(gaussian, rgba(0,74,198,0.22), 4, 0, 0, 2);
+=======
+>>>>>>> 514a3e54e1212fbc2f52fc9b8654554dbadb4d6d:src/main/resources/css/Cursos.css
+}
+.btn-primary:hover   { -fx-background-color: #0053db; }
+.btn-primary:pressed { -fx-background-color: #003ea8; }
+.btn-primary__label  { -fx-text-fill: #ffffff; -fx-font-size: 13px; -fx-font-weight: 600; }
+
+/* Outlined */
+.btn-outlined {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8px;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-text-fill: #334155;
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+}
+.btn-outlined:hover { -fx-background-color: #F8FAFC; }
+
+/* Ghost icon */
+.btn-icon-ghost {
+    -fx-background-color: transparent;
+    -fx-background-radius: 24px;
+    -fx-border-width: 0;
+    -fx-font-size: 16px;
+    -fx-text-fill: #94A3B8;
+    -fx-padding: 8 8 8 8;
+    -fx-cursor: hand;
+    -fx-min-width: 36px; -fx-min-height: 36px;
+}
+.btn-icon-ghost:hover { -fx-background-color: #F8FAFC; -fx-text-fill: #3FC2E8; }
+
+/* Link */
+.btn-link {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-text-fill: #3FC2E8;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-padding: 4 0 4 0;
+}
+.btn-link:hover { -fx-text-fill: #2dafd4; }
+
+.btn-link-primary {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-text-fill: #004ac6;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+}
+.btn-link-primary:hover { -fx-text-fill: #0053db; }
+
+/* Icono en botones */
+.btn-icon       { -fx-text-fill: #64748B; -fx-font-size: 15px; }
+.btn-icon--white { -fx-text-fill: #ffffff; -fx-font-size: 15px; }
+
+
+/* ──────────────────────────────────────────────────────
+   10. AVATARES
+────────────────────────────────────────────────────── */
+
+.avatar { -fx-alignment: CENTER; }
+
+.avatar--sm  {
+    -fx-min-width: 32px; -fx-max-width: 32px;
+    -fx-min-height: 32px; -fx-max-height: 32px;
+    -fx-background-radius: 16px;
+}
+.avatar--md  {
+    -fx-min-width: 40px; -fx-max-width: 40px;
+    -fx-min-height: 40px; -fx-max-height: 40px;
+    -fx-background-radius: 20px;
+}
+.avatar__initials {
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #1E293B;
+}
+
+/* Variantes */
+.avatar--primary { -fx-background-color: #3FC2E8; }
+.avatar--primary .avatar__initials { -fx-text-fill: #ffffff; }
+
+.avatar--blue    { -fx-background-color: #b4c5ff; }
+.avatar--blue    .avatar__initials { -fx-text-fill: #00174b; }
+
+.avatar--cyan    { -fx-background-color: #7bd1fa; }
+.avatar--cyan    .avatar__initials { -fx-text-fill: #001e2b; }
+
+.avatar--grey    { -fx-background-color: #bfc8ce; }
+.avatar--grey    .avatar__initials { -fx-text-fill: #141d21; }
+
+.avatar--green   { -fx-background-color: #c0e8ff; }
+.avatar--green   .avatar__initials { -fx-text-fill: #001e2b; }
+
+.avatar--amber   { -fx-background-color: #dbe4ea; }
+.avatar--amber   .avatar__initials { -fx-text-fill: #141d21; }
+
+.avatar--teal    { -fx-background-color: #7ed4fd; }
+.avatar--teal    .avatar__initials { -fx-text-fill: #001e2b; }
+
+.avatar--course-red    { -fx-background-color: #FEE2E2; }
+.avatar--course-green  { -fx-background-color: #D1FAE5; }
+.avatar--course-purple { -fx-background-color: #EDE9FE; }
+.avatar--course-orange { -fx-background-color: #FEF3C7; }
+
+
+/* ──────────────────────────────────────────────────────
+   11. CARDS (Vista Detalle)
+────────────────────────────────────────────────────── */
+
+.card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 16px;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 16px;
+    -fx-border-width: 1px;
+<<<<<<< HEAD:demo/src/main/resources/com/example/demo/styles/Cursos.css
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);
+    -fx-padding: 24 24 24 24;
+=======
+-fx-padding: 24 24 24 24;
+>>>>>>> 514a3e54e1212fbc2f52fc9b8654554dbadb4d6d:src/main/resources/css/Cursos.css
+}
+.card__title   { -fx-font-size: 16px; -fx-font-weight: 700; -fx-text-fill: #1E293B; }
+.card__subtitle { -fx-font-size: 12px; -fx-text-fill: #64748B; }
+
+/* Bento grid */
+.bento-grid { -fx-hgap: 24; -fx-vgap: 24; }
+
+/* Badge */
+.badge {
+    -fx-font-size: 10px;
+    -fx-font-weight: 700;
+    -fx-padding: 4 10 4 10;
+    -fx-background-radius: 24px;
+}
+.badge--surface { -fx-background-color: #E2E8F0; -fx-text-fill: #475569; }
+
+
+/* ──────────────────────────────────────────────────────
+   12. COURSE IMAGE (overview card)
+────────────────────────────────────────────────────── */
+
+.course-image-container {
+    -fx-background-radius: 10px;
+    -fx-background-color: #CBD5E1;
+    -fx-pref-height: 192px;
+    -fx-min-height: 192px;
+    -fx-max-height: 192px;
+}
+.course-image-placeholder {
+    -fx-background-color: linear-gradient(to bottom, #7bd1fa 0%, #b4c5ff 100%);
+    -fx-background-radius: 10px;
+}
+.course-image-overlay {
+    -fx-background-color: linear-gradient(to top, rgba(0,0,0,0.60) 0%, transparent 55%);
+    -fx-background-radius: 10px;
+}
+.course-image-caption  { -fx-padding: 0 0 12 14; }
+.caption-subtitle { -fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.82); }
+.caption-title    { -fx-font-size: 14px; -fx-font-weight: 700; -fx-text-fill: #ffffff; }
+
+
+/* ──────────────────────────────────────────────────────
+   13. STAT ROWS
+────────────────────────────────────────────────────── */
+
+.stat-row {
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 10px;
+    -fx-padding: 10 14 10 14;
+}
+.stat-icon {
+    -fx-min-width: 40px; -fx-max-width: 40px;
+    -fx-min-height: 40px; -fx-max-height: 40px;
+    -fx-background-radius: 20px;
+    -fx-alignment: CENTER;
+}
+.stat-icon--primary   { -fx-background-color: #3FC2E8; }
+.stat-icon--secondary { -fx-background-color: #7ed4fd; }
+.stat-icon--neutral   { -fx-background-color: #E2E8F0; }
+.stat-label { -fx-font-size: 11px; -fx-text-fill: #64748B; }
+.stat-value { -fx-font-size: 14px; -fx-font-weight: 700; -fx-text-fill: #1E293B; }
+
+
+/* ──────────────────────────────────────────────────────
+   14. TEACHER CARDS
+────────────────────────────────────────────────────── */
+
+.teacher-card {
+    -fx-padding: 10 14 10 14;
+    -fx-background-radius: 10px;
+    -fx-border-color: #F1F5F9;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-cursor: hand;
+}
+.teacher-card:hover { -fx-border-color: #b4c5ff; }
+.teacher-name    { -fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #1E293B; }
+.teacher-subject { -fx-font-size: 11px; -fx-text-fill: #64748B; }
+
+
+/* ──────────────────────────────────────────────────────
+   15. STUDENTS CARD & TABLE
+────────────────────────────────────────────────────── */
+
+.students-card { -fx-padding: 0; }
+
+.students-card__header {
+    -fx-padding: 20 24 20 24;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 0 0 1 0;
+}
+.students-card__footer {
+    -fx-padding: 12 24 14 24;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 1 0 0 0;
+    -fx-alignment: CENTER;
+}
+
+/* View Toggle */
+.view-toggle {
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 8px;
+    -fx-padding: 3 3 3 3;
+}
+.view-toggle__btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-border-width: 0;
+    -fx-text-fill: #64748B;
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+    -fx-padding: 4 12 4 12;
+    -fx-cursor: hand;
+}
+.view-toggle__btn--active,
+.view-toggle__btn:selected {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #1E293B;
+    -fx-font-weight: 700;
+<<<<<<< HEAD:demo/src/main/resources/com/example/demo/styles/Cursos.css
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.09), 3, 0, 0, 1);
+=======
+>>>>>>> 514a3e54e1212fbc2f52fc9b8654554dbadb4d6d:src/main/resources/css/Cursos.css
+}
+.view-toggle__btn:hover:selected { -fx-text-fill: #1E293B; }
+
+/* Students TableView */
+.students-table {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-table-cell-border-color: transparent;
+    -fx-padding: 0;
+}
+.students-table .column-header-background {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 0 0 1 0;
+}
+.students-table .column-header {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 10 24 10 24;
+}
+.students-table .column-header .label {
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+}
+.students-table .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #F1F5F9;
+    -fx-border-width: 0 0 1 0;
+    -fx-pref-height: 60px;
+}
+.students-table .table-row-cell:hover    { -fx-background-color: #F8FAFC; }
+.students-table .table-row-cell:selected { -fx-background-color: #EEF2FF; }
+.students-table .table-cell {
+    -fx-padding: 8 24 8 24;
+    -fx-border-width: 0;
+    -fx-alignment: CENTER_LEFT;
+    -fx-font-size: 13px;
+    -fx-text-fill: #334155;
+}
+
+/* Cell labels */
+.cell-student-name  { -fx-font-size: 13px; -fx-font-weight: 700; -fx-text-fill: #1E293B; }
+.cell-student-email { -fx-font-size: 11px; -fx-text-fill: #64748B; }
+.cell-matricula     { -fx-font-size: 13px; -fx-text-fill: #334155; }
+
+/* Attendance bar */
+.attendance-bar {
+    -fx-pref-width: 100px; -fx-max-width: 100px;
+    -fx-pref-height: 6px;
+    -fx-background-radius: 3px;
+    -fx-accent: #3FC2E8;
+}
+.attendance-bar > .track {
+    -fx-background-color: #E2E8F0;
+    -fx-background-radius: 3px;
+}
+.attendance-bar > .bar {
+    -fx-background-color: #3FC2E8;
+    -fx-background-radius: 3px;
+    -fx-background-insets: 0;
+    -fx-padding: 3px;
+}
+.attendance-bar--low > .bar { -fx-background-color: #EF4444; }
+
+.cell-attendance-pct     { -fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: #64748B; }
+.cell-attendance-pct--low { -fx-text-fill: #EF4444; }
+
+/* Action button */
+.btn-action-menu {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 18px;
+    -fx-padding: 2 6 2 6;
+    -fx-cursor: hand;
+    -fx-background-radius: 4px;
+}
+.btn-action-menu:hover { -fx-text-fill: #3FC2E8; -fx-background-color: #F1F5F9; }
+
+
+/* ──────────────────────────────────────────────────────
+   16. MISC
+────────────────────────────────────────────────────── */
+
+.icon-label { -fx-font-size: 16px; }
+
+
+/* ──────────────────────────────────────────────────────
+   17. SVGPath ICONS
+────────────────────────────────────────────────────── */
+
+/* Icono nav normal (gris) */
+.nav-svg-icon {
+    -fx-fill: #64748B;
+    -fx-min-width: 20px;
+    -fx-min-height: 20px;
+}
+
+/* Icono nav ítem activo (blanco) */
+.nav-svg-icon--active {
+    -fx-fill: #ffffff;
+}
+
+/* Cuando el HBox padre tiene nav-item--active, todos sus SVGPath se ponen blancos */
+.nav-item--active .nav-svg-icon {
+    -fx-fill: #ffffff;
+}
+
+/* Hover: el SVG hereda el color del hover del nav-item */
+.nav-item:hover .nav-svg-icon {
+    -fx-fill: #3FC2E8;
+}
+
+/* Icono en la barra de búsqueda */
+.search-svg-icon {
+    -fx-fill: #94A3B8;
+}
+
+/* Icono en botones (outlined / primary) */
+.btn-svg-icon {
+    -fx-fill: #64748B;
+}
+.btn-svg-icon--white {
+    -fx-fill: #ffffff;
+}
+
+/* Iconos dentro de stat cards */
+.stat-svg-icon {
+    -fx-fill: #ffffff;
+}
+.stat-svg-icon--dark {
+    -fx-fill: #475569;
+}
+
+
+
+
+
+
+
+
+

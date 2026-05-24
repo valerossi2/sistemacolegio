@@ -1,0 +1,22 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run JavaFX" type="MavenRunConfiguration" factoryName="Maven">
+    <MavenSettings>
+      <option name="myGeneralSettings" />
+      <option name="myRunnerSettings" />
+      <option name="myRunnerParameters">
+        <MavenRunnerParameters>
+          <option name="cmdOptions" />
+          <option name="commandLineValue" value="javafx:run" />
+          <option name="goals" value="" />
+          <option name="profiles">
+            <set />
+          </option>
+          <option name="pomFileName" value="pom.xml" />
+          <option name="projectPath" value="$PROJECT_DIR$" />
+          <option name="vmOptions" value="" />
+        </MavenRunnerParameters>
+      </option>
+    </MavenSettings>
+    <method v="2" />
+  </configuration>
+</component>

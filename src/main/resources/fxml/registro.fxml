@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.geometry.Insets?>
+
+<HBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.RegisterController"
+      styleClass="root-container"
+      minWidth="820"
+      minHeight="620">
+
+    <StackPane styleClass="left-panel" prefWidth="350" maxWidth="380">
+
+        <SVGPath styleClass="wave-shape"
+                 content="M 0 0 L 270 0 Q 320 160 270 310 Q 240 460 270 620 L 0 620 Z"
+                 StackPane.alignment="CENTER_LEFT"/>
+
+        <VBox styleClass="left-text-box" maxWidth="240" spacing="10"
+              StackPane.alignment="CENTER_LEFT">
+            <StackPane.margin><Insets left="32"/></StackPane.margin>
+            <Label styleClass="left-title" wrapText="true"
+                   text="Comienza a&#10;Gestionar el Éxito&#10;de tus Alumnos"/>
+            <Label styleClass="left-subtitle" wrapText="true"
+                   text="Crea tu cuenta y empieza&#10;a gestionar el éxito académico."/>
+        </VBox>
+
+
+        <ImageView fx:id="heroImage" fitWidth="220" fitHeight="180"
+                   preserveRatio="true" styleClass="hero-image"
+                   StackPane.alignment="BOTTOM_LEFT">
+            <image>
+                <Image url="@../img/logoCEPVAremove.png"/>
+            </image>
+            <StackPane.margin><Insets bottom="20" left="20"/></StackPane.margin>
+        </ImageView>
+
+    </StackPane>
+
+    <StackPane styleClass="right-panel" HBox.hgrow="ALWAYS">
+        <VBox styleClass="form-container" maxWidth="340" spacing="10"
+              alignment="CENTER" StackPane.alignment="CENTER">
+
+            <Label styleClass="form-title" text="Crear Cuenta">
+                <VBox.margin><Insets bottom="6"/></VBox.margin>
+            </Label>
+
+            <HBox styleClass="field-wrapper" alignment="CENTER_LEFT" spacing="8">
+                <Label styleClass="field-icon" text="👤"/>
+                <TextField fx:id="nameField" styleClass="field-input"
+                           promptText="Nombre Completo" HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <HBox styleClass="field-wrapper" alignment="CENTER_LEFT" spacing="8">
+                <Label styleClass="field-icon" text="✉"/>
+                <TextField fx:id="emailField" styleClass="field-input"
+                           promptText="Correo Electrónico" HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <HBox styleClass="field-wrapper" alignment="CENTER_LEFT" spacing="8">
+                <Label styleClass="field-icon" text="🔒"/>
+                <PasswordField fx:id="passwordField" styleClass="field-input"
+                               promptText="Contraseña" HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="passwordVisible" styleClass="field-input"
+                           promptText="Contraseña" visible="false" managed="false"
+                           HBox.hgrow="ALWAYS"/>
+                <Label styleClass="eye-button" text="👁" onMouseClicked="#togglePassword"/>
+            </HBox>
+
+            <HBox styleClass="field-wrapper" alignment="CENTER_LEFT" spacing="8">
+                <Label styleClass="field-icon" text="🔒"/>
+                <PasswordField fx:id="confirmField" styleClass="field-input"
+                               promptText="Confirmar Contraseña" HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="confirmVisible" styleClass="field-input"
+                           promptText="Confirmar Contraseña" visible="false" managed="false"
+                           HBox.hgrow="ALWAYS"/>
+                <Label styleClass="eye-button" text="👁" onMouseClicked="#toggleConfirm"/>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="4">
+                <CheckBox fx:id="termsCheck" styleClass="remember-checkbox"
+                          text="Acepto los"/>
+                <Hyperlink styleClass="forgot-link" text="términos y condiciones"
+                           onAction="#onTerms"/>
+            </HBox>
+
+            <Button text="Crear Cuenta" styleClass="btn-primary"
+                    maxWidth="Infinity" onAction="#onRegister">
+                <VBox.margin><Insets top="4"/></VBox.margin>
+            </Button>
+
+            <Label styleClass="divider-text" text="¿Ya tienes una cuenta?">
+                <VBox.margin><Insets top="2"/></VBox.margin>
+            </Label>
+
+            <Button text="Iniciar Sesión" styleClass="btn-secondary"
+                    maxWidth="Infinity" onAction="#goToLogin"/>
+
+            <HBox alignment="CENTER" spacing="0">
+                <VBox.margin><Insets top="4" bottom="4"/></VBox.margin>
+                <Region styleClass="divider-line" HBox.hgrow="ALWAYS"/>
+                <Label styleClass="divider-text" text="O regístrate con">
+                    <HBox.margin><Insets left="10" right="10"/></HBox.margin>
+                </Label>
+                <Region styleClass="divider-line" HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <Button styleClass="btn-google" maxWidth="Infinity" onAction="#onGoogle">
+                <graphic>
+                    <HBox alignment="CENTER" spacing="10">
+                        <Label styleClass="google-logo" text="G"/>
+                        <Label styleClass="google-text" text="Google"/>
+                    </HBox>
+                </graphic>
+            </Button>
+
+        </VBox>
+    </StackPane>
+
+</HBox>

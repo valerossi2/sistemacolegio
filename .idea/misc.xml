@@ -4,12 +4,16 @@
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
-        <option value="$PROJECT_DIR$/demo/pom.xml" />
         <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>
   </component>
+<<<<<<< HEAD
   <component name="ProjectRootManager" version="2" languageLevel="JDK_25" default="true" project-jdk-name="25" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
+=======
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="temurin-25.0.3" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/target" />
+>>>>>>> 514a3e54e1212fbc2f52fc9b8654554dbadb4d6d
   </component>
 </project>

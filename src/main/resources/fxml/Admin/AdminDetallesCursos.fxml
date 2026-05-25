@@ -160,65 +160,25 @@
                   VBox.vgrow="ALWAYS">
 
                 <!-- Equipo Docente -->
-                <VBox styleClass="card" spacing="16">
-                    <HBox alignment="CENTER_LEFT">
+                <VBox styleClass="card" spacing="0">
+                    <HBox styleClass="teacher-card__header" alignment="CENTER_LEFT">
                         <Label text="Equipo Docente" styleClass="card__title"
                                HBox.hgrow="ALWAYS"/>
                         <Button fx:id="btnVerTodosDocentes" text="Ver Todos"
                                 styleClass="btn-link" mnemonicParsing="false"
                                 onAction="#onVerTodosDocentes"/>
                     </HBox>
-                    <GridPane hgap="16" vgap="12">
-                        <columnConstraints>
-                            <ColumnConstraints percentWidth="50"/>
-                            <ColumnConstraints percentWidth="50"/>
-                        </columnConstraints>
-
-                        <HBox styleClass="teacher-card" spacing="12" alignment="CENTER_LEFT"
-                              GridPane.columnIndex="0" GridPane.rowIndex="0">
-                            <StackPane styleClass="avatar avatar--md avatar--blue">
-                                <Label text="CR" styleClass="avatar__initials"/>
-                            </StackPane>
-                            <VBox spacing="2">
-                                <Label text="Carlos Ruiz"             styleClass="teacher-name"/>
-                                <Label text="Matemáticas Avanzadas"   styleClass="teacher-subject"/>
-                            </VBox>
-                        </HBox>
-
-                        <HBox styleClass="teacher-card" spacing="12" alignment="CENTER_LEFT"
-                              GridPane.columnIndex="1" GridPane.rowIndex="0">
-                            <StackPane styleClass="avatar avatar--md avatar--green">
-                                <Label text="ET" styleClass="avatar__initials"/>
-                            </StackPane>
-                            <VBox spacing="2">
-                                <Label text="Elena Torres"    styleClass="teacher-name"/>
-                                <Label text="Física y Química" styleClass="teacher-subject"/>
-                            </VBox>
-                        </HBox>
-
-                        <HBox styleClass="teacher-card" spacing="12" alignment="CENTER_LEFT"
-                              GridPane.columnIndex="0" GridPane.rowIndex="1">
-                            <StackPane styleClass="avatar avatar--md avatar--amber">
-                                <Label text="MS" styleClass="avatar__initials"/>
-                            </StackPane>
-                            <VBox spacing="2">
-                                <Label text="Miguel Ángel Soto"       styleClass="teacher-name"/>
-                                <Label text="Literatura Hispanoam."    styleClass="teacher-subject"/>
-                            </VBox>
-                        </HBox>
-
-                        <HBox styleClass="teacher-card" spacing="12" alignment="CENTER_LEFT"
-                              GridPane.columnIndex="1" GridPane.rowIndex="1">
-                            <StackPane styleClass="avatar avatar--md avatar--teal">
-                                <Label text="AS" styleClass="avatar__initials"/>
-                            </StackPane>
-                            <VBox spacing="2">
-                                <Label text="Ana Silva"         styleClass="teacher-name"/>
-                                <Label text="Historia Universal" styleClass="teacher-subject"/>
-                            </VBox>
-                        </HBox>
-
-                    </GridPane>
+                    <TableView fx:id="teacherTable"
+                               styleClass="teacher-table"
+                               VBox.vgrow="NEVER">
+                        <columns>
+                            <TableColumn fx:id="colTeacherName" text="DOCENTE" prefWidth="220"/>
+                            <TableColumn fx:id="colTeacherSubject" text="MATERIA" prefWidth="220"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No hay docentes asignados." styleClass="table-placeholder-label"/>
+                        </placeholder>
+                    </TableView>
                 </VBox>
 
                 <!-- Lista de Estudiantes -->

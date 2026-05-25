@@ -1,9 +1,14 @@
 package com.edugrade.controllers;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -14,6 +19,10 @@ public class DetalleCursoController {
 
     private LanguageManager lang;
     private ThemeManager theme;
+    private boolean showingAllTeachers = false;
+
+    private final ObservableList<TeacherRow> fullTeacherData = FXCollections.observableArrayList();
+    private final ObservableList<TeacherRow> displayedTeacherData = FXCollections.observableArrayList();
 
     @FXML private VBox root;
     @FXML private VBox courseOverviewCard;
@@ -29,6 +38,9 @@ public class DetalleCursoController {
     @FXML private Label totalTeachers;
     @FXML private Label assignedRoom;
     @FXML private Button btnVerTodosDocentes;
+    @FXML private TableView<TeacherRow> teacherTable;
+    @FXML private TableColumn<TeacherRow, String> colTeacherName;
+    @FXML private TableColumn<TeacherRow, String> colTeacherSubject;
     @FXML private TableView<?> studentsTable;
     @FXML private TableColumn<?, ?> colStudent;
     @FXML private TableColumn<?, ?> colMatricula;
@@ -47,9 +59,35 @@ public class DetalleCursoController {
         loadStylesheets();
         updateTexts();
         applyTheme();
+        initTeacherTable();
+        initTeacherData();
 
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);
+    }
+
+    private void initTeacherTable() {
+        colTeacherName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colTeacherSubject.setCellValueFactory(new PropertyValueFactory<>("subject"));
+    }
+
+    private void initTeacherData() {
+        fullTeacherData.setAll(
+            new TeacherRow("Carlos Ruiz", "Matemáticas Avanzadas"),
+            new TeacherRow("Elena Torres", "Física y Química"),
+            new TeacherRow("Miguel Ángel Soto", "Literatura Hispanoam."),
+            new TeacherRow("Ana Silva", "Historia Universal"),
+            new TeacherRow("Roberto Sánchez", "Programación I"),
+            new TeacherRow("Laura Méndez", "Biología Molecular"),
+            new TeacherRow("Pedro García", "Inglés Avanzado"),
+            new TeacherRow("Sofía Valdez", "Arte y Diseño"),
+            new TeacherRow("Diego Ramírez", "Educación Física"),
+            new TeacherRow("Carmen Vega", "Filosofía"),
+            new TeacherRow("Luis Torres", "Química Orgánica"),
+            new TeacherRow("María Paz", "Geografía Mundial")
+        );
+        displayedTeacherData.addAll(fullTeacherData.subList(0, 4));
+        teacherTable.setItems(displayedTeacherData);
     }
 
     private void loadStylesheets() {
@@ -84,11 +122,15 @@ public class DetalleCursoController {
         btnEditCourse.setText(lang.get("detalle.btnEdit", "Editar Curso"));
         badgeNivel.setText(lang.get("detalle.badgeNivel", "SECUNDARIA"));
         lblTutorPrincipal.setText(lang.get("detalle.tutorPrincipal", "Prof. Laura Méndez"));
-        btnVerTodosDocentes.setText(lang.get("detalle.verTodos", "Ver Todos"));
+        btnVerTodosDocentes.setText(lang.get(
+            showingAllTeachers ? "detalle.verMenos" : "detalle.verTodos"
+        ));
         btnLoadMore.setText(lang.get("detalle.cargarMas", "Cargar más estudiantes"));
         studentsSubtitle.setText(lang.get("detalle.studentsSubtitle", "32 alumnos inscritos en el ciclo actual"));
         btnViewTable.setText(lang.get("detalle.viewTable", "Tabla"));
         btnViewGrid.setText(lang.get("detalle.viewGrid", "Cuadrícula"));
+        colTeacherName.setText(lang.get("detalle.colDocente", "DOCENTE"));
+        colTeacherSubject.setText(lang.get("detalle.colMateria", "MATERIA"));
     }
 
     @FXML
@@ -115,11 +157,13 @@ public class DetalleCursoController {
 
     @FXML
     private void onVerTodosDocentes(ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(lang.get("detalle.docentesTitle", "Docentes"));
-        alert.setHeaderText(null);
-        alert.setContentText(lang.get("detalle.docentesMsg", "Lista completa de docentes no implementada."));
-        alert.showAndWait();
+        showingAllTeachers = !showingAllTeachers;
+        displayedTeacherData.setAll(
+            showingAllTeachers ? fullTeacherData : fullTeacherData.subList(0, 4)
+        );
+        btnVerTodosDocentes.setText(lang.get(
+            showingAllTeachers ? "detalle.verMenos" : "detalle.verTodos"
+        ));
     }
 
     @FXML
@@ -129,5 +173,23 @@ public class DetalleCursoController {
         alert.setHeaderText(null);
         alert.setContentText(lang.get("detalle.estudiantesMsg", "Carga de más estudiantes no implementada."));
         alert.showAndWait();
+    }
+
+    public static class TeacherRow {
+        private final StringProperty name;
+        private final StringProperty subject;
+
+        public TeacherRow(String name, String subject) {
+            this.name = new SimpleStringProperty(name);
+            this.subject = new SimpleStringProperty(subject);
+        }
+
+        public String getName() { return name.get(); }
+        public void setName(String n) { name.set(n); }
+        public StringProperty nameProperty() { return name; }
+
+        public String getSubject() { return subject.get(); }
+        public void setSubject(String s) { subject.set(s); }
+        public StringProperty subjectProperty() { return subject; }
     }
 }

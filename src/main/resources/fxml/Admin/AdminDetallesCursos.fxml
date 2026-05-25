@@ -242,8 +242,10 @@
 
                     <TableView fx:id="studentsTable"
                                styleClass="students-table"
-                               VBox.vgrow="ALWAYS"
-                               columnResizePolicy="CONSTRAINED_RESIZE_POLICY">
+                               VBox.vgrow="ALWAYS">
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                        </columnResizePolicy>
                         <columns>
                             <TableColumn fx:id="colStudent"    text="ESTUDIANTE"   prefWidth="240"/>
                             <TableColumn fx:id="colMatricula"  text="ID MATRÍCULA" prefWidth="140"/>

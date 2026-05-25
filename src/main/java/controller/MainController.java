@@ -16,7 +16,9 @@ import javafx.scene.shape.*;
 import javafx.scene.text.*;
 import javafx.util.Duration;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -270,12 +272,26 @@ public class MainController {
         if (index == 0) {
             setCenterView(mainCanvas);
             loadHeaderProfileImage();
+        } else if (index == 2) {
+            loadView("/fxml/Admin/AdminMaestros.fxml");
+        } else if (index == 3) {
+            loadView("/fxml/Admin/AdminCursos.fxml");
         } else if (index == 5) {
             controller.Configuracion config = new controller.Configuracion(theme);
             config.setOwnerStage(stage);
             setCenterView(config.getView());
         } else {
             System.out.println("Navegando a sección: " + index + " (No implementada)");
+        }
+    }
+
+    private void loadView(String fxmlPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Node view = loader.load();
+            setCenterView(view);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.edugrade.controllers.MaestrosController"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED"
+            style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;"
+            stylesheets="@../../css/Cursos.css">
+
+    <VBox spacing="24" styleClass="content-area">
+        <padding>
+            <Insets top="32" right="40" bottom="40" left="40"/>
+        </padding>
+
+        <VBox spacing="6">
+            <Text fx:id="pageTitle" text="Listado de Profesores"
+                  style="-fx-font-family: 'Plus Jakarta Sans'; -fx-font-weight: bold; -fx-font-size: 24px;" />
+            <Text fx:id="pageSubtitle" text="Gestiona los profesores activos del instituto."
+                  style="-fx-font-family: 'Plus Jakarta Sans'; -fx-font-size: 14px;" />
+        </VBox>
+
+        <Label fx:id="lblTotalMaestros" text="Todos los Profesores (0)"
+               style="-fx-font-family: 'Plus Jakarta Sans'; -fx-font-weight: bold; -fx-font-size: 15px;" />
+
+        <TableView fx:id="maestrosTable"
+                   VBox.vgrow="ALWAYS"
+                   style="-fx-background-color: transparent;">
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+            <columns>
+                <TableColumn fx:id="colNombre"  text="Nombre"    prefWidth="220" minWidth="160"/>
+                <TableColumn fx:id="colEmail"   text="Email"     prefWidth="240" minWidth="180"/>
+                <TableColumn fx:id="colMateria" text="Materia"   prefWidth="180" minWidth="140"/>
+                <TableColumn fx:id="colSeccion" text="Sección"   prefWidth="100" minWidth="80"/>
+                <TableColumn fx:id="colEstado"  text="Estado"    prefWidth="120" minWidth="100"/>
+            </columns>
+            <placeholder>
+                <Label text="No hay profesores que mostrar." />
+            </placeholder>
+        </TableView>
+    </VBox>
+</ScrollPane>

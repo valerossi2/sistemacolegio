@@ -704,49 +704,4 @@
 .stat-svg-icon { -fx-fill: #ffffff; }
 .stat-svg-icon--dark { -fx-fill: cursos-text-muted; }
 
-/* ── LAUNCHER-SPECIFIC ───────────────────────────────────── */
-.launcher-titlebar {
-    -fx-background-color: cursos-surface;
-    -fx-padding: 0 12 0 16;
-    -fx-min-height: 36px;
-    -fx-pref-height: 36px;
-    -fx-border-color: cursos-border-light;
-    -fx-border-width: 0 0 1 0;
-}
-.launcher-titlebar__label {
-    -fx-font-size: 12px;
-    -fx-font-weight: 600;
-    -fx-text-fill: cursos-text-muted;
-}
-.launcher-window-btn {
-    -fx-background-color: transparent;
-    -fx-cursor: hand;
-    -fx-min-width: 46px;
-    -fx-min-height: 32px;
-}
-.launcher-window-btn:hover { -fx-background-color: cursos-surface-hover; }
-.launcher-window-btn--close:hover { -fx-background-color: #e81123; }
-.launcher-window-btn--close:hover .launcher-icon { -fx-fill: #ffffff; }
 
-.launcher-header-actions {
-    -fx-spacing: 8;
-    -fx-padding: 0 24 0 0;
-}
-
-.launcher-toggle-btn {
-    -fx-background-color: cursos-input-bg;
-    -fx-background-radius: 8px;
-    -fx-border-color: cursos-input-border;
-    -fx-border-radius: 8px;
-    -fx-border-width: 1px;
-    -fx-padding: 6 12 6 12;
-    -fx-cursor: hand;
-    -fx-font-size: 12px;
-    -fx-font-weight: 600;
-    -fx-text-fill: cursos-text-muted;
-}
-.launcher-toggle-btn:hover {
-    -fx-background-color: cursos-surface-hover;
-    -fx-text-fill: cursos-accent;
-    -fx-border-color: cursos-accent;
-}

@@ -29,8 +29,6 @@ public class GradesController implements Initializable {
     @FXML private Button           btnGuardarTop;
     @FXML private Button           btnGuardarBottom;
     @FXML private Button           btnCancelar;
-    @FXML private TextField        searchField;
-
     private final ObservableList<Student> studentData =
         FXCollections.observableArrayList(
             new Student("Alejandro García",  "alejandro.g@student.edu", "STU-2023-045", 8.5, Gender.MALE),

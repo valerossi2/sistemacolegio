@@ -331,7 +331,26 @@ public class CursosLauncher extends Application {
         root.getStylesheets().add(css);
 
         if (theme.isDark()) {
-            root.setStyle("-fx-cursos-bg: #0F172A; -fx-cursos-surface: #1E293B; -fx-cursos-surface-hover: #334155; -fx-cursos-surface-active: #1E3A5F; -fx-cursos-border: #334155; -fx-cursos-border-light: #1E293B; -fx-cursos-text-primary: #F8FAFC; -fx-cursos-text-secondary: #CBD5E1; -fx-cursos-text-muted: #64748B; -fx-cursos-text-extra-muted: #475569; -fx-cursos-table-header-bg: #1E293B; -fx-cursos-input-bg: #334155; -fx-cursos-input-border: #475569; -fx-cursos-pagination-bg: #334155; -fx-cursos-pagination-hover: #475569; -fx-cursos-sidebar-bg: #1E293B; -fx-cursos-sidebar-border: #334155; -fx-cursos-topbar-bg: #1E293B;".replace("; ", ";\n");
+            root.setStyle(
+                "-fx-cursos-bg: #0F172A;" +
+                "-fx-cursos-surface: #1E293B;" +
+                "-fx-cursos-surface-hover: #334155;" +
+                "-fx-cursos-surface-active: #1E3A5F;" +
+                "-fx-cursos-border: #334155;" +
+                "-fx-cursos-border-light: #1E293B;" +
+                "-fx-cursos-text-primary: #F8FAFC;" +
+                "-fx-cursos-text-secondary: #CBD5E1;" +
+                "-fx-cursos-text-muted: #64748B;" +
+                "-fx-cursos-text-extra-muted: #475569;" +
+                "-fx-cursos-table-header-bg: #1E293B;" +
+                "-fx-cursos-input-bg: #334155;" +
+                "-fx-cursos-input-border: #475569;" +
+                "-fx-cursos-pagination-bg: #334155;" +
+                "-fx-cursos-pagination-hover: #475569;" +
+                "-fx-cursos-sidebar-bg: #1E293B;" +
+                "-fx-cursos-sidebar-border: #334155;" +
+                "-fx-cursos-topbar-bg: #1E293B;"
+            );
         } else {
             root.setStyle("");
         }

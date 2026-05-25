@@ -115,24 +115,19 @@ public class DetalleCursoController {
                     setText(null);
                 } else {
                     Button btn = new Button();
+                    btn.getStyleClass().add("attendance-btn");
                     switch (status) {
                         case "presente" -> {
                             btn.setText("Presente");
-                            btn.setStyle("-fx-background-color: #22c55e; -fx-text-fill: #fff; " +
-                                "-fx-background-radius: 6px; -fx-font-size: 12px; -fx-font-weight: 600; " +
-                                "-fx-padding: 4 12; -fx-cursor: hand; -fx-border-width: 0;");
+                            btn.getStyleClass().add("attendance-btn--presente");
                         }
                         case "ausente" -> {
                             btn.setText("Ausente");
-                            btn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: #fff; " +
-                                "-fx-background-radius: 6px; -fx-font-size: 12px; -fx-font-weight: 600; " +
-                                "-fx-padding: 4 12; -fx-cursor: hand; -fx-border-width: 0;");
+                            btn.getStyleClass().add("attendance-btn--ausente");
                         }
                         case "excusa" -> {
                             btn.setText("Excusa");
-                            btn.setStyle("-fx-background-color: #eab308; -fx-text-fill: #fff; " +
-                                "-fx-background-radius: 6px; -fx-font-size: 12px; -fx-font-weight: 600; " +
-                                "-fx-padding: 4 12; -fx-cursor: hand; -fx-border-width: 0;");
+                            btn.getStyleClass().add("attendance-btn--excusa");
                         }
                     }
                     setGraphic(btn);

@@ -157,6 +157,7 @@
     -fx-font-weight: 600;
     -fx-text-fill: #6B7280;
     -fx-padding: 10 16;
+    -fx-alignment: CENTER_LEFT;
 }
 .teacher-table .table-row-cell {
     -fx-background-color: #FFFFFF;

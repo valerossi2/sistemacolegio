@@ -33,7 +33,7 @@
                 <HBox spacing="6" alignment="CENTER_LEFT">
                     <Label fx:id="breadcrumbCursos"
                            text="Cursos"
-                           styleClass="breadcrumb__parent breadcrumb__link"/>
+                           styleClass="breadcrumb__parent btn-link"/>
                     <Label text="›" styleClass="breadcrumb__separator"/>
                     <Label fx:id="breadcrumbCursoActual"
                            text="5to E"
@@ -166,7 +166,7 @@
                 </VBox>
 
                 <!-- Lista de Estudiantes -->
-                <VBox styleClass="card" spacing="0" VBox.vgrow="ALWAYS" alignment="TOP_LEFT">
+                <VBox styleClass="card card--no-bg" spacing="0" VBox.vgrow="ALWAYS" alignment="TOP_LEFT">
                     <HBox styleClass="teacher-card__header" alignment="CENTER_LEFT">
                         <Label text="Lista de Estudiantes" styleClass="card__title"
                                HBox.hgrow="ALWAYS"/>
@@ -175,7 +175,7 @@
                                 onAction="#onCargarMas"/>
                     </HBox>
                     <TableView fx:id="studentsTable"
-                               styleClass="teacher-table"
+                               styleClass="teacher-table student-table"
                                VBox.vgrow="NEVER">
                         <columnResizePolicy>
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

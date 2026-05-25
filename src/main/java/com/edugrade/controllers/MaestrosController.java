@@ -89,6 +89,21 @@ public class MaestrosController {
     private void setupResponsive() {
         root.widthProperty().addListener((obs, oldVal, newVal) -> {
             double w = newVal.doubleValue();
+            
+            if (w < 600) {
+                colEmail.setVisible(false);
+                colSeccion.setVisible(false);
+                colEstado.setVisible(false);
+            } else if (w < 800) {
+                colEmail.setVisible(false);
+                colSeccion.setVisible(true);
+                colEstado.setVisible(true);
+            } else {
+                colEmail.setVisible(true);
+                colSeccion.setVisible(true);
+                colEstado.setVisible(true);
+            }
+
             boolean compact = w < COMPACT_THRESHOLD;
             boolean wasCompact = oldVal.doubleValue() < COMPACT_THRESHOLD;
             if (compact == wasCompact) return;

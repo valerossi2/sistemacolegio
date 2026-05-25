@@ -98,6 +98,29 @@ public class CursoController {
     private void setupResponsive() {
         cursosRoot.widthProperty().addListener((obs, oldVal, newVal) -> {
             double w = newVal.doubleValue();
+            
+            if (w < 600) {
+                colSeccion.setVisible(false);
+                colAlumnos.setVisible(false);
+                colRendimiento.setVisible(false);
+                colEstado.setVisible(false);
+            } else if (w < 800) {
+                colSeccion.setVisible(true);
+                colAlumnos.setVisible(false);
+                colRendimiento.setVisible(false);
+                colEstado.setVisible(true);
+            } else if (w < 1000) {
+                colSeccion.setVisible(true);
+                colAlumnos.setVisible(true);
+                colRendimiento.setVisible(false);
+                colEstado.setVisible(true);
+            } else {
+                colSeccion.setVisible(true);
+                colAlumnos.setVisible(true);
+                colRendimiento.setVisible(true);
+                colEstado.setVisible(true);
+            }
+
             boolean compact = w < COMPACT_THRESHOLD;
             boolean wasCompact = oldVal.doubleValue() < COMPACT_THRESHOLD;
             if (compact == wasCompact) return;

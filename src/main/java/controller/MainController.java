@@ -337,6 +337,7 @@ public class MainController {
     private void setCenterView(Node node) {
         ScrollPane sp = new ScrollPane();
         sp.setFitToWidth(true);
+        sp.setFitToHeight(true);
         sp.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent; -fx-padding: 0;");
         sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         sp.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
@@ -352,6 +353,7 @@ public class MainController {
     private void setCenterViewDirect(Node node) {
         ScrollPane sp = new ScrollPane();
         sp.setFitToWidth(true);
+        sp.setFitToHeight(true);
         sp.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent; -fx-padding: 0;");
         sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         sp.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);

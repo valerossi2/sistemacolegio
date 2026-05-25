@@ -166,7 +166,7 @@
                 </VBox>
 
                 <!-- Lista de Estudiantes -->
-                <VBox styleClass="card card--no-bg" spacing="0" VBox.vgrow="ALWAYS" alignment="TOP_LEFT">
+                <VBox styleClass="card" spacing="0">
                     <HBox styleClass="teacher-card__header" alignment="CENTER_LEFT">
                         <Label text="Lista de Estudiantes" styleClass="card__title"
                                HBox.hgrow="ALWAYS"/>
@@ -175,7 +175,7 @@
                                 onAction="#onCargarMas"/>
                     </HBox>
                     <TableView fx:id="studentsTable"
-                               styleClass="teacher-table student-table"
+                               styleClass="teacher-table"
                                VBox.vgrow="NEVER">
                         <columnResizePolicy>
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

@@ -470,7 +470,7 @@ public class MainController {
             String key = e.getKey();
             if ("profileImagePath".equals(key)) {
                 loadHeaderProfileImage();
-            } else if ("userName".equals(key) || "userRole".equals(key)) {
+            } else if ("userFirstName".equals(key) || "userLastName".equals(key) || "userRole".equals(key)) {
                 loadHeaderUserName();
             }
         });
@@ -510,9 +510,11 @@ public class MainController {
     }
 
     private void loadHeaderUserName() {
-        String name = prefs.get("userName", "");
+        String firstName = prefs.get("userFirstName", "");
+        String lastName = prefs.get("userLastName", "");
+        String fullName = (firstName + " " + lastName).trim();
         String role = prefs.get("userRole", "");
-        if (!name.isEmpty()) uName.setText(name);
+        if (!fullName.isEmpty()) uName.setText(fullName);
         if (!role.isEmpty()) uRole.setText(role);
     }
 

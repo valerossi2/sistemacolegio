@@ -1,5 +1,7 @@
 package com.edugrade.controllers;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -20,9 +22,12 @@ public class DetalleCursoController {
     private LanguageManager lang;
     private ThemeManager theme;
     private boolean showingAllTeachers = false;
+    private boolean showingAllStudents = false;
 
     private final ObservableList<TeacherRow> fullTeacherData = FXCollections.observableArrayList();
     private final ObservableList<TeacherRow> displayedTeacherData = FXCollections.observableArrayList();
+    private final ObservableList<StudentRow> fullStudentData = FXCollections.observableArrayList();
+    private final ObservableList<StudentRow> displayedStudentData = FXCollections.observableArrayList();
 
     @FXML private VBox root;
     @FXML private VBox courseOverviewCard;
@@ -36,20 +41,15 @@ public class DetalleCursoController {
     @FXML private Label lblTutorPrincipal;
     @FXML private Label totalStudents;
     @FXML private Label totalTeachers;
-    @FXML private Label assignedRoom;
     @FXML private Button btnVerTodosDocentes;
     @FXML private TableView<TeacherRow> teacherTable;
     @FXML private TableColumn<TeacherRow, String> colTeacherName;
     @FXML private TableColumn<TeacherRow, String> colTeacherSubject;
-    @FXML private TableView<?> studentsTable;
-    @FXML private TableColumn<?, ?> colStudent;
-    @FXML private TableColumn<?, ?> colMatricula;
-    @FXML private TableColumn<?, ?> colAsistencia;
-    @FXML private TableColumn<?, ?> colAcciones;
+    @FXML private TableView<StudentRow> studentsTable;
+    @FXML private TableColumn<StudentRow, String> colStudent;
+    @FXML private TableColumn<StudentRow, String> colMatricula;
+    @FXML private TableColumn<StudentRow, String> colAsistencia;
     @FXML private Button btnLoadMore;
-    @FXML private Label studentsSubtitle;
-    @FXML private ToggleButton btnViewTable;
-    @FXML private ToggleButton btnViewGrid;
 
     @FXML
     private void initialize() {
@@ -61,6 +61,8 @@ public class DetalleCursoController {
         applyTheme();
         initTeacherTable();
         initTeacherData();
+        initStudentTable();
+        initStudentData();
 
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);
@@ -70,6 +72,10 @@ public class DetalleCursoController {
     private static final double TEACHER_HEADER_HEIGHT = 32;
     private static final int INITIAL_TEACHER_COUNT = 4;
     private static final int TOTAL_TEACHER_COUNT = 12;
+    private static final double STUDENT_ROW_HEIGHT = 48;
+    private static final double STUDENT_HEADER_HEIGHT = 32;
+    private static final int INITIAL_STUDENT_COUNT = 5;
+    private static final int TOTAL_STUDENT_COUNT = 10;
 
     private void initTeacherTable() {
         colTeacherName.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -94,6 +100,68 @@ public class DetalleCursoController {
         displayedTeacherData.addAll(fullTeacherData.subList(0, INITIAL_TEACHER_COUNT));
         teacherTable.setItems(displayedTeacherData);
         updateTeacherTableHeight(INITIAL_TEACHER_COUNT);
+    }
+
+    private void initStudentTable() {
+        colStudent.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colMatricula.setCellValueFactory(new PropertyValueFactory<>("matricula"));
+        colAsistencia.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colAsistencia.setCellFactory(col -> new TableCell<StudentRow, String>() {
+            @Override
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+                if (empty || status == null) {
+                    setGraphic(null);
+                    setText(null);
+                } else {
+                    Button btn = new Button();
+                    switch (status) {
+                        case "presente" -> {
+                            btn.setText("Presente");
+                            btn.setStyle("-fx-background-color: #22c55e; -fx-text-fill: #fff; " +
+                                "-fx-background-radius: 6px; -fx-font-size: 12px; -fx-font-weight: 600; " +
+                                "-fx-padding: 4 12; -fx-cursor: hand; -fx-border-width: 0;");
+                        }
+                        case "ausente" -> {
+                            btn.setText("Ausente");
+                            btn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: #fff; " +
+                                "-fx-background-radius: 6px; -fx-font-size: 12px; -fx-font-weight: 600; " +
+                                "-fx-padding: 4 12; -fx-cursor: hand; -fx-border-width: 0;");
+                        }
+                        case "excusa" -> {
+                            btn.setText("Excusa");
+                            btn.setStyle("-fx-background-color: #eab308; -fx-text-fill: #fff; " +
+                                "-fx-background-radius: 6px; -fx-font-size: 12px; -fx-font-weight: 600; " +
+                                "-fx-padding: 4 12; -fx-cursor: hand; -fx-border-width: 0;");
+                        }
+                    }
+                    setGraphic(btn);
+                }
+            }
+        });
+    }
+
+    private void initStudentData() {
+        String[][] raw = {
+            {"Liam Castillo",     "MAT-001"},
+            {"Emma Rodríguez",    "MAT-002"},
+            {"Noah García",       "MAT-003"},
+            {"Olivia Martínez",   "MAT-004"},
+            {"Mateo Hernández",   "MAT-005"},
+            {"Isabella López",    "MAT-006"},
+            {"Santiago Pérez",    "MAT-007"},
+            {"Sophia González",   "MAT-008"},
+            {"Lucas Fernández",   "MAT-009"},
+            {"Mía Torres",        "MAT-010"},
+        };
+        String[] statuses = {"presente", "ausente", "excusa"};
+        for (var r : raw) {
+            String s = statuses[ThreadLocalRandom.current().nextInt(statuses.length)];
+            fullStudentData.add(new StudentRow(r[0], r[1], s));
+        }
+        displayedStudentData.addAll(fullStudentData.subList(0, INITIAL_STUDENT_COUNT));
+        studentsTable.setItems(displayedStudentData);
+        updateStudentTableHeight(INITIAL_STUDENT_COUNT);
     }
 
     private void loadStylesheets() {
@@ -131,12 +199,14 @@ public class DetalleCursoController {
         btnVerTodosDocentes.setText(lang.get(
             showingAllTeachers ? "detalle.verMenos" : "detalle.verTodos"
         ));
-        btnLoadMore.setText(lang.get("detalle.cargarMas", "Cargar más estudiantes"));
-        studentsSubtitle.setText(lang.get("detalle.studentsSubtitle", "32 alumnos inscritos en el ciclo actual"));
-        btnViewTable.setText(lang.get("detalle.viewTable", "Tabla"));
-        btnViewGrid.setText(lang.get("detalle.viewGrid", "Cuadrícula"));
+        btnLoadMore.setText(lang.get(
+            showingAllStudents ? "detalle.verMenos" : "detalle.cargarMas"
+        ));
         colTeacherName.setText(lang.get("detalle.colDocente", "DOCENTE"));
         colTeacherSubject.setText(lang.get("detalle.colMateria", "MATERIA"));
+        colStudent.setText(lang.get("detalle.colStudent", "ESTUDIANTE"));
+        colMatricula.setText(lang.get("detalle.colMatricula", "ID MATRÍCULA"));
+        colAsistencia.setText(lang.get("detalle.colAsistencia", "ASISTENCIA"));
     }
 
     @FXML
@@ -165,6 +235,10 @@ public class DetalleCursoController {
         teacherTable.setPrefHeight(TEACHER_HEADER_HEIGHT + rowCount * TEACHER_ROW_HEIGHT + 2);
     }
 
+    private void updateStudentTableHeight(int rowCount) {
+        studentsTable.setPrefHeight(STUDENT_HEADER_HEIGHT + rowCount * STUDENT_ROW_HEIGHT + 2);
+    }
+
     @FXML
     private void onVerTodosDocentes(ActionEvent event) {
         showingAllTeachers = !showingAllTeachers;
@@ -180,11 +254,39 @@ public class DetalleCursoController {
 
     @FXML
     private void onCargarMas(ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(lang.get("detalle.estudiantesTitle", "Estudiantes"));
-        alert.setHeaderText(null);
-        alert.setContentText(lang.get("detalle.estudiantesMsg", "Carga de más estudiantes no implementada."));
-        alert.showAndWait();
+        showingAllStudents = !showingAllStudents;
+        int count = showingAllStudents ? TOTAL_STUDENT_COUNT : INITIAL_STUDENT_COUNT;
+        displayedStudentData.setAll(
+            showingAllStudents ? fullStudentData : fullStudentData.subList(0, INITIAL_STUDENT_COUNT)
+        );
+        updateStudentTableHeight(count);
+        btnLoadMore.setText(lang.get(
+            showingAllStudents ? "detalle.verMenos" : "detalle.cargarMas"
+        ));
+    }
+
+    public static class StudentRow {
+        private final StringProperty name;
+        private final StringProperty matricula;
+        private final StringProperty status;
+
+        public StudentRow(String name, String matricula, String status) {
+            this.name = new SimpleStringProperty(name);
+            this.matricula = new SimpleStringProperty(matricula);
+            this.status = new SimpleStringProperty(status);
+        }
+
+        public String getName() { return name.get(); }
+        public void setName(String n) { name.set(n); }
+        public StringProperty nameProperty() { return name; }
+
+        public String getMatricula() { return matricula.get(); }
+        public void setMatricula(String m) { matricula.set(m); }
+        public StringProperty matriculaProperty() { return matricula; }
+
+        public String getStatus() { return status.get(); }
+        public void setStatus(String s) { status.set(s); }
+        public StringProperty statusProperty() { return status; }
     }
 
     public static class TeacherRow {

@@ -118,14 +118,8 @@
 .stat-icon--secondary {
     -fx-background-color: #D1FAE5;
 }
-.stat-icon--neutral {
-    -fx-background-color: #F1F5F9;
-}
 .stat-svg-icon {
     -fx-fill: #2B54A8;
-}
-.stat-svg-icon--dark {
-    -fx-fill: #6B7280;
 }
 .stat-label {
     -fx-font-size: 12px;
@@ -185,104 +179,6 @@
     -fx-padding: 8 16;
 }
 
-/* ── STUDENTS CARD ────────────────────────────────────────── */
-.students-card {
-    -fx-background-color: #FFFFFF;
-    -fx-background-radius: 24px;
-    -fx-border-color: #E5E7EB;
-    -fx-border-radius: 24px;
-    -fx-border-width: 1px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);
-}
-.students-card__header {
-    -fx-padding: 24 32 16 32;
-    -fx-border-color: #E5E7EB;
-    -fx-border-width: 0 0 1 0;
-}
-.students-card__footer {
-    -fx-padding: 16 32;
-    -fx-border-color: #E5E7EB;
-    -fx-border-width: 1 0 0 0;
-}
-.students-table {
-    -fx-background-color: transparent;
-    -fx-border-width: 0;
-    -fx-table-cell-border-color: transparent;
-    -fx-padding: 0;
-}
-.students-table .column-header-background {
-    -fx-background-color: rgba(238,242,255,0.5);
-    -fx-border-color: transparent;
-    -fx-border-width: 0;
-}
-.students-table .column-header {
-    -fx-background-color: transparent;
-    -fx-border-width: 0;
-}
-.students-table .column-header .label {
-    -fx-font-size: 12px;
-    -fx-font-weight: 600;
-    -fx-text-fill: #6B7280;
-    -fx-padding: 12 16;
-}
-.students-table .table-row-cell {
-    -fx-background-color: #FFFFFF;
-    -fx-border-color: #E5E7EB;
-    -fx-border-width: 0 0 1 0;
-    -fx-pref-height: 57px;
-    -fx-cell-size: 57px;
-}
-.students-table .table-row-cell:hover {
-    -fx-background-color: rgba(249,250,251,0.5);
-}
-.students-table .table-row-cell:selected {
-    -fx-background-color: #EFF6FF;
-}
-.students-table .table-cell {
-    -fx-border-width: 0;
-    -fx-alignment: CENTER_LEFT;
-    -fx-font-size: 14px;
-    -fx-text-fill: #374151;
-    -fx-padding: 8 16;
-}
-
-/* ── VIEW TOGGLE ──────────────────────────────────────────── */
-.view-toggle {
-    -fx-background-color: #F1F5F9;
-    -fx-background-radius: 8px;
-    -fx-padding: 2;
-}
-.view-toggle__btn {
-    -fx-background-color: transparent;
-    -fx-background-radius: 6px;
-    -fx-text-fill: #6B7280;
-    -fx-font-size: 12px;
-    -fx-font-weight: 500;
-    -fx-padding: 6 12;
-    -fx-cursor: hand;
-    -fx-border-width: 0;
-}
-.view-toggle__btn--active {
-    -fx-background-color: #FFFFFF;
-    -fx-text-fill: #1F2937;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0, 0, 1);
-}
-
-/* ── LINK PRIMARY ─────────────────────────────────────────── */
-.btn-link-primary {
-    -fx-background-color: transparent;
-    -fx-text-fill: #2B54A8;
-    -fx-font-size: 14px;
-    -fx-font-weight: 500;
-    -fx-cursor: hand;
-    -fx-padding: 8 16;
-    -fx-border-width: 0;
-}
-.btn-link-primary:hover {
-    -fx-text-fill: #1E40AF;
-    -fx-underline: true;
-}
-
 /* ── PLACEHOLDER ──────────────────────────────────────────── */
 .table-placeholder-label {
     -fx-font-size: 14px;
@@ -298,13 +194,7 @@
 .root-dark .teacher-table .table-row-cell { -fx-background-color: #1E293B; -fx-border-color: #334155; }
 .root-dark .teacher-table .table-cell { -fx-text-fill: #F8FAFC; }
 .root-dark .teacher-table .column-header .label { -fx-text-fill: #94A3B8; }
-.root-dark .students-card { -fx-background-color: #1E293B; -fx-border-color: #334155; }
-.root-dark .students-table .table-row-cell { -fx-background-color: #1E293B; -fx-border-color: #334155; }
-.root-dark .students-table .table-cell { -fx-text-fill: #F8FAFC; }
-.root-dark .students-table .column-header .label { -fx-text-fill: #94A3B8; }
-.root-dark .students-card__header { -fx-border-color: #334155; }
-.root-dark .students-card__footer { -fx-border-color: #334155; }
-.root-dark .view-toggle__btn--active { -fx-background-color: #334155; -fx-text-fill: #F8FAFC; }
+
 .root-dark .badge--surface { -fx-background-color: #334155; -fx-text-fill: #CBD5E1; }
 .root-dark .course-image-container { -fx-border-color: #334155; }
 .root-dark .course-image-placeholder { -fx-background-color: #1E293B; }

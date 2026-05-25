@@ -130,20 +130,7 @@
                         </VBox>
                     </HBox>
 
-                    <!-- Stat: Aula Asignada -->
-                    <HBox styleClass="stat-row" spacing="12" alignment="CENTER_LEFT">
-                        <StackPane styleClass="stat-icon stat-icon--neutral">
-                            <SVGPath styleClass="stat-svg-icon stat-svg-icon--dark"
-                                     content="M12 3L4 9v12h16V9l-8-6zm0 2.35L18 9.86V19h-3v-4H9v4H6V9.86L12 5.35z"
-                                     scaleX="0.7" scaleY="0.7"/>
-                        </StackPane>
-                        <VBox>
-                            <Label text="Aula Asignada" styleClass="stat-label"/>
-                            <Label fx:id="assignedRoom"
-                                   text="Pabellón B - Aula 204"
-                                   styleClass="stat-value"/>
-                        </VBox>
-                    </HBox>
+
 
                 </VBox>
             </VBox>
@@ -179,28 +166,17 @@
                 </VBox>
 
                 <!-- Lista de Estudiantes -->
-                <VBox styleClass="card students-card" spacing="0" VBox.vgrow="ALWAYS">
-                    <HBox styleClass="students-card__header"
-                          alignment="CENTER_LEFT" spacing="16">
-                        <VBox spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="Lista de Estudiantes" styleClass="card__title"/>
-                            <Label fx:id="studentsSubtitle"
-                                   text="32 alumnos inscritos en el ciclo actual"
-                                   styleClass="card__subtitle"/>
-                        </VBox>
-                        <HBox styleClass="view-toggle" spacing="0">
-                            <ToggleButton fx:id="btnViewTable" text="Tabla"
-                                          styleClass="view-toggle__btn view-toggle__btn--active"
-                                          selected="true" mnemonicParsing="false"/>
-                            <ToggleButton fx:id="btnViewGrid" text="Cuadrícula"
-                                          styleClass="view-toggle__btn"
-                                          mnemonicParsing="false"/>
-                        </HBox>
+                <VBox styleClass="card" spacing="0" VBox.vgrow="ALWAYS" alignment="TOP_LEFT">
+                    <HBox styleClass="teacher-card__header" alignment="CENTER_LEFT">
+                        <Label text="Lista de Estudiantes" styleClass="card__title"
+                               HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnLoadMore" text="Cargar más estudiantes"
+                                styleClass="btn-link" mnemonicParsing="false"
+                                onAction="#onCargarMas"/>
                     </HBox>
-
                     <TableView fx:id="studentsTable"
-                               styleClass="students-table"
-                               VBox.vgrow="ALWAYS">
+                               styleClass="teacher-table"
+                               VBox.vgrow="NEVER">
                         <columnResizePolicy>
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                         </columnResizePolicy>
@@ -208,21 +184,12 @@
                             <TableColumn fx:id="colStudent"    text="ESTUDIANTE"   prefWidth="240"/>
                             <TableColumn fx:id="colMatricula"  text="ID MATRÍCULA" prefWidth="140"/>
                             <TableColumn fx:id="colAsistencia" text="ASISTENCIA"   prefWidth="160"/>
-                            <TableColumn fx:id="colAcciones"   text="ACCIONES"     prefWidth="80"/>
                         </columns>
                         <placeholder>
                             <Label text="No hay estudiantes registrados."
                                    styleClass="table-placeholder-label"/>
                         </placeholder>
                     </TableView>
-
-                    <HBox styleClass="students-card__footer" alignment="CENTER">
-                        <Button fx:id="btnLoadMore"
-                                text="Cargar más estudiantes"
-                                styleClass="btn-link-primary"
-                                mnemonicParsing="false"
-                                onAction="#onCargarMas"/>
-                    </HBox>
                 </VBox>
 
             </VBox>

@@ -54,7 +54,6 @@ public class CursoController {
         updateTexts();
         updateCourseCount(allCourses.size());
 
-        // find card container (first VBox child with cursos-card class)
         Platform.runLater(() -> {
             for (var child : cursosRoot.getChildrenUnmodifiable()) {
                 if (child instanceof VBox vb && vb.getStyleClass().contains("cursos-card")) {

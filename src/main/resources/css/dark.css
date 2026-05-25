@@ -61,10 +61,6 @@
     -fx-background-color: #334155; 
 } 
 
-.schedule-row:hover { 
-    -fx-background-color: #334155; 
-} 
-
 .schedule-row { 
     -fx-border-color: transparent transparent #334155 transparent; 
 } 

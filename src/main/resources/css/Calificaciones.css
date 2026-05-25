@@ -432,7 +432,6 @@
     -fx-border-radius: 12;
     -fx-background-radius: 12;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);
-    -fx-overflow: hidden;
 }
 
 /* ── TABLE VIEW ─────────────────────────────────────────────────── */
@@ -486,29 +485,13 @@
     -fx-background-color: #EBF4FF;
 }
 
-/* Table Rows */
-.grades-table .table-row-cell {
-    -fx-background-color: #FFFFFF;
-    -fx-border-color: transparent transparent #F1F5F9 transparent;
-    -fx-border-width: 0 0 1 0;
-    -fx-cell-size: 72px;
-}
-
-.grades-table .table-row-cell:hover {
-    -fx-background-color: #FAFBFD;
-}
-
-.grades-table .table-row-cell:selected {
-    -fx-background-color: #EBF4FF;
-}
-
 /* Table Cells */
 .grades-table .table-cell {
     -fx-padding: 0 16 0 16;
     -fx-alignment: CENTER_LEFT;
     -fx-border-color: transparent;
     -fx-text-fill: #475569;
-    -fx-font-size: 13.5;
+    -fx-font-size: 13.5px;
 }
 
 .grades-table .table-row-cell:selected .table-cell {
@@ -518,7 +501,7 @@
 /* Placeholder */
 .table-placeholder {
     -fx-text-fill: #94A3B8;
-    -fx-font-size: 13.5;
+    -fx-font-size: 13.5px;
 }
 
 /* ── STUDENT CELL COMPONENTS ────────────────────────────────────── */
@@ -557,7 +540,7 @@
 }
 
 .student-name-label {
-    -fx-font-size: 13.5;
+    -fx-font-size: 13.5px;
     -fx-font-weight: 600;
     -fx-text-fill: #1E293B;
 }
@@ -574,7 +557,7 @@
 }
 
 .grade-current-label {
-    -fx-font-size: 13.5;
+    -fx-font-size: 13.5px;
     -fx-font-weight: 700;
     -fx-text-fill: #1E293B;
 }
@@ -587,7 +570,7 @@
     -fx-border-radius: 6;
     -fx-background-radius: 6;
     -fx-padding: 6 10 6 10;
-    -fx-font-size: 13.5;
+    -fx-font-size: 13.5px;
     -fx-text-fill: #1E293B;
     -fx-pref-width: 130px;
     -fx-max-width: 160px;

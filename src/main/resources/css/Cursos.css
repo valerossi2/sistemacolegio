@@ -78,13 +78,13 @@
     -fx-text-fill: #374151;
 }
 
-/* ── ACCIONES (right-aligned) ────────────────────────────── */
+/* ── ACCIONES ────────────────────────────────────────────── */
 .col-acciones-header .label {
-    -fx-alignment: CENTER_RIGHT;
+    -fx-alignment: CENTER-LEFT;
 }
 .cell-acciones {
-    -fx-alignment: CENTER_RIGHT;
-    -fx-padding: 8 32 8 16;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 8 16 8 16;
 }
 
 /* ── INDIVIDUAL COLUMN PADDING ───────────────────────────── */

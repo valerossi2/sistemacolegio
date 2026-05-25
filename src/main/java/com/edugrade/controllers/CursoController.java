@@ -212,7 +212,7 @@ public class CursoController {
         colAcciones.setCellFactory(accionesCell());
 
         // right-align ACCIONES header label
-        colAcciones.setStyle("-fx-alignment: CENTER-RIGHT;");
+        colAcciones.setStyle("-fx-alignment: CENTER-LEFT;");
         colAcciones.getStyleClass().add("col-acciones-header");
     }
 
@@ -404,8 +404,8 @@ public class CursoController {
                     }
                 });
                 setGraphic(btn);
-                setAlignment(Pos.CENTER_RIGHT);
-                setPadding(new Insets(8, 32, 8, 16));
+                setAlignment(Pos.CENTER_LEFT);
+                setPadding(new Insets(8, 16, 8, 16));
             }
             @Override
             protected void updateItem(String item, boolean empty) {

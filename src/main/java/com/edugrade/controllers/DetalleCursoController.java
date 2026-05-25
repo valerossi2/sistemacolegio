@@ -9,11 +9,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
+import javafx.util.Callback;
 import theme.ThemeManager;
 import util.LanguageManager;
 
@@ -68,6 +75,9 @@ public class DetalleCursoController {
         theme.addListener(this::onThemeChanged);
     }
 
+    private static final String[] AVATAR_COLORS = {
+        "#3B82F6", "#8B5CF6", "#EC4899", "#F59E0B", "#10B981", "#EF4444", "#6366F1", "#14B8A6"
+    };
     private static final double TEACHER_ROW_HEIGHT = 48;
     private static final double TEACHER_HEADER_HEIGHT = 32;
     private static final int INITIAL_TEACHER_COUNT = 4;
@@ -78,24 +88,58 @@ public class DetalleCursoController {
     private static final int TOTAL_STUDENT_COUNT = 10;
 
     private void initTeacherTable() {
-        colTeacherName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        colTeacherSubject.setCellValueFactory(new PropertyValueFactory<>("subject"));
+        colTeacherName.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().nombre()));
+        colTeacherName.setCellFactory(nombreCell());
+        colTeacherSubject.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().materia()));
+    }
+
+    private Callback<TableColumn<TeacherRow, String>, TableCell<TeacherRow, String>> nombreCell() {
+        return col -> new TableCell<>() {
+            private final HBox box = new HBox(12);
+            private final StackPane avatarContainer = new StackPane();
+            private final Circle avatarCircle = new Circle(16);
+            private final Text initials = new Text();
+            private final Label nameLabel = new Label();
+            {
+                avatarCircle.getStyleClass().add("avatar-circle");
+                initials.getStyleClass().add("avatar-initials");
+                avatarContainer.getChildren().addAll(avatarCircle, initials);
+                box.getChildren().addAll(avatarContainer, nameLabel);
+                setGraphic(box);
+                setPadding(new Insets(8, 16, 8, 16));
+            }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                var tv = getTableView();
+                if (empty || tv == null || getIndex() < 0 || getIndex() >= tv.getItems().size()) {
+                    nameLabel.setText(null);
+                    initials.setText(null);
+                } else {
+                    TeacherRow row = tv.getItems().get(getIndex());
+                    nameLabel.setText(row.nombre());
+                    String initial = row.nombre().substring(0, 1).toUpperCase();
+                    initials.setText(initial);
+                    avatarCircle.setFill(Color.web(AVATAR_COLORS[row.avatarIdx() % AVATAR_COLORS.length]));
+                }
+            }
+        };
     }
 
     private void initTeacherData() {
         fullTeacherData.setAll(
-            new TeacherRow("Carlos Ruiz", "Matemáticas Avanzadas"),
-            new TeacherRow("Elena Torres", "Física y Química"),
-            new TeacherRow("Miguel Ángel Soto", "Literatura Hispanoam."),
-            new TeacherRow("Ana Silva", "Historia Universal"),
-            new TeacherRow("Roberto Sánchez", "Programación I"),
-            new TeacherRow("Laura Méndez", "Biología Molecular"),
-            new TeacherRow("Pedro García", "Inglés Avanzado"),
-            new TeacherRow("Sofía Valdez", "Arte y Diseño"),
-            new TeacherRow("Diego Ramírez", "Educación Física"),
-            new TeacherRow("Carmen Vega", "Filosofía"),
-            new TeacherRow("Luis Torres", "Química Orgánica"),
-            new TeacherRow("María Paz", "Geografía Mundial")
+            new TeacherRow("Prof. Laura Méndez", "laura.mendez@edu.com", "Matemáticas", "5to E", "Activo", 0),
+            new TeacherRow("Prof. Carlos Ruiz", "carlos.ruiz@edu.com", "Historia", "4to A", "Activo", 1),
+            new TeacherRow("Prof. Elena Torres", "elena.torres@edu.com", "Lenguaje", "3ro B", "Activo", 2),
+            new TeacherRow("Prof. Ana Silva", "ana.silva@edu.com", "Ciencias", "2do C", "Activo", 3),
+            new TeacherRow("Prof. Miguel Soto", "miguel.soto@edu.com", "Inglés", "1ro A", "Inactivo", 4),
+            new TeacherRow("Prof. Diana Ríos", "diana.rios@edu.com", "Arte", "5to B", "Activo", 5),
+            new TeacherRow("Prof. Pedro Lima", "pedro.lima@edu.com", "Educación Física", "4to B", "Activo", 6),
+            new TeacherRow("Prof. Sofía Vega", "sofia.vega@edu.com", "Música", "3ro A", "Activo", 7),
+            new TeacherRow("Prof. Luis Paz", "luis.paz@edu.com", "Filosofía", "6to A", "Inactivo", 0),
+            new TeacherRow("Prof. Carmen Rojas", "carmen.rojas@edu.com", "Biología", "5to C", "Activo", 1),
+            new TeacherRow("Prof. Andrés Cruz", "andres.cruz@edu.com", "Química", "4to C", "Activo", 2),
+            new TeacherRow("Prof. Valeria Solís", "valeria.solis@edu.com", "Historia del Arte", "6to B", "Activo", 3)
         );
         displayedTeacherData.addAll(fullTeacherData.subList(0, INITIAL_TEACHER_COUNT));
         teacherTable.setItems(displayedTeacherData);
@@ -290,21 +334,5 @@ public class DetalleCursoController {
         public StringProperty statusProperty() { return status; }
     }
 
-    public static class TeacherRow {
-        private final StringProperty name;
-        private final StringProperty subject;
-
-        public TeacherRow(String name, String subject) {
-            this.name = new SimpleStringProperty(name);
-            this.subject = new SimpleStringProperty(subject);
-        }
-
-        public String getName() { return name.get(); }
-        public void setName(String n) { name.set(n); }
-        public StringProperty nameProperty() { return name; }
-
-        public String getSubject() { return subject.get(); }
-        public void setSubject(String s) { subject.set(s); }
-        public StringProperty subjectProperty() { return subject; }
-    }
+    public record TeacherRow(String nombre, String email, String materia, String seccion, String estado, int avatarIdx) {}
 }

@@ -13,19 +13,18 @@
       styleClass="cursos-root"
       spacing="0"
       maxWidth="Infinity"
-      stylesheets="@../../css/Cursos.css">
-      <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+      maxHeight="Infinity"
+      stylesheets="@../../css/base.css,@../../css/Cursos.css">
 
-    <VBox spacing="8" styleClass="cursos-page-header">
-        <padding>
-            <Insets bottom="32"/>
-        </padding>
-        <Text fx:id="pageTitle" text="Listado Completo de Cursos" styleClass="cursos-page-title" />
-        <Text fx:id="pageSubtitle" text="Bienvenido de nuevo. Aquí tienes un resumen del estado institucional hoy." styleClass="cursos-page-subtitle" />
-    </VBox>
+    <VBox fx:id="cursosCard" styleClass="cursos-card" VBox.vgrow="ALWAYS" spacing="0">
+        <VBox spacing="6">
+            <padding><Insets top="32" right="40" bottom="0" left="40"/></padding>
+            <Text fx:id="pageTitle" text="Listado Completo de Cursos" styleClass="cursos-page-title" />
+            <Text fx:id="pageSubtitle" text="Gestiona los cursos activos del instituto." styleClass="cursos-page-subtitle" />
+        </VBox>
 
-    <VBox styleClass="cursos-card" VBox.vgrow="ALWAYS" spacing="0">
-        <HBox styleClass="cursos-card__header" alignment="CENTER_LEFT">
+        <HBox alignment="CENTER_LEFT">
+            <padding><Insets top="24" right="40" bottom="16" left="40"/></padding>
             <Label fx:id="lblTotalCursos" text="Todos los Cursos (35)" styleClass="cursos-card__title" />
         </HBox>
 
@@ -36,17 +35,18 @@
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
             </columnResizePolicy>
             <columns>
-                <TableColumn fx:id="colGrado"       text="GRADO"     styleClass="col-grado" />
-                <TableColumn fx:id="colEncargado"   text="ENCARGADO" styleClass="col-encargado" />
-                <TableColumn fx:id="colSeccion"     text="SECCIÓN"   styleClass="col-seccion" />
-                <TableColumn fx:id="colAlumnos"     text="ALUMNOS"   styleClass="col-alumnos" />
-                <TableColumn fx:id="colRendimiento" text="RENDIMIENTO PROMEDIO" styleClass="col-rendimiento" />
-                <TableColumn fx:id="colEstado"      text="ESTADO"    styleClass="col-estado" />
-                <TableColumn fx:id="colAcciones"    text="ACCIONES"  styleClass="col-acciones" />
+                <TableColumn fx:id="colGrado"       text="GRADO"     />
+                <TableColumn fx:id="colEncargado"   text="ENCARGADO" />
+                <TableColumn fx:id="colSeccion"     text="SECCIÓN"   />
+                <TableColumn fx:id="colAlumnos"     text="ALUMNOS"   />
+                <TableColumn fx:id="colRendimiento" text="RENDIMIENTO PROMEDIO" />
+                <TableColumn fx:id="colEstado"      text="ESTADO"    />
+                <TableColumn fx:id="colAcciones"    text="ACCIONES"  />
             </columns>
             <placeholder>
                 <Label text="No hay cursos que mostrar." styleClass="cursos-placeholder" />
             </placeholder>
         </TableView>
+
     </VBox>
 </VBox>

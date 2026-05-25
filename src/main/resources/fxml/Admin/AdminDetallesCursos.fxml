@@ -18,12 +18,12 @@
             fx:controller="com.edugrade.controllers.DetalleCursoController"
             fx:id="vistaDetalleCurso"
             styleClass="main-scroll-pane"
-            stylesheets="@../../css/Cursos.css"
+            stylesheets="@../../css/base.css,@../../css/Cursos.css"
             fitToWidth="true"
             hbarPolicy="NEVER"
             vbarPolicy="AS_NEEDED">
 
-    <VBox styleClass="content-area" spacing="32">
+    <VBox fx:id="root" styleClass="content-area" spacing="32">
 
         <!-- ════════════════════════════════════════
              Page Header — Breadcrumb + Acciones

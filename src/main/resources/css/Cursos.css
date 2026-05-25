@@ -1,0 +1,236 @@
+/* ────────────────────────────────────────────────────────────
+   CURSOS.CSS
+   ──────────────────────────────────────────────────────────── */
+
+/* ── GLOBAL ──────────────────────────────────────────────── */
+.cursos-root {
+    -fx-font-family: "Segoe UI", "Inter", Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-padding: 0;
+    -fx-background-color: #FFFFFF;
+}
+.cursos-root-dark {
+    -fx-background-color: #1E293B;
+}
+
+/* ── PAGE HEADER (inside card) ───────────────────────────── */
+.cursos-page-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #1F2937;
+}
+.cursos-page-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6B7280;
+}
+
+/* ── MAIN CARD ───────────────────────────────────────────── */
+.cursos-card {
+    -fx-spacing: 0;
+}
+.cursos-card-dark {
+}
+.cursos-card__title {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #1F2937;
+}
+
+/* ── TABLE ───────────────────────────────────────────────── */
+.cursos-table {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-table-cell-border-color: transparent;
+    -fx-padding: 0;
+}
+.cursos-table .column-header-background {
+    -fx-background-color: rgba(238,242,255,0.5);
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1px 0;
+}
+.cursos-table .column-header {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+.cursos-table .column-header .label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #6B7280;
+}
+.cursos-table .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 0 0 1 0;
+    -fx-pref-height: 57px;
+    -fx-cell-size: 57px;
+}
+.cursos-table .table-row-cell:hover {
+    -fx-background-color: rgba(249,250,251,0.5);
+}
+.cursos-table .table-row-cell:selected {
+    -fx-background-color: #EFF6FF;
+}
+.cursos-table .table-cell {
+    -fx-border-width: 0;
+    -fx-alignment: CENTER_LEFT;
+    -fx-font-size: 14px;
+    -fx-text-fill: #374151;
+}
+
+/* ── ACCIONES (right-aligned) ────────────────────────────── */
+.col-acciones-header .label {
+    -fx-alignment: CENTER_RIGHT;
+}
+.cell-acciones {
+    -fx-alignment: CENTER_RIGHT;
+    -fx-padding: 8 32 8 16;
+}
+
+/* ── INDIVIDUAL COLUMN PADDING ───────────────────────────── */
+.cell-grado {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #1F2937;
+    -fx-padding: 8 16 8 32;
+}
+.cell-seccion {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #1F2937;
+    -fx-padding: 8 16 8 16;
+}
+.cell-rendimiento {
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #1F2937;
+    -fx-padding: 8 16 8 16;
+}
+.cell-encargado-name {
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #1F2937;
+}
+.cell-encargado-surname {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6B7280;
+}
+.cell-alumnos-count {
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #1F2937;
+}
+.cell-alumnos-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6B7280;
+}
+
+/* ── STATUS PILLS ────────────────────────────────────────── */
+.status-pill {
+    -fx-background-radius: 16px;
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+    -fx-padding: 2 10 2 10;
+    -fx-min-width: 80px;
+    -fx-min-height: 24px;
+}
+.status-pill--active {
+    -fx-background-color: #D1FAE5;
+    -fx-text-fill: #065F46;
+}
+.status-pill--break {
+    -fx-background-color: #FEF3C7;
+    -fx-text-fill: #92400E;
+}
+
+/* ── BOTÓN VER DETALLES ──────────────────────────────────── */
+.btn-ver-detalles {
+    -fx-background-color: #2B54A8;
+    -fx-background-radius: 8px;
+    -fx-border-width: 0;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+    -fx-min-width: 100px;
+}
+.btn-ver-detalles:hover {
+    -fx-background-color: #1E40AF;
+}
+
+/* ── SCROLLBAR ───────────────────────────────────────────── */
+.cursos-root .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 6px;
+}
+.cursos-root .scroll-bar:vertical .thumb {
+    -fx-background-color: #CBD5E1;
+    -fx-background-radius: 3px;
+}
+.cursos-root .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #94A3B8;
+}
+.cursos-root .scroll-bar:vertical .increment-button,
+.cursos-root .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-pref-height: 0;
+}
+.cursos-root .scroll-bar:horizontal {
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
+}
+
+/* ── PLACEHOLDER ─────────────────────────────────────────── */
+.cursos-placeholder {
+    -fx-font-size: 14px;
+    -fx-text-fill: #9CA3AF;
+}
+
+/* ── DARK CARD OVERRIDE ──────────────────────────────────── */
+.cursos-root-dark .cursos-page-title,
+.cursos-root-dark .cursos-card__title,
+.cursos-root-dark .cell-grado,
+.cursos-root-dark .cell-seccion,
+.cursos-root-dark .cell-rendimiento,
+.cursos-root-dark .cell-encargado-name,
+.cursos-root-dark .cell-alumnos-count {
+    -fx-fill: #F8FAFC;
+    -fx-text-fill: #F8FAFC;
+}
+.cursos-root-dark .cursos-page-subtitle,
+.cursos-root-dark .cell-encargado-surname,
+.cursos-root-dark .cell-alumnos-label {
+    -fx-fill: #94A3B8;
+    -fx-text-fill: #94A3B8;
+}
+.cursos-root-dark .cursos-table .table-row-cell {
+    -fx-background-color: #1E293B;
+    -fx-border-color: #334155;
+}
+.cursos-root-dark .cursos-table .table-row-cell:hover {
+    -fx-background-color: rgba(51,65,85,0.5);
+}
+.cursos-root-dark .cursos-table .table-row-cell:selected {
+    -fx-background-color: #1E3A5F;
+}
+.cursos-root-dark .cursos-table .table-cell {
+    -fx-text-fill: #F8FAFC;
+}
+.cursos-root-dark .cursos-table .column-header-background {
+    -fx-background-color: rgba(30,41,59,0.8);
+    -fx-border-color: #334155;
+}
+.cursos-root-dark .cursos-table .column-header .label {
+    -fx-text-fill: #94A3B8;
+}
+.cursos-root-dark .status-pill--active {
+    -fx-background-color: #064E3B;
+    -fx-text-fill: #6EE7B7;
+}
+.cursos-root-dark .status-pill--break {
+    -fx-background-color: #78350F;
+    -fx-text-fill: #FCD34D;
+}
+.cursos-root-dark .cursos-placeholder {
+    -fx-text-fill: #64748B;
+}

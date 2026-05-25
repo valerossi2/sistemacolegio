@@ -1,21 +1,28 @@
 package com.edugrade.controllers;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import theme.ThemeManager;
+import util.LanguageManager;
 
 public class DetalleCursoController {
 
+    private LanguageManager lang;
+    private ThemeManager theme;
+
+    @FXML private VBox root;
+    @FXML private VBox courseOverviewCard;
     @FXML private Label breadcrumbCursos;
     @FXML private Label breadcrumbCursoActual;
     @FXML private Label pageTitle;
     @FXML private Button btnPrint;
     @FXML private Button btnEditCourse;
     @FXML private GridPane bentoGrid;
-    @FXML private VBox courseOverviewCard;
     @FXML private Label badgeNivel;
     @FXML private Label lblTutorPrincipal;
     @FXML private Label totalStudents;
@@ -34,6 +41,42 @@ public class DetalleCursoController {
 
     @FXML
     private void initialize() {
+        lang = LanguageManager.getInstance();
+        theme = ThemeManager.getInstance();
+
+        updateTexts();
+        applyTheme();
+
+        lang.addListener(this::onLanguageChanged);
+        theme.addListener(this::onThemeChanged);
+    }
+
+    private void onLanguageChanged() {
+        Platform.runLater(this::updateTexts);
+    }
+
+    private void onThemeChanged() {
+        Platform.runLater(this::applyTheme);
+    }
+
+    private void applyTheme() {
+        boolean dark = theme.isDark();
+        courseOverviewCard.getStyleClass().removeAll("cursos-card-dark");
+        if (dark) courseOverviewCard.getStyleClass().add("cursos-card-dark");
+    }
+
+    private void updateTexts() {
+        pageTitle.setText(lang.get("detalle.pageTitle", "Detalles del Curso"));
+        breadcrumbCursos.setText(lang.get("detalle.breadcrumbCursos", "Cursos"));
+        btnPrint.setText(lang.get("detalle.btnPrint", "Imprimir Reporte"));
+        btnEditCourse.setText(lang.get("detalle.btnEdit", "Editar Curso"));
+        badgeNivel.setText(lang.get("detalle.badgeNivel", "SECUNDARIA"));
+        lblTutorPrincipal.setText(lang.get("detalle.tutorPrincipal", "Prof. Laura Méndez"));
+        btnVerTodosDocentes.setText(lang.get("detalle.verTodos", "Ver Todos"));
+        btnLoadMore.setText(lang.get("detalle.cargarMas", "Cargar más estudiantes"));
+        studentsSubtitle.setText(lang.get("detalle.studentsSubtitle", "32 alumnos inscritos en el ciclo actual"));
+        btnViewTable.setText(lang.get("detalle.viewTable", "Tabla"));
+        btnViewGrid.setText(lang.get("detalle.viewGrid", "Cuadrícula"));
     }
 
     @FXML
@@ -42,29 +85,37 @@ public class DetalleCursoController {
 
     @FXML
     private void onImprimirReporte(ActionEvent event) {
-        showInfo("Reporte", "Impresion de reporte no implementada.");
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(lang.get("detalle.reporteTitle", "Reporte"));
+        alert.setHeaderText(null);
+        alert.setContentText(lang.get("detalle.reporteMsg", "Impresión de reporte no implementada."));
+        alert.showAndWait();
     }
 
     @FXML
     private void onEditarCurso(ActionEvent event) {
-        showInfo("Editar curso", "Edicion de curso no implementada.");
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(lang.get("detalle.editarTitle", "Editar curso"));
+        alert.setHeaderText(null);
+        alert.setContentText(lang.get("detalle.editarMsg", "Edición de curso no implementada."));
+        alert.showAndWait();
     }
 
     @FXML
     private void onVerTodosDocentes(ActionEvent event) {
-        showInfo("Docentes", "Lista completa de docentes no implementada.");
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(lang.get("detalle.docentesTitle", "Docentes"));
+        alert.setHeaderText(null);
+        alert.setContentText(lang.get("detalle.docentesMsg", "Lista completa de docentes no implementada."));
+        alert.showAndWait();
     }
 
     @FXML
     private void onCargarMas(ActionEvent event) {
-        showInfo("Estudiantes", "Carga de mas estudiantes no implementada.");
-    }
-
-    private void showInfo(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
+        alert.setTitle(lang.get("detalle.estudiantesTitle", "Estudiantes"));
         alert.setHeaderText(null);
-        alert.setContentText(message);
+        alert.setContentText(lang.get("detalle.estudiantesMsg", "Carga de más estudiantes no implementada."));
         alert.showAndWait();
     }
 }

@@ -91,25 +91,25 @@ public class MainController {
     private SVGPath headerAvatarSvg;
     private Preferences prefs = Preferences.userNodeForPackage(controller.Configuracion.class);
 
-    private final String L_PRIMARY = "#004ac6";
-    private final String L_PRIMARY_CONTAINER = "#2563eb";
-    private final String L_BG = "#f9f9ff";
-    private final String L_SURFACE_LOW = "#f0f3ff";
-    private final String L_SURFACE_CONTAINER = "#e7eeff";
-    private final String L_SURFACE_CONTAINER_HIGH = "#dee8ff";
-    private final String L_ON_SURFACE = "#111c2d";
-    private final String L_ON_SURFACE_VARIANT = "#434655";
-    private final String L_OUTLINE = "#737686";
+    private final String L_PRIMARY = "#2B54A8";
+    private final String L_PRIMARY_CONTAINER = "#1D4ED8";
+    private final String L_BG = "#F8F9FA";
+    private final String L_SURFACE_LOW = "#F1F5F9";
+    private final String L_SURFACE_CONTAINER = "#E2E8F0";
+    private final String L_SURFACE_CONTAINER_HIGH = "#E5E7EB";
+    private final String L_ON_SURFACE = "#1F2937";
+    private final String L_ON_SURFACE_VARIANT = "#6B7280";
+    private final String L_OUTLINE = "#9CA3AF";
     private final String L_WHITE = "#ffffff";
-    private final String L_PRIMARY_FIXED = "#dbe1ff";
-    private final String L_SECONDARY = "#006686";
-    private final String L_SECONDARY_FIXED = "#c0e8ff";
-    private final String L_TERTIARY = "#4e565b";
-    private final String L_TERTIARY_CONTAINER = "#666f74";
-    private final String L_TERTIARY_FIXED = "#dbe4ea";
+    private final String L_PRIMARY_FIXED = "#DBEAFE";
+    private final String L_SECONDARY = "#059669";
+    private final String L_SECONDARY_FIXED = "#D1FAE5";
+    private final String L_TERTIARY = "#6B7280";
+    private final String L_TERTIARY_CONTAINER = "#9CA3AF";
+    private final String L_TERTIARY_FIXED = "#F3F4F6";
 
-    private final String D_PRIMARY = "#2D6AEE";
-    private final String D_PRIMARY_CONTAINER = "#1D4ED8";
+    private final String D_PRIMARY = "#3B82F6";
+    private final String D_PRIMARY_CONTAINER = "#2563EB";
     private final String D_BG = "#0F172A";
     private final String D_SURFACE_LOW = "#1E293B";
     private final String D_SURFACE_CONTAINER = "#334155";
@@ -119,8 +119,8 @@ public class MainController {
     private final String D_OUTLINE = "#64748B";
     private final String D_WHITE = "#1E293B";
     private final String D_PRIMARY_FIXED = "#1E3A5F";
-    private final String D_SECONDARY = "#38BDF8";
-    private final String D_SECONDARY_FIXED = "#0C4A6E";
+    private final String D_SECONDARY = "#34D399";
+    private final String D_SECONDARY_FIXED = "#065F46";
     private final String D_TERTIARY = "#94A3B8";
     private final String D_TERTIARY_CONTAINER = "#475569";
     private final String D_TERTIARY_FIXED = "#334155";
@@ -146,16 +146,13 @@ public class MainController {
     private final String ICON_BOLT = "M14.69 2.21c-.29-.27-.71-.27-1.01 0l-10 9.52c-.29.28-.35.73-.14 1.07.2.34.58.51.98.44l5.93-.85-2.46 8.38c-.12.41.08.85.46 1.03.23.11.49.12.71.03.09-.04.17-.09.24-.16l10-9.52c.29-.28.35-.73.14-1.07-.2-.34-.58-.51-.98-.44l-5.93.85 2.46-8.38c.12-.41-.08-.85-.46-1.03-.11-.05-.23-.07-.34-.06z";
     private final String ICON_AVATAR = "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z";
 
-    public void setThemeManager(ThemeManager theme) {
-        this.theme = theme;
-    }
-
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
     @FXML
     public void initialize() {
+        theme = ThemeManager.getInstance();
     }
 
     public void setupEverything() {
@@ -271,16 +268,18 @@ public class MainController {
         if (index == 0) {
             setCenterView(mainCanvas);
             loadHeaderProfileImage();
+        } else if (index == 1) {
+            loadView("/fxml/Admin/AdminEstudiantes.fxml");
         } else if (index == 2) {
             loadView("/fxml/Admin/AdminMaestros.fxml");
         } else if (index == 3) {
             loadView("/fxml/Admin/AdminCursos.fxml");
+        } else if (index == 4) {
+            loadView("/fxml/Admin/AdminHorario.fxml");
         } else if (index == 5) {
-            controller.Configuracion config = new controller.Configuracion(theme);
+            controller.Configuracion config = new controller.Configuracion();
             config.setOwnerStage(stage);
             setCenterView(config.getView());
-        } else {
-            System.out.println("Navegando a sección: " + index + " (No implementada)");
         }
     }
 
@@ -543,11 +542,18 @@ public class MainController {
         );
     }
 
+    private String cardStyle(boolean dark) {
+        if (dark) {
+            return "-fx-background-color: #1E293B; -fx-background-radius: 24; -fx-border-color: #334155; -fx-border-radius: 24; -fx-border-width: 1;";
+        }
+        return "-fx-background-color: #FFFFFF; -fx-background-radius: 24; -fx-border-color: #E5E7EB; -fx-border-radius: 24; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);";
+    }
+
     private VBox createKpiCard(String label, String value, String lightBg, String iconColor, String iconPath) {
         HBox card = new HBox(12);
         card.setPadding(new Insets(12));
         card.setAlignment(Pos.CENTER_LEFT);
-        card.getStyleClass().add("glass-card");
+        card.setStyle(cardStyle(theme.isDark()));
 
         Circle iconCircle = new Circle(16);
         SVGPath iconSvg = createIcon(iconPath, 16, "#FFFFFF");
@@ -582,6 +588,7 @@ public class MainController {
         kpiCircleList.add(iconCircle);
 
         themeUpdaters.add(() -> {
+            card.setStyle(cardStyle(theme.isDark()));
             iconCircle.setFill(Color.web(c(lightBg, D_SURFACE_CONTAINER)));
             iconSvg.setFill(Color.web(c("#FFFFFF", iconColor)));
             lbl.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
@@ -627,7 +634,9 @@ public class MainController {
         );
 
         coursesBox.getChildren().addAll(head, table);
+        coursesBox.setStyle(cardStyle(theme.isDark()));
         themeUpdaters.add(() -> {
+            coursesBox.setStyle(cardStyle(theme.isDark()));
             courseTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
             cols.setStyle("-fx-background-color: " + c(L_SURFACE_LOW, D_SURFACE_LOW) + "; -fx-background-radius: 8;");
         });
@@ -766,9 +775,11 @@ public class MainController {
         performanceBox.getChildren().addAll(head, perfSubText, chart, footer);
         performanceBox.setPadding(new Insets(12));
         performanceBox.setSpacing(8);
+        performanceBox.setStyle(cardStyle(theme.isDark()));
         perfBarsList.addAll(bars);
 
         themeUpdaters.add(() -> {
+            performanceBox.setStyle(cardStyle(theme.isDark()));
             perfTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
             perfSubText.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
             moreDots.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
@@ -803,8 +814,12 @@ public class MainController {
         scheduleBox.getChildren().addAll(scheduleTitleText, sp);
         scheduleBox.setPadding(new Insets(12));
         scheduleBox.setSpacing(8);
+        scheduleBox.setStyle(cardStyle(theme.isDark()));
 
-        themeUpdaters.add(() -> scheduleTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE))));
+        themeUpdaters.add(() -> {
+            scheduleBox.setStyle(cardStyle(theme.isDark()));
+            scheduleTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+        });
     }
 
     private HBox createScheduleRow(String time, String subj, String det, boolean isFirst) {
@@ -931,10 +946,18 @@ public class MainController {
     }
 
     private void setupTheme() {
-        h1.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 32));
+        mainCanvas.getStyleClass().add("cursos-root");
+        h1.setFont(Font.font("Segoe UI", FontWeight.BOLD, 30));
         h1.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
-        sub.setFont(Font.font("Plus Jakarta Sans", 16));
+        sub.setFont(Font.font("Segoe UI", 18));
         sub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+        h1.getStyleClass().add("cursos-page-title");
+        sub.getStyleClass().add("cursos-page-subtitle");
+
+        themeUpdaters.add(() -> {
+            h1.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            sub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+        });
 
         LanguageManager.getInstance().addListener(this::updateLanguageTexts);
         updateLanguageTexts();

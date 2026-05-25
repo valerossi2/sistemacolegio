@@ -4,24 +4,26 @@
 
 .sidebar {
     -fx-background-color: #1E293B;
-    -fx-border-color: transparent #475569 transparent transparent;
+    -fx-border-color: transparent #334155 transparent transparent;
+    -fx-background-radius: 0 24 24 0;
 }
 
 .nav-item { 
     -fx-background-color: transparent; 
     -fx-cursor: hand; 
     -fx-text-fill: #CBD5E1; 
+    -fx-background-radius: 12; 
 } 
 
 .nav-item:hover { 
-    -fx-background-color: #1E293B; 
+    -fx-background-color: #334155; 
     -fx-cursor: hand; 
     -fx-background-radius: 12; 
-    -fx-text-fill: #2D6AEE; 
+    -fx-text-fill: #3B82F6; 
 } 
 
 .sidebar-active { 
-    -fx-background-color: #1D4ED8; 
+    -fx-background-color: #2563EB; 
     -fx-cursor: hand; 
     -fx-background-radius: 12; 
 } 
@@ -41,16 +43,17 @@
 .search-input { 
     -fx-background-color: transparent; 
     -fx-border-color: transparent; 
-    -fx-font-family: 'Plus Jakarta Sans'; 
+    -fx-font-family: 'Segoe UI', 'Inter', Arial, sans-serif; 
     -fx-text-fill: #F8FAFC; 
     -fx-prompt-text-fill: #64748B; 
 } 
 
 .glass-card { 
     -fx-background-color: #1E293B; 
-    -fx-background-radius: 16; 
+    -fx-background-radius: 24; 
     -fx-border-color: #334155; 
-    -fx-border-radius: 16; 
+    -fx-border-radius: 24; 
+    -fx-border-width: 1;
 } 
 
 .course-row { 
@@ -66,11 +69,11 @@
 } 
 
 .schedule-row:hover { 
-    -fx-background-color: #1E293B; 
+    -fx-background-color: #334155; 
 } 
 
 .text-button { 
-    -fx-text-fill: #2D6AEE; 
+    -fx-text-fill: #3B82F6; 
     -fx-background-color: transparent; 
     -fx-underline: false; 
     -fx-cursor: hand; 
@@ -88,14 +91,14 @@
 
 .growth-badge { 
     -fx-background-color: #1E3A5F; 
-    -fx-text-fill: #2D6AEE; 
+    -fx-text-fill: #3B82F6; 
     -fx-font-weight: bold; 
     -fx-padding: 4 12 4 12; 
     -fx-background-radius: 16; 
 } 
 
 .fab-button { 
-    -fx-background-color: #2D6AEE; 
+    -fx-background-color: #2563EB; 
     -fx-background-radius: 32; 
     -fx-cursor: hand; 
 } 
@@ -177,4 +180,20 @@
 .modal-scroll .scroll-bar:horizontal {
     -fx-pref-height: 0;
     -fx-opacity: 0;
+}
+
+.logo-title {
+    -fx-font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+}
+.logo-subtitle {
+    -fx-font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 10px;
+}
+.header-role {
+    -fx-font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 10px;
 }

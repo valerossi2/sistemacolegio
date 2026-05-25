@@ -60,8 +60,8 @@ public class Configuracion {
     private ComboBox<String> langCombo;
     private Runnable languageUpdater;
 
-    public Configuracion(ThemeManager theme) {
-        this.theme = theme;
+    public Configuracion() {
+        this.theme = ThemeManager.getInstance();
         root = new VBox();
         root.setPadding(new Insets(16, 24, 16, 24));
         root.setAlignment(Pos.TOP_CENTER);

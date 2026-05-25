@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+
+<VBox fx:id="root"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      styleClass="content-area"
+      spacing="0"
+      maxWidth="Infinity"
+      stylesheets="@../../css/base.css">
+      <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+
+    <VBox spacing="8" styleClass="cursos-page-header">
+        <padding>
+            <Insets bottom="32"/>
+        </padding>
+        <Text text="Gestión de Estudiantes" styleClass="cursos-page-title" />
+        <Text text="Administra los estudiantes del instituto." styleClass="cursos-page-subtitle" />
+    </VBox>
+
+    <VBox styleClass="cursos-card" VBox.vgrow="ALWAYS" alignment="CENTER">
+        <Label text="Módulo de Estudiantes - Próximamente" style="-fx-font-size: 18px; -fx-text-fill: #9CA3AF;" />
+    </VBox>
+</VBox>

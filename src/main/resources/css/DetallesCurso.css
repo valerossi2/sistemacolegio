@@ -145,7 +145,7 @@
     -fx-padding: 0;
 }
 .teacher-table .column-header-background {
-    -fx-background-color: rgba(238,242,255,0.5);
+    -fx-background-color: #E2E8F0;
     -fx-border-color: transparent;
     -fx-border-width: 0;
 }
@@ -256,7 +256,7 @@
 .root-dark .stat-value { -fx-text-fill: #F8FAFC; }
 .root-dark .stat-row { -fx-background-color: #1E293B; }
 .root-dark .teacher-card__header { -fx-border-color: #334155; }
-.root-dark .teacher-table .column-header-background { -fx-background-color: rgba(30,41,59,0.8); }
+.root-dark .teacher-table .column-header-background { -fx-background-color: #334155; }
 .root-dark .teacher-table .table-row-cell { -fx-background-color: #1E293B; -fx-border-color: #334155; }
 .root-dark .teacher-table .table-row-cell:hover { -fx-background-color: #334155; }
 .root-dark .teacher-table .table-cell { -fx-text-fill: #F8FAFC; }

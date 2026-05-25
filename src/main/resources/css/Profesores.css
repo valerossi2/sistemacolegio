@@ -1,0 +1,517 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   profesor_styles.css  —  Lumina Academy · Detalle Profesor
+   JavaFX CSS  |  Paleta: Slate + Blue-600 · Fuente: System (Inter-like)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────── ROOT / GLOBAL ─────────────────────────────── */
+.root-container {
+    -fx-background-color: #f8fafc;
+    -fx-font-family: "Inter", "Segoe UI", "SF Pro Text", "Helvetica Neue", "System";
+    -fx-font-size: 14px;
+}
+
+/* ─────────────────────────── SIDEBAR ───────────────────────────────────── */
+.sidebar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent #e2e8f0 transparent transparent;
+    -fx-border-width: 0 1 0 0;
+    -fx-min-width: 256px;
+    -fx-max-width: 256px;
+    -fx-pref-width: 256px;
+}
+
+/* Brand / Logo row */
+.sidebar-brand {
+    -fx-padding: 0 24 0 24;
+    -fx-min-height: 80px;
+    -fx-max-height: 80px;
+    -fx-border-color: transparent transparent #f1f5f9 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-background-color: #ffffff;
+}
+
+.brand-icon-wrapper {
+    -fx-background-color: #2563eb;
+    -fx-background-radius: 50%;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+}
+
+.brand-icon-svg {
+    -fx-fill: #ffffff;
+    -fx-scale-x: 0.8;
+    -fx-scale-y: 0.8;
+}
+
+.brand-name {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+
+.brand-sub {
+    -fx-font-size: 10px;
+    -fx-text-fill: #94a3b8;
+    -fx-font-weight: 600;
+}
+
+/* Nav list */
+.nav-list {
+    -fx-background-color: #ffffff;
+}
+
+.nav-item {
+    -fx-padding: 10 16 10 16;
+    -fx-background-radius: 12px;
+    -fx-cursor: hand;
+    -fx-min-height: 44px;
+    -fx-max-height: 44px;
+}
+
+.nav-item:hover {
+    -fx-background-color: #f8fafc;
+}
+
+.nav-item-active {
+    -fx-background-color: #2563eb;
+    -fx-effect: dropshadow(three-pass-box, rgba(37,99,235,0.28), 12, 0, 0, 4);
+}
+
+.nav-item-active:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+.nav-icon {
+    -fx-fill: #64748b;
+    -fx-scale-x: 0.75;
+    -fx-scale-y: 0.75;
+}
+
+.nav-icon-active {
+    -fx-fill: #ffffff;
+}
+
+.nav-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #475569;
+    -fx-font-weight: 500;
+}
+
+.nav-label-active {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: 600;
+}
+
+/* ─────────────────────────── MAIN AREA ─────────────────────────────────── */
+.main-area {
+    -fx-background-color: #f8fafc;
+}
+
+/* Header */
+.top-header {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #e2e8f0 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0 32 0 32;
+    -fx-min-height: 80px;
+    -fx-max-height: 80px;
+}
+
+/* Search */
+.search-wrapper {
+    -fx-alignment: CENTER_LEFT;
+}
+
+.search-field {
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 999px;
+    -fx-border-color: transparent;
+    -fx-border-radius: 999px;
+    -fx-padding: 10 16 10 44;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1e293b;
+    -fx-prompt-text-fill: #94a3b8;
+    -fx-pref-height: 44px;
+}
+
+.search-field:focused {
+    -fx-background-color: #eff6ff;
+    -fx-border-color: #bfdbfe;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, rgba(37,99,235,0.10), 8, 0, 0, 0);
+}
+
+.search-icon {
+    -fx-fill: #94a3b8;
+    -fx-scale-x: 0.75;
+    -fx-scale-y: 0.75;
+}
+
+/* Icon buttons (bell, help) */
+.icon-btn {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-max-width: 36px;
+    -fx-max-height: 36px;
+}
+
+.icon-btn:hover {
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 50%;
+}
+
+.header-icon {
+    -fx-fill: #94a3b8;
+    -fx-scale-x: 0.8;
+    -fx-scale-y: 0.8;
+}
+
+.notif-dot {
+    -fx-fill: #ef4444;
+}
+
+/* Admin Profile */
+.admin-profile {
+    -fx-padding: 4 0 4 0;
+    -fx-cursor: hand;
+}
+
+.admin-avatar {
+    -fx-background-color: #e2e8f0;
+    -fx-background-radius: 50%;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+    -fx-border-color: #ffffff;
+    -fx-border-width: 2px;
+    -fx-border-radius: 50%;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.10), 4, 0, 0, 1);
+}
+
+.admin-avatar-icon {
+    -fx-fill: #64748b;
+    -fx-scale-x: 0.85;
+    -fx-scale-y: 0.85;
+}
+
+.admin-name {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #1e293b;
+}
+
+.admin-email {
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748b;
+}
+
+/* ─────────────────────────── SCROLL / CONTENT ───────────────────────────── */
+.content-scroll {
+    -fx-background-color: #f8fafc;
+    -fx-background: #f8fafc;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.content-scroll > .viewport {
+    -fx-background-color: #f8fafc;
+}
+
+.content-scroll > .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8px;
+}
+
+.content-scroll > .scroll-bar:vertical .thumb {
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 4px;
+}
+
+.content-inner {
+    -fx-background-color: #f8fafc;
+}
+
+/* ─────────────────────────── BACK LINK ─────────────────────────────────── */
+.back-link {
+    -fx-cursor: hand;
+}
+
+.back-icon {
+    -fx-fill: #2563eb;
+    -fx-scale-x: 0.85;
+    -fx-scale-y: 0.85;
+}
+
+.back-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #2563eb;
+}
+
+.back-link:hover .back-label {
+    -fx-text-fill: #1d4ed8;
+}
+
+/* ─────────────────────────── CARD BASE ─────────────────────────────────── */
+.card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 24px;
+    -fx-border-color: #eef2f7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 24px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 20, 0, 0, 4);
+    -fx-padding: 24;
+}
+
+/* ─────────────────────────── PROFILE CARD ──────────────────────────────── */
+.profile-card {
+    -fx-padding: 24;
+}
+
+/* Professor avatar circle */
+.professor-avatar-container {
+    -fx-background-color: #e2e8f0;
+    -fx-background-radius: 50%;
+    -fx-min-width: 96px;
+    -fx-min-height: 96px;
+    -fx-max-width: 96px;
+    -fx-max-height: 96px;
+    -fx-border-color: #f1f5f9;
+    -fx-border-width: 3px;
+    -fx-border-radius: 50%;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 8, 0, 0, 2);
+}
+
+/* SVG inside avatar is set dynamically via controller */
+.avatar-svg-male {
+    -fx-fill: #475569;
+    -fx-scale-x: 3.2;
+    -fx-scale-y: 3.2;
+}
+
+.avatar-svg-female {
+    -fx-fill: #475569;
+    -fx-scale-x: 3.2;
+    -fx-scale-y: 3.2;
+}
+
+.professor-name {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.professor-subject {
+    -fx-font-size: 15px;
+    -fx-text-fill: #475569;
+}
+
+/* ─────────────────────────── DETAIL CARDS ──────────────────────────────── */
+.detail-card {
+    -fx-padding: 24;
+}
+
+.card-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+/* Course rows */
+.course-row {
+    -fx-padding: 14 0 14 0;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.course-row-border {
+    -fx-border-color: transparent transparent #f1f5f9 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.course-name {
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #1e293b;
+}
+
+/* ─────────────────────────── TIMELINE ──────────────────────────────────── */
+.timeline-item {
+    -fx-padding: 0 0 20 0;
+}
+
+.timeline-dot-active {
+    -fx-fill: #2563eb;
+    -fx-stroke: #ffffff;
+    -fx-stroke-width: 2.5px;
+    -fx-effect: dropshadow(three-pass-box, rgba(37,99,235,0.30), 6, 0, 0, 2);
+}
+
+.timeline-dot-inactive {
+    -fx-fill: #cbd5e1;
+    -fx-stroke: #ffffff;
+    -fx-stroke-width: 2.5px;
+}
+
+.timeline-line {
+    -fx-background-color: #e2e8f0;
+    -fx-min-width: 2px;
+    -fx-max-width: 2px;
+    -fx-min-height: 28px;
+    -fx-pref-height: 28px;
+}
+
+.timeline-content {
+    -fx-padding: 0 0 0 0;
+}
+
+.timeline-time {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+
+.timeline-class {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+}
+
+/* ─────────────────────────── ATTENDANCE TABLE ───────────────────────────── */
+.attendance-card {
+    -fx-padding: 24;
+}
+
+.attendance-table {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-table-cell-border-color: transparent;
+    -fx-padding: 0;
+}
+
+/* Table column headers */
+.attendance-table .column-header-background {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 12px 12px 0 0;
+}
+
+.attendance-table .column-header {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: transparent;
+    -fx-padding: 12 16 12 16;
+}
+
+.attendance-table .column-header .label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #475569;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Table rows */
+.attendance-table .table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #f1f5f9 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-table-cell-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.attendance-table .table-row-cell:hover {
+    -fx-background-color: #f8fafc;
+}
+
+.attendance-table .table-row-cell:selected {
+    -fx-background-color: #eff6ff;
+}
+
+.attendance-table .table-row-cell:last-child {
+    -fx-border-color: transparent;
+}
+
+/* Table cells */
+.attendance-table .table-cell {
+    -fx-padding: 12 16 12 16;
+    -fx-font-size: 14px;
+    -fx-text-fill: #334155;
+    -fx-border-color: transparent;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Status badge: Presente */
+.badge-presente {
+    -fx-background-color: #dcfce7;
+    -fx-background-radius: 999px;
+    -fx-padding: 3 10 3 10;
+    -fx-text-fill: #16a34a;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+/* Status badge: Tardanza */
+.badge-tardanza {
+    -fx-background-color: #fff7ed;
+    -fx-background-radius: 999px;
+    -fx-padding: 3 10 3 10;
+    -fx-text-fill: #ea580c;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+/* Status badge: Ausente */
+.badge-ausente {
+    -fx-background-color: #fee2e2;
+    -fx-background-radius: 999px;
+    -fx-padding: 3 10 3 10;
+    -fx-text-fill: #dc2626;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+.badge-icon {
+    -fx-scale-x: 0.7;
+    -fx-scale-y: 0.7;
+}
+
+.badge-presente-icon {
+    -fx-fill: #16a34a;
+}
+
+.badge-tardanza-icon {
+    -fx-fill: #ea580c;
+}
+
+.table-placeholder {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 13px;
+}
+
+/* ─────────────────────────── SCROLL BARS (global) ──────────────────────── */
+.scroll-bar {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8px;
+    -fx-pref-height: 8px;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 4px;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #94a3b8;
+}
+
+.scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-pref-height: 0;
+    -fx-pref-width: 0;
+}

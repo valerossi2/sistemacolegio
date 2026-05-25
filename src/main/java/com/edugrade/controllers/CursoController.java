@@ -129,6 +129,14 @@ public class CursoController {
         allCourses.add(new CourseRow("4to", 2, "A", 40, 8.5, "Descanso"));
         allCourses.add(new CourseRow("3ro", 6, "C", 24, 8.8, "En clase"));
         allCourses.add(new CourseRow("5to", 0, "E", 24, 9.2, "Descanso"));
+        allCourses.add(new CourseRow("2do", 3, "B", 30, 8.0, "En clase"));
+        allCourses.add(new CourseRow("6to", 4, "D", 36, 7.5, "En clase"));
+        allCourses.add(new CourseRow("1ro", 5, "A", 28, 9.0, "Descanso"));
+        allCourses.add(new CourseRow("3ro", 7, "B", 32, 8.2, "En clase"));
+        allCourses.add(new CourseRow("4to", 0, "C", 26, 8.7, "En clase"));
+        allCourses.add(new CourseRow("2do", 2, "A", 34, 7.9, "Descanso"));
+        allCourses.add(new CourseRow("5to", 1, "B", 30, 8.3, "En clase"));
+        allCourses.add(new CourseRow("6to", 6, "C", 28, 8.1, "En clase"));
     }
 
     private void configureCourseTable() {

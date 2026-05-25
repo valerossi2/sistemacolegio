@@ -208,19 +208,17 @@
 }
 
 /* ── STUDENT CARD NO BG ────────────────────────────────────── */
-.card--no-bg {
+.card.card--no-bg {
     -fx-background-color: transparent;
 }
-.root-dark .card--no-bg {
+.root-dark .card.card--no-bg {
     -fx-background-color: transparent;
 }
 
 /* ── STUDENT ROWS ──────────────────────────────────────────── */
-.student-table .table-row-cell {
-    -fx-background-color: #F8FAFC;
-}
+.student-table .table-row-cell,
 .student-table .table-row-cell:odd {
-    -fx-background-color: #F1F5F9;
+    -fx-background-color: transparent;
 }
 
 /* ── TEACHER NAME ──────────────────────────────────────────── */
@@ -274,8 +272,8 @@
 .root-dark .teacher-card__header { -fx-border-color: #334155; }
 .root-dark .teacher-table .column-header-background { -fx-background-color: rgba(30,41,59,0.8); }
 .root-dark .teacher-table .table-row-cell { -fx-background-color: #1E293B; -fx-border-color: #334155; }
-.root-dark .student-table .table-row-cell { -fx-background-color: #0F172A; }
-.root-dark .student-table .table-row-cell:odd { -fx-background-color: #1E293B; }
+.root-dark .student-table .table-row-cell,
+.root-dark .student-table .table-row-cell:odd { -fx-background-color: transparent; }
 .root-dark .teacher-table .table-cell { -fx-text-fill: #F8FAFC; }
 .root-dark .teacher-table .column-header .label { -fx-text-fill: #94A3B8; }
 .root-dark .btn-link { -fx-text-fill: #60A5FA; }

@@ -212,7 +212,7 @@ public class CursoController {
         colAcciones.setCellFactory(accionesCell());
 
         // right-align ACCIONES header label
-        colAcciones.setStyle("-fx-alignment: CENTER-LEFT;");
+        colAcciones.setStyle("-fx-alignment: CENTER;");
         colAcciones.getStyleClass().add("col-acciones-header");
     }
 

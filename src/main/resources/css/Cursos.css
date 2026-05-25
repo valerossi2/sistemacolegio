@@ -80,10 +80,10 @@
 
 /* ── ACCIONES ────────────────────────────────────────────── */
 .col-acciones-header .label {
-    -fx-alignment: CENTER-LEFT;
+    -fx-alignment: CENTER;
 }
 .cell-acciones {
-    -fx-alignment: CENTER_LEFT;
+    -fx-alignment: CENTER;
     -fx-padding: 8 16 8 16;
 }
 

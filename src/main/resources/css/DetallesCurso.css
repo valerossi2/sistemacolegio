@@ -168,7 +168,7 @@
     -fx-cell-size: 48px;
 }
 .teacher-table .table-row-cell:hover {
-    -fx-background-color: rgba(249,250,251,0.5);
+    -fx-background-color: #F1F5F9;
 }
 .teacher-table .table-row-cell:selected {
     -fx-background-color: #EFF6FF;
@@ -258,6 +258,7 @@
 .root-dark .teacher-card__header { -fx-border-color: #334155; }
 .root-dark .teacher-table .column-header-background { -fx-background-color: rgba(30,41,59,0.8); }
 .root-dark .teacher-table .table-row-cell { -fx-background-color: #1E293B; -fx-border-color: #334155; }
+.root-dark .teacher-table .table-row-cell:hover { -fx-background-color: #334155; }
 .root-dark .teacher-table .table-cell { -fx-text-fill: #F8FAFC; }
 .root-dark .teacher-table .column-header .label { -fx-text-fill: #94A3B8; }
 .root-dark .btn-link { -fx-text-fill: #60A5FA; }

@@ -66,6 +66,11 @@ public class DetalleCursoController {
         theme.addListener(this::onThemeChanged);
     }
 
+    private static final double TEACHER_ROW_HEIGHT = 48;
+    private static final double TEACHER_HEADER_HEIGHT = 32;
+    private static final int INITIAL_TEACHER_COUNT = 4;
+    private static final int TOTAL_TEACHER_COUNT = 12;
+
     private void initTeacherTable() {
         colTeacherName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colTeacherSubject.setCellValueFactory(new PropertyValueFactory<>("subject"));
@@ -86,8 +91,9 @@ public class DetalleCursoController {
             new TeacherRow("Luis Torres", "Química Orgánica"),
             new TeacherRow("María Paz", "Geografía Mundial")
         );
-        displayedTeacherData.addAll(fullTeacherData.subList(0, 4));
+        displayedTeacherData.addAll(fullTeacherData.subList(0, INITIAL_TEACHER_COUNT));
         teacherTable.setItems(displayedTeacherData);
+        updateTeacherTableHeight(INITIAL_TEACHER_COUNT);
     }
 
     private void loadStylesheets() {
@@ -155,12 +161,18 @@ public class DetalleCursoController {
         alert.showAndWait();
     }
 
+    private void updateTeacherTableHeight(int rowCount) {
+        teacherTable.setPrefHeight(TEACHER_HEADER_HEIGHT + rowCount * TEACHER_ROW_HEIGHT + 2);
+    }
+
     @FXML
     private void onVerTodosDocentes(ActionEvent event) {
         showingAllTeachers = !showingAllTeachers;
+        int count = showingAllTeachers ? TOTAL_TEACHER_COUNT : INITIAL_TEACHER_COUNT;
         displayedTeacherData.setAll(
-            showingAllTeachers ? fullTeacherData : fullTeacherData.subList(0, 4)
+            showingAllTeachers ? fullTeacherData : fullTeacherData.subList(0, INITIAL_TEACHER_COUNT)
         );
+        updateTeacherTableHeight(count);
         btnVerTodosDocentes.setText(lang.get(
             showingAllTeachers ? "detalle.verMenos" : "detalle.verTodos"
         ));

@@ -122,6 +122,7 @@ public class DetalleCursoController {
                 avatarCircle.getStyleClass().add("avatar-circle");
                 initials.getStyleClass().add("avatar-initials");
                 avatarContainer.getChildren().addAll(avatarCircle, initials);
+                nameLabel.getStyleClass().add("cell-docente-name");
                 box.getChildren().addAll(avatarContainer, nameLabel);
                 setGraphic(box);
                 setPadding(new Insets(8, 16, 8, 16));

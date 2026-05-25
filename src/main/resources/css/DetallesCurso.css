@@ -30,6 +30,7 @@
 }
 .breadcrumb__parent:hover,
 .breadcrumb__link:hover {
+    -fx-text-fill: #1E40AF;
     -fx-underline: true;
 }
 .breadcrumb__separator {
@@ -206,6 +207,37 @@
     -fx-text-fill: #fff;
 }
 
+/* ── TEACHER NAME ──────────────────────────────────────────── */
+.cell-docente-name {
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #1F2937;
+}
+
+/* ── CONTEXT MENU ──────────────────────────────────────────── */
+.context-menu {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 8px;
+    -fx-border-color: #E5E7EB;
+    -fx-border-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 4);
+    -fx-padding: 4;
+}
+.context-menu .menu-item {
+    -fx-padding: 8 16;
+    -fx-background-radius: 6px;
+}
+.context-menu .menu-item:hover {
+    -fx-background-color: #F3F4F6;
+}
+.context-menu .menu-item:disabled {
+    -fx-opacity: 0.5;
+}
+.context-menu .menu-item .label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #374151;
+}
+
 /* ── PLACEHOLDER ──────────────────────────────────────────── */
 .table-placeholder-label {
     -fx-font-size: 14px;
@@ -215,6 +247,12 @@
 /* ── DARK MODE ────────────────────────────────────────────── */
 .root-dark .page-header .page-title { -fx-text-fill: #F8FAFC; }
 .root-dark .breadcrumb__current { -fx-text-fill: #94A3B8; }
+.root-dark .breadcrumb__parent:hover,
+.root-dark .breadcrumb__link:hover { -fx-text-fill: #93C5FD; }
+.root-dark .cell-docente-name { -fx-text-fill: #F8FAFC; }
+.root-dark .context-menu { -fx-background-color: #1E293B; -fx-border-color: #334155; }
+.root-dark .context-menu .menu-item:hover { -fx-background-color: #334155; }
+.root-dark .context-menu .menu-item .label { -fx-text-fill: #F8FAFC; }
 .root-dark .stat-value { -fx-text-fill: #F8FAFC; }
 .root-dark .stat-row { -fx-background-color: #1E293B; }
 .root-dark .teacher-card__header { -fx-border-color: #334155; }

@@ -6,246 +6,62 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.shape.*?>
 
-
-<BorderPane xmlns="http://javafx.com/javafx"
+<ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.edugrade.controllers.CursoController"
-            fx:id="rootPane"
-            styleClass="root-pane"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED"
+            styleClass="main-scroll-pane"
             stylesheets="@../../css/Cursos.css">
 
-    <!-- ════════════════════════════════════════
-         SIDEBAR
-    ════════════════════════════════════════ -->
-    <left>
-        <VBox fx:id="sideNavBar" styleClass="side-navbar" prefWidth="256">
+    <VBox spacing="24" styleClass="content-area">
+        <padding>
+            <Insets top="32" right="40" bottom="40" left="40"/>
+        </padding>
 
-            <!-- Logo -->
-            <HBox styleClass="side-navbar__brand" alignment="CENTER_LEFT" spacing="12">
-                <StackPane styleClass="brand-logo-placeholder">
-                    <Label text="L" styleClass="brand-logo-initial"/>
-                </StackPane>
-                <VBox spacing="2">
-                    <Label text="Lumina Academy"      styleClass="brand-title"/>
-                    <Label text="Academic Management" styleClass="brand-subtitle"/>
-                </VBox>
-            </HBox>
-
-            <!-- Ítems de navegación -->
-            <VBox fx:id="navItemsContainer"
-                  styleClass="nav-items-container"
-                  spacing="2"
-                  VBox.vgrow="ALWAYS">
-
-                <HBox fx:id="navinicio" styleClass="nav-item"
-                      spacing="12" alignment="CENTER_LEFT"
-                      onMouseClicked="#onNavinicio">
-                    <SVGPath styleClass="nav-svg-icon"
-                             content="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"
-                             scaleX="0.9" scaleY="0.9"/>
-                    <Label text="Inicio" styleClass="nav-item__label"/>
-                </HBox>
-
-                <HBox fx:id="navCursos" styleClass="nav-item nav-item--active"
-                      spacing="12" alignment="CENTER_LEFT"
-                      onMouseClicked="#onNavCursos">
-                    <SVGPath styleClass="nav-svg-icon nav-svg-icon--active"
-                             content="M19 2l-5 4.5v11l5-4.5V2zM6.5 5C4.55 5 2.45 5.4 1 6.5v11.5c1.45-1.1 3.55-1.5 5.5-1.5s4.05.4 5.5 1.5V6.5C14.95 5.4 12.85 5 10.5 5S8.05 5.4 6.5 5z"
-                             scaleX="0.9" scaleY="0.9"/>
-                    <Label text="Cursos" styleClass="nav-item__label"/>
-                </HBox>
-
-                <HBox fx:id="navEstudiantes" styleClass="nav-item"
-                      spacing="12" alignment="CENTER_LEFT"
-                      onMouseClicked="#onNavEstudiantes">
-                    <SVGPath styleClass="nav-svg-icon"
-                             content="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"
-                             scaleX="0.9" scaleY="0.9"/>
-                    <Label text="Estudiantes" styleClass="nav-item__label"/>
-                </HBox>
-
-                <HBox fx:id="navHorario" styleClass="nav-item"
-                      spacing="12" alignment="CENTER_LEFT"
-                      onMouseClicked="#onNavHorario">
-                    <SVGPath styleClass="nav-svg-icon"
-                             content="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"
-                             scaleX="0.9" scaleY="0.9"/>
-                    <Label text="Horario" styleClass="nav-item__label"/>
-                </HBox>
-
-                <HBox fx:id="navConfig" styleClass="nav-item"
-                      spacing="12" alignment="CENTER_LEFT"
-                      onMouseClicked="#onNavConfig">
-                    <SVGPath styleClass="nav-svg-icon"
-                             content="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"
-                             scaleX="0.9" scaleY="0.9"/>
-                    <Label text="Configuración" styleClass="nav-item__label"/>
-                </HBox>
-            </VBox>
-
-            <!-- Perfil + Logout -->
-            <HBox styleClass="side-navbar__profile" spacing="12" alignment="CENTER_LEFT">
-                <StackPane styleClass="avatar avatar--md avatar--blue">
-                    <Label text="AU" styleClass="avatar__initials"/>
-                </StackPane>
-                <VBox VBox.vgrow="ALWAYS" spacing="2" HBox.hgrow="ALWAYS">
-                    <Label text="Admin User"       styleClass="profile-name"/>
-                    <Label text="admin@lumina.edu" styleClass="profile-email"/>
-                </VBox>
-                <Button fx:id="btnLogout" styleClass="btn-icon-ghost"
-                        mnemonicParsing="false" onAction="#onLogout">
-                    <graphic>
-                        <SVGPath styleClass="nav-svg-icon"
-                                 content="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
-                                 scaleX="0.85" scaleY="0.85"/>
-                    </graphic>
-                </Button>
-            </HBox>
-
+        <VBox spacing="6">
+            <Text fx:id="pageTitle" text="Listado Completo de Cursos" styleClass="page-title-lg" />
+            <Text fx:id="pageSubtitle" text="Gestiona los cursos activos del instituto." styleClass="page-subtitle" />
         </VBox>
-    </left>
 
-    <!-- ════════════════════════════════════════
-         CENTRO — TopBar + Contenido principal
-    ════════════════════════════════════════ -->
-    <center>
-        <VBox styleClass="main-content" VBox.vgrow="ALWAYS">
-
-            <!-- TopBar -->
-            <HBox fx:id="topAppBar" styleClass="top-app-bar"
-                  alignment="CENTER_LEFT" spacing="16">
-
-                <HBox styleClass="search-bar" alignment="CENTER_LEFT" spacing="8">
-                    <SVGPath styleClass="search-svg-icon"
-                             content="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
-                             scaleX="0.75" scaleY="0.75"/>
-                    <TextField fx:id="searchField"
-                               promptText="Buscar expedientes, cursos o reportes..."
-                               styleClass="search-bar__input"
-                               prefWidth="320"
-                               onKeyReleased="#onSearch"/>
-                </HBox>
-
-                <Region HBox.hgrow="ALWAYS"/>
-
-                <!-- Notificaciones -->
-                <StackPane>
-                    <Button fx:id="btnNotifications" styleClass="btn-icon-ghost"
-                            mnemonicParsing="false">
-                        <graphic>
-                            <SVGPath styleClass="nav-svg-icon"
-                                     content="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
-                                     scaleX="0.85" scaleY="0.85"/>
-                        </graphic>
-                    </Button>
-                    <Circle fx:id="notifBadge" radius="4" styleClass="notif-badge"
-                            StackPane.alignment="TOP_RIGHT"
-                            translateX="4" translateY="-4"/>
-                </StackPane>
-
-                <!-- Ayuda -->
-                <Button styleClass="btn-icon-ghost" mnemonicParsing="false">
-                    <graphic>
-                        <SVGPath styleClass="nav-svg-icon"
-                                 content="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"
-                                 scaleX="0.85" scaleY="0.85"/>
-                    </graphic>
-                </Button>
-
-                <!-- Mini-perfil -->
-                <HBox spacing="10" alignment="CENTER_RIGHT">
-                    <VBox alignment="CENTER_RIGHT" spacing="1">
-                        <Label text="Admin"            styleClass="topbar-user-name"/>
-                        <Label text="admin@lumina.edu" styleClass="topbar-user-email"/>
-                    </VBox>
-                    <StackPane styleClass="avatar avatar--md avatar--primary">
-                        <Label text="A" styleClass="avatar__initials"/>
-                    </StackPane>
-                </HBox>
+        <VBox styleClass="list-table-container" VBox.vgrow="ALWAYS" spacing="0">
+            <HBox spacing="12" alignment="CENTER_LEFT" styleClass="list-table__header">
+                <Label fx:id="lblTotalCursos" text="Todos los Cursos (0)" styleClass="list-table__title" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="filterTodos" text="Todos" styleClass="filter-pill, filter-pill--active" onAction="#onFilterTodos" />
+                <Button fx:id="filterActivos" text="Activos" styleClass="filter-pill" onAction="#onFilterActivos" />
             </HBox>
 
-            <!-- ════════════════════════════════════════
-                 CONTENIDO — StackPane que el controller
-                 usa para intercambiar vistas en runtime
-            ════════════════════════════════════════ -->
-            <StackPane fx:id="contentStack" VBox.vgrow="ALWAYS">
+            <TableView fx:id="cursosTable"
+                       styleClass="courses-table"
+                       VBox.vgrow="ALWAYS">
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+                <columns>
+                    <TableColumn fx:id="colGrado"       text="Grado"               prefWidth="80"  minWidth="70"/>
+                    <TableColumn fx:id="colEncargado"   text="Encargado"            prefWidth="220" minWidth="160"/>
+                    <TableColumn fx:id="colSeccion"     text="Sección"              prefWidth="90"  minWidth="70"/>
+                    <TableColumn fx:id="colAlumnos"     text="Alumnos"              prefWidth="110" minWidth="80"/>
+                    <TableColumn fx:id="colRendimiento" text="Rendimiento Promedio" prefWidth="190" minWidth="140"/>
+                    <TableColumn fx:id="colEstado"      text="Estado"               prefWidth="120" minWidth="100"/>
+                </columns>
+                <placeholder>
+                    <Label text="No hay cursos que mostrar." styleClass="table-placeholder-label" />
+                </placeholder>
+            </TableView>
 
-                <!-- ──────────── VISTA 1: LISTA DE CURSOS ──────────── -->
-                <ScrollPane fx:id="vistaListaCursos"
-                            styleClass="main-scroll-pane"
-                            fitToWidth="true"
-                            hbarPolicy="NEVER"
-                            vbarPolicy="AS_NEEDED">
-                    <VBox styleClass="content-area" spacing="24">
-
-                        <!-- Encabezado de página -->
-                        <VBox spacing="6">
-                            <Label text="Listado Completo de Cursos" styleClass="page-title-lg"/>
-                            <Label text="Bienvenido de nuevo. Aquí tienes un resumen del estado institucional hoy."
-                                   styleClass="page-subtitle"/>
-                        </VBox>
-
-                        <!-- Tabla + Filtros -->
-                        <VBox styleClass="list-table-container" spacing="0">
-
-                            <!-- Header filtros -->
-                            <VBox styleClass="list-table__header" spacing="12">
-                                <Label fx:id="lblTotalCursos"
-                                       text="Todos los Cursos (0)"
-                                       styleClass="list-table__title"/>
-                                <HBox spacing="8">
-                                    <Button fx:id="FilterTodos" text="Todos"
-                                            styleClass="filter-pill filter-pill--active"
-                                            mnemonicParsing="false" onAction="#onFilterTodos"/>
-                                    <Button fx:id="filterActivos" text="Activos"
-                                            styleClass="filter-pill"
-                                            mnemonicParsing="false" onAction="#onFilterActivos"/>
-                                </HBox>
-                            </VBox>
-
-                            <!-- TableView Cursos -->
-                            <TableView fx:id="cursosTable"
-                                       styleClass="courses-table"
-                                       columnResizePolicy="CONSTRAINED_RESIZE_POLICY">
-                                <columns>
-                                    <TableColumn fx:id="colGrado"       text="Grado"               prefWidth="80"  minWidth="70"/>
-                                    <TableColumn fx:id="colEncargado"   text="Encargado"            prefWidth="220" minWidth="160"/>
-                                    <TableColumn fx:id="colSeccion"     text="Sección"              prefWidth="90"  minWidth="70"/>
-                                    <TableColumn fx:id="colAlumnos"     text="Alumnos"              prefWidth="110" minWidth="80"/>
-                                    <TableColumn fx:id="colRendimiento" text="Rendimiento Promedio" prefWidth="190" minWidth="140"/>
-                                    <TableColumn fx:id="colEstado"      text="Estado"               prefWidth="120" minWidth="100"/>
-                                </columns>
-                                <placeholder>
-                                    <Label text="No hay cursos que mostrar." styleClass="table-placeholder-label"/>
-                                </placeholder>
-                            </TableView>
-
-                            <!-- Paginación -->
-                            <HBox styleClass="pagination-bar" alignment="CENTER_LEFT">
-                                <Label fx:id="lblPaginacion"
-                                       text="Mostrando 7 de 36 cursos"
-                                       styleClass="pagination-info"
-                                       HBox.hgrow="ALWAYS"/>
-                                <HBox spacing="4">
-                                    <Button fx:id="btnPage1"    text="1" styleClass="page-btn page-btn--active"
-                                            mnemonicParsing="false" onAction="#onPage1"/>
-                                    <Button fx:id="btnPage2"    text="2" styleClass="page-btn"
-                                            mnemonicParsing="false" onAction="#onPage2"/>
-                                    <Button fx:id="btnPage3"    text="3" styleClass="page-btn"
-                                            mnemonicParsing="false" onAction="#onPage3"/>
-                                    <Button fx:id="btnPageNext" text="›" styleClass="page-btn"
-                                            mnemonicParsing="false" onAction="#onPageNext"/>
-                                </HBox>
-                            </HBox>
-
-                        </VBox>
-                    </VBox>
-                </ScrollPane>
-                <!-- ──────────── FIN VISTA 1 ──────────── -->
-
-            </StackPane>
-
+            <HBox alignment="CENTER_RIGHT" styleClass="pagination-bar">
+                <Label fx:id="lblPaginacion" text="Mostrando 5 de 5 cursos" styleClass="pagination-info" HBox.hgrow="ALWAYS"/>
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox spacing="4" alignment="CENTER_RIGHT">
+                    <Button fx:id="btnPage1" text="1" styleClass="page-btn, page-btn--active" onAction="#onPage1" />
+                    <Button fx:id="btnPage2" text="2" styleClass="page-btn" onAction="#onPage2" />
+                    <Button fx:id="btnPage3" text="3" styleClass="page-btn" onAction="#onPage3" />
+                    <Button fx:id="btnPageNext" text="›" styleClass="page-btn" onAction="#onPageNext" />
+                </HBox>
+            </HBox>
         </VBox>
-    </center>
-
-</BorderPane>
+    </VBox>
+</ScrollPane>

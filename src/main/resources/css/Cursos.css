@@ -1,38 +1,70 @@
+/* ────────────────────────────────────────────────────────────
+   CURSOS.CSS  —  Looked-up colors for light / dark themes
+   ──────────────────────────────────────────────────────────── */
+
+.root {
+    cursos-bg:                    #F3F4F6;
+    cursos-surface:               #FFFFFF;
+    cursos-surface-hover:         #F8FAFC;
+    cursos-surface-active:        #EEF2FF;
+    cursos-border:                #E2E8F0;
+    cursos-border-light:          #F1F5F9;
+    cursos-text-primary:          #0F172A;
+    cursos-text-secondary:        #334155;
+    cursos-text-muted:            #64748B;
+    cursos-text-extra-muted:      #94A3B8;
+    cursos-accent:                #3FC2E8;
+    cursos-accent-hover:          #2dafd4;
+    cursos-accent-light:          #EEF2FF;
+    cursos-danger:                #EF4444;
+    cursos-success:               #10B981;
+    cursos-success-bg:            #DEF7EC;
+    cursos-success-text:          #03543F;
+    cursos-warning-bg:            #FEF3C7;
+    cursos-warning-text:          #92400E;
+    cursos-accent-blue:           #004ac6;
+    cursos-table-header-bg:       #F8FAFC;
+    cursos-shadow:                rgba(0,0,0,0.05);
+    cursos-shadow-heavy:          rgba(0,0,0,0.08);
+    cursos-pagination-bg:         #F1F5F9;
+    cursos-pagination-hover:      #E2E8F0;
+    cursos-pagination-active:     #3FC2E8;
+    cursos-pagination-active-text:#ffffff;
+    cursos-input-bg:              #F8FAFC;
+    cursos-input-border:          #E2E8F0;
+    cursos-sidebar-bg:            #FFFFFF;
+    cursos-sidebar-border:        #E2E8F0;
+    cursos-topbar-bg:             #FFFFFF;
+}
+
+/* ── GLOBAL ──────────────────────────────────────────────── */
 .root-pane {
     -fx-font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", Arial, sans-serif;
     -fx-font-size: 14px;
-    -fx-background-color: #F3F4F6;
+    -fx-background-color: cursos-bg;
 }
 
-
-/* ──────────────────────────────────────────────────────
-   2. SIDEBAR
-────────────────────────────────────────────────────── */
-
+/* ── SIDEBAR ─────────────────────────────────────────────── */
 .side-navbar {
-    -fx-background-color: #FFFFFF;
-    -fx-border-color: #E2E8F0;
+    -fx-background-color: cursos-sidebar-bg;
+    -fx-border-color: cursos-sidebar-border;
     -fx-border-width: 0 1 0 0;
     -fx-pref-width: 256px;
     -fx-min-width: 256px;
-<<<<<<< HEAD:demo/src/main/resources/com/example/demo/styles/Cursos.css
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 2, 0);
-=======
->>>>>>> 514a3e54e1212fbc2f52fc9b8654554dbadb4d6d:src/main/resources/css/Cursos.css
+    -fx-effect: dropshadow(gaussian, cursos-shadow, 8, 0, 2, 0);
 }
 
 .side-navbar__brand {
     -fx-padding: 20 24 20 24;
-    -fx-border-color: #E2E8F0;
+    -fx-border-color: cursos-border-light;
     -fx-border-width: 0 0 1 0;
     -fx-spacing: 12;
 }
 
-/* Logo square */
 .brand-logo-placeholder {
     -fx-min-width: 40px;   -fx-max-width: 40px;
     -fx-min-height: 40px;  -fx-max-height: 40px;
-    -fx-background-color: #3FC2E8;
+    -fx-background-color: cursos-accent;
     -fx-background-radius: 12px;
 }
 .brand-logo-initial {
@@ -44,125 +76,92 @@
 .brand-title {
     -fx-font-size: 16px;
     -fx-font-weight: 800;
-    -fx-text-fill: #234E5D;
+    -fx-text-fill: cursos-text-primary;
 }
 .brand-subtitle {
     -fx-font-size: 11px;
     -fx-font-weight: 500;
-    -fx-text-fill: #64748B;
+    -fx-text-fill: cursos-text-muted;
 }
 
-/* Nav container */
-.nav-items-container {
-    -fx-padding: 12 10 12 10;
-}
+.nav-items-container { -fx-padding: 12 10 12 10; }
 
-/* Nav item base */
 .nav-item {
     -fx-padding: 10 16 10 16;
     -fx-background-radius: 12px;
     -fx-cursor: hand;
     -fx-spacing: 12;
 }
-.nav-item:hover {
-    -fx-background-color: #F8FAFC;
-}
-.nav-item:hover .nav-item__label { -fx-text-fill: #3FC2E8; }
-.nav-item:hover .nav-item__icon  { -fx-text-fill: #3FC2E8; }
+.nav-item:hover { -fx-background-color: cursos-surface-hover; }
+.nav-item:hover .nav-item__label { -fx-text-fill: cursos-accent; }
+.nav-item:hover .nav-item__icon  { -fx-text-fill: cursos-accent; }
 
 .nav-item__icon {
-    -fx-text-fill: #64748B;
+    -fx-text-fill: cursos-text-muted;
     -fx-font-size: 18px;
     -fx-min-width: 24px;
 }
 .nav-item__label {
     -fx-font-size: 13px;
     -fx-font-weight: 500;
-    -fx-text-fill: #64748B;
+    -fx-text-fill: cursos-text-muted;
 }
 
-/* Activo — fondo primario Lumina */
-.nav-item--active {
-    -fx-background-color: #3FC2E8;
-}
-.nav-item--active .nav-item__label {
-    -fx-text-fill: #ffffff;
-    -fx-font-weight: 700;
-}
-.nav-item--active .nav-item__icon {
-    -fx-text-fill: #ffffff;
-}
-.nav-item--active:hover {
-    -fx-background-color: #2dafd4;
-}
+.nav-item--active { -fx-background-color: cursos-accent; }
+.nav-item--active .nav-item__label { -fx-text-fill: #ffffff; -fx-font-weight: 700; }
+.nav-item--active .nav-item__icon { -fx-text-fill: #ffffff; }
+.nav-item--active:hover { -fx-background-color: cursos-accent-hover; }
 
-/* Perfil usuario */
 .side-navbar__profile {
     -fx-padding: 12 16 16 16;
-    -fx-border-color: #E2E8F0;
+    -fx-border-color: cursos-border-light;
     -fx-border-width: 1 0 0 0;
     -fx-spacing: 12;
 }
-.profile-name  { -fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #1E293B; }
-.profile-email { -fx-font-size: 11px; -fx-text-fill: #64748B; }
+.profile-name  { -fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: cursos-text-primary; }
+.profile-email { -fx-font-size: 11px; -fx-text-fill: cursos-text-muted; }
 
-
-/* ──────────────────────────────────────────────────────
-   3. TOP APP BAR
-────────────────────────────────────────────────────── */
-
+/* ── TOP APP BAR ─────────────────────────────────────────── */
 .top-app-bar {
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: cursos-topbar-bg;
     -fx-padding: 10 24 10 24;
-    -fx-border-color: #E2E8F0;
+    -fx-border-color: cursos-border-light;
     -fx-border-width: 0 0 1 0;
-<<<<<<< HEAD:demo/src/main/resources/com/example/demo/styles/Cursos.css
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 2);
+    -fx-effect: dropshadow(gaussian, cursos-shadow, 4, 0, 0, 2);
     -fx-min-height: 64px;
-=======
--fx-min-height: 64px;
->>>>>>> 514a3e54e1212fbc2f52fc9b8654554dbadb4d6d:src/main/resources/css/Cursos.css
     -fx-pref-height: 64px;
 }
 
-/* Search bar (topbar) */
 .search-bar {
-    -fx-background-color: #F8FAFC;
+    -fx-background-color: cursos-input-bg;
     -fx-background-radius: 8px;
-    -fx-border-color: #E2E8F0;
+    -fx-border-color: cursos-input-border;
     -fx-border-radius: 8px;
     -fx-border-width: 1px;
     -fx-padding: 6 14 6 14;
     -fx-max-width: 400px;
 }
-.search-bar__icon  { -fx-text-fill: #94A3B8; -fx-font-size: 14px; }
+.search-bar__icon  { -fx-text-fill: cursos-text-extra-muted; -fx-font-size: 14px; }
 .search-bar__input {
     -fx-background-color: transparent;
     -fx-border-width: 0;
     -fx-font-size: 13px;
-    -fx-text-fill: #1E293B;
-    -fx-prompt-text-fill: #94A3B8;
+    -fx-text-fill: cursos-text-primary;
+    -fx-prompt-text-fill: cursos-text-extra-muted;
     -fx-padding: 0;
 }
 .search-bar__input:focused { -fx-background-color: transparent; }
 
-/* Notif badge */
-.notif-badge { -fx-fill: #EF4444; }
+.notif-badge { -fx-fill: cursos-danger; }
+.topbar-user-name  { -fx-font-size: 13px; -fx-font-weight: 700; -fx-text-fill: cursos-text-primary; }
+.topbar-user-email { -fx-font-size: 11px; -fx-text-fill: cursos-text-extra-muted; }
 
-/* Mini-perfil en topbar */
-.topbar-user-name  { -fx-font-size: 13px; -fx-font-weight: 700; -fx-text-fill: #1E293B; }
-.topbar-user-email { -fx-font-size: 11px; -fx-text-fill: #94A3B8; }
-
-
-/* ──────────────────────────────────────────────────────
-   4. SCROLL PANE / CONTENT AREA
-────────────────────────────────────────────────────── */
-
-.main-content { -fx-background-color: #F3F4F6; }
+/* ── CONTENT AREA ────────────────────────────────────────── */
+.main-content { -fx-background-color: cursos-bg; }
 
 .main-scroll-pane {
     -fx-background-color: transparent;
-    -fx-background: #F3F4F6;
+    -fx-background: cursos-bg;
     -fx-border-width: 0;
     -fx-padding: 0;
 }
@@ -173,10 +172,10 @@
     -fx-pref-width: 6px;
 }
 .main-scroll-pane .scroll-bar:vertical .thumb {
-    -fx-background-color: #CBD5E1;
+    -fx-background-color: cursos-border;
     -fx-background-radius: 3px;
 }
-.main-scroll-pane .scroll-bar:vertical .thumb:hover { -fx-background-color: #94A3B8; }
+.main-scroll-pane .scroll-bar:vertical .thumb:hover { -fx-background-color: cursos-text-extra-muted; }
 .main-scroll-pane .scroll-bar:vertical .increment-button,
 .main-scroll-pane .scroll-bar:vertical .decrement-button {
     -fx-background-color: transparent;
@@ -185,96 +184,80 @@
 
 .content-area {
     -fx-padding: 32 32 32 32;
-    -fx-background-color: #F3F4F6;
+    -fx-background-color: cursos-bg;
 }
 
 .scroll-bar:horizontal { -fx-pref-height: 0; -fx-opacity: 0; }
 
-
-/* ──────────────────────────────────────────────────────
-   5. PAGE HEADERS (Vista Listado)
-────────────────────────────────────────────────────── */
-
+/* ── PAGE HEADERS ────────────────────────────────────────── */
 .page-title-lg {
     -fx-font-size: 28px;
     -fx-font-weight: 800;
-    -fx-text-fill: #0F172A;
+    -fx-text-fill: cursos-text-primary;
 }
 .page-subtitle {
     -fx-font-size: 13px;
-    -fx-text-fill: #64748B;
+    -fx-text-fill: cursos-text-muted;
 }
 
-/* Page Header (Vista Detalle) */
 .page-header { -fx-spacing: 16; }
 
-.breadcrumb__parent  { -fx-font-size: 13px; -fx-font-weight: 500; -fx-text-fill: #64748B; }
+.breadcrumb__parent  { -fx-font-size: 13px; -fx-font-weight: 500; -fx-text-fill: cursos-text-muted; }
 .breadcrumb__link    { -fx-cursor: hand; }
-.breadcrumb__link:hover { -fx-text-fill: #3FC2E8; }
-.breadcrumb__separator { -fx-font-size: 13px; -fx-text-fill: #94A3B8; }
+.breadcrumb__link:hover { -fx-text-fill: cursos-accent; }
+.breadcrumb__separator { -fx-font-size: 13px; -fx-text-fill: cursos-text-extra-muted; }
 .breadcrumb__current {
     -fx-font-size: 13px;
     -fx-font-weight: 600;
-    -fx-text-fill: #3FC2E8;
+    -fx-text-fill: cursos-accent;
 }
 .page-title {
     -fx-font-size: 24px;
     -fx-font-weight: 700;
-    -fx-text-fill: #0F172A;
+    -fx-text-fill: cursos-text-primary;
 }
 
-
-/* ──────────────────────────────────────────────────────
-   6. LISTA DE CURSOS — contenedor tipo card
-────────────────────────────────────────────────────── */
-
+/* ── LIST CARD CONTAINER ─────────────────────────────────── */
 .list-table-container {
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: cursos-surface;
     -fx-background-radius: 20px;
     -fx-border-radius: 20px;
     -fx-border-color: transparent;
-<<<<<<< HEAD:demo/src/main/resources/com/example/demo/styles/Cursos.css
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 16, 0, 0, 4);
-=======
->>>>>>> 514a3e54e1212fbc2f52fc9b8654554dbadb4d6d:src/main/resources/css/Cursos.css
+    -fx-effect: dropshadow(gaussian, cursos-shadow-heavy, 16, 0, 0, 4);
 }
 
 .list-table__header {
     -fx-padding: 24 24 16 24;
-    -fx-border-color: #F1F5F9;
+    -fx-border-color: cursos-border-light;
     -fx-border-width: 0 0 1 0;
 }
 
 .list-table__title {
     -fx-font-size: 16px;
     -fx-font-weight: 800;
-    -fx-text-fill: #1E293B;
+    -fx-text-fill: cursos-text-primary;
 }
 
-/* Filter pills */
+/* ── FILTER PILLS ────────────────────────────────────────── */
 .filter-pill {
-    -fx-background-color: #F1F5F9;
+    -fx-background-color: cursos-pagination-bg;
     -fx-background-radius: 24px;
     -fx-border-width: 0;
-    -fx-text-fill: #64748B;
+    -fx-text-fill: cursos-text-muted;
     -fx-font-size: 12px;
     -fx-font-weight: 700;
     -fx-padding: 6 18 6 18;
     -fx-cursor: hand;
 }
-.filter-pill:hover { -fx-background-color: #E2E8F0; }
+.filter-pill:hover { -fx-background-color: cursos-pagination-hover; }
 
 .filter-pill--active {
-    -fx-background-color: #3FC2E8;
+    -fx-background-color: cursos-accent;
     -fx-text-fill: #ffffff;
 }
-.filter-pill--active:hover { -fx-background-color: #2dafd4; }
+.filter-pill--active:hover { -fx-background-color: cursos-accent-hover; }
 
-
-/* ──────────────────────────────────────────────────────
-   7. TABLA DE CURSOS (courses-table)
-────────────────────────────────────────────────────── */
-
+/* ── COURSES TABLE ───────────────────────────────────────── */
 .courses-table {
     -fx-background-color: transparent;
     -fx-border-width: 0;
@@ -282,10 +265,9 @@
     -fx-padding: 0;
 }
 
-/* Header */
 .courses-table .column-header-background {
-    -fx-background-color: #F8FAFC;
-    -fx-border-color: #F1F5F9;
+    -fx-background-color: cursos-table-header-bg;
+    -fx-border-color: cursos-border-light;
     -fx-border-width: 0 0 1 0;
 }
 .courses-table .column-header {
@@ -294,70 +276,61 @@
     -fx-padding: 14 24 14 24;
 }
 .courses-table .column-header .label {
-    -fx-text-fill: #94A3B8;
+    -fx-text-fill: cursos-text-extra-muted;
     -fx-font-size: 11px;
     -fx-font-weight: 800;
 }
 
-/* Filas */
 .courses-table .table-row-cell {
-    -fx-background-color: #FFFFFF;
-    -fx-border-color: #F1F5F9;
+    -fx-background-color: cursos-surface;
+    -fx-border-color: cursos-border-light;
     -fx-border-width: 0 0 1 0;
     -fx-pref-height: 72px;
 }
-.courses-table .table-row-cell:hover  { -fx-background-color: #F8FAFC; }
-.courses-table .table-row-cell:selected { -fx-background-color: #EEF2FF; }
+.courses-table .table-row-cell:hover  { -fx-background-color: cursos-surface-hover; }
+.courses-table .table-row-cell:selected { -fx-background-color: cursos-surface-active; }
 
 .courses-table .table-cell {
     -fx-padding: 10 24 10 24;
     -fx-border-width: 0;
     -fx-alignment: CENTER_LEFT;
     -fx-font-size: 13px;
-    -fx-text-fill: #334155;
+    -fx-text-fill: cursos-text-secondary;
 }
 
-/* Celda Grado */
+/* Cell styles */
 .cell-grado {
     -fx-font-size: 14px;
     -fx-font-weight: 800;
-    -fx-text-fill: #1E293B;
+    -fx-text-fill: cursos-text-primary;
 }
-
-/* Celda Encargado */
 .cell-teacher-name {
     -fx-font-size: 13px;
     -fx-font-weight: 600;
-    -fx-text-fill: #334155;
+    -fx-text-fill: cursos-text-secondary;
 }
-
-/* Celda Sección */
 .cell-seccion {
     -fx-font-size: 14px;
     -fx-font-weight: 800;
-    -fx-text-fill: #1E293B;
+    -fx-text-fill: cursos-text-primary;
     -fx-alignment: CENTER;
 }
-
-/* Celda Alumnos */
 .cell-alumnos-count {
     -fx-font-size: 13px;
     -fx-font-weight: 800;
-    -fx-text-fill: #1E293B;
+    -fx-text-fill: cursos-text-primary;
 }
 .cell-alumnos-label {
     -fx-font-size: 11px;
-    -fx-text-fill: #94A3B8;
+    -fx-text-fill: cursos-text-extra-muted;
 }
-
-/* Celda Rendimiento */
 .cell-rendimiento {
     -fx-font-size: 14px;
     -fx-font-weight: 800;
-    -fx-text-fill: #1E293B;
+    -fx-text-fill: cursos-text-primary;
 }
 
-/* Status Pills */
+/* Status pills */
 .status-pill {
     -fx-background-radius: 24px;
     -fx-font-size: 11px;
@@ -365,17 +338,17 @@
     -fx-padding: 4 12 4 12;
 }
 .status-pill--active {
-    -fx-background-color: #DEF7EC;
-    -fx-text-fill: #03543F;
+    -fx-background-color: cursos-success-bg;
+    -fx-text-fill: cursos-success-text;
 }
 .status-pill--break {
-    -fx-background-color: #FEF3C7;
-    -fx-text-fill: #92400E;
+    -fx-background-color: cursos-warning-bg;
+    -fx-text-fill: cursos-warning-text;
 }
 
-/* Botón "Ver" */
+/* View button */
 .btn-ver {
-    -fx-background-color: #3FC2E8;
+    -fx-background-color: cursos-accent;
     -fx-background-radius: 8px;
     -fx-border-width: 0;
     -fx-text-fill: #ffffff;
@@ -384,56 +357,46 @@
     -fx-padding: 6 14 6 14;
     -fx-cursor: hand;
 }
-.btn-ver:hover { -fx-background-color: #2dafd4; }
+.btn-ver:hover { -fx-background-color: cursos-accent-hover; }
 
-/* Placeholder */
 .table-placeholder-label {
     -fx-font-size: 13px;
-    -fx-text-fill: #94A3B8;
+    -fx-text-fill: cursos-text-extra-muted;
 }
 
-
-/* ──────────────────────────────────────────────────────
-   8. PAGINACIÓN
-────────────────────────────────────────────────────── */
-
+/* ── PAGINATION ──────────────────────────────────────────── */
 .pagination-bar {
     -fx-padding: 14 24 14 24;
-    -fx-border-color: #F1F5F9;
+    -fx-border-color: cursos-border-light;
     -fx-border-width: 1 0 0 0;
     -fx-spacing: 8;
 }
 .pagination-info {
     -fx-font-size: 11px;
     -fx-font-weight: 600;
-    -fx-text-fill: #94A3B8;
+    -fx-text-fill: cursos-text-extra-muted;
 }
 .page-btn {
     -fx-min-width: 32px;  -fx-max-width: 32px;
     -fx-min-height: 32px; -fx-max-height: 32px;
-    -fx-background-color: #F1F5F9;
+    -fx-background-color: cursos-pagination-bg;
     -fx-background-radius: 6px;
     -fx-border-width: 0;
-    -fx-text-fill: #64748B;
+    -fx-text-fill: cursos-text-muted;
     -fx-font-size: 12px;
     -fx-cursor: hand;
 }
-.page-btn:hover { -fx-background-color: #E2E8F0; }
+.page-btn:hover { -fx-background-color: cursos-pagination-hover; }
 .page-btn--active {
-    -fx-background-color: #3FC2E8;
+    -fx-background-color: cursos-accent;
     -fx-text-fill: #ffffff;
     -fx-font-weight: 700;
 }
-.page-btn--active:hover { -fx-background-color: #2dafd4; }
+.page-btn--active:hover { -fx-background-color: cursos-accent-hover; }
 
-
-/* ──────────────────────────────────────────────────────
-   9. BUTTONS (compartidos entre vistas)
-────────────────────────────────────────────────────── */
-
-/* Primario (Detalle) */
+/* ── BUTTONS ─────────────────────────────────────────────── */
 .btn-primary {
-    -fx-background-color: #004ac6;
+    -fx-background-color: cursos-accent-blue;
     -fx-background-radius: 8px;
     -fx-border-width: 0;
     -fx-text-fill: #ffffff;
@@ -441,74 +404,64 @@
     -fx-font-weight: 600;
     -fx-padding: 8 16 8 16;
     -fx-cursor: hand;
-<<<<<<< HEAD:demo/src/main/resources/com/example/demo/styles/Cursos.css
     -fx-effect: dropshadow(gaussian, rgba(0,74,198,0.22), 4, 0, 0, 2);
-=======
->>>>>>> 514a3e54e1212fbc2f52fc9b8654554dbadb4d6d:src/main/resources/css/Cursos.css
 }
 .btn-primary:hover   { -fx-background-color: #0053db; }
 .btn-primary:pressed { -fx-background-color: #003ea8; }
 .btn-primary__label  { -fx-text-fill: #ffffff; -fx-font-size: 13px; -fx-font-weight: 600; }
 
-/* Outlined */
 .btn-outlined {
     -fx-background-color: transparent;
     -fx-background-radius: 8px;
-    -fx-border-color: #E2E8F0;
+    -fx-border-color: cursos-border;
     -fx-border-radius: 8px;
     -fx-border-width: 1px;
-    -fx-text-fill: #334155;
+    -fx-text-fill: cursos-text-secondary;
     -fx-font-size: 13px;
     -fx-font-weight: 500;
     -fx-padding: 8 16 8 16;
     -fx-cursor: hand;
 }
-.btn-outlined:hover { -fx-background-color: #F8FAFC; }
+.btn-outlined:hover { -fx-background-color: cursos-surface-hover; }
 
-/* Ghost icon */
 .btn-icon-ghost {
     -fx-background-color: transparent;
     -fx-background-radius: 24px;
     -fx-border-width: 0;
     -fx-font-size: 16px;
-    -fx-text-fill: #94A3B8;
+    -fx-text-fill: cursos-text-extra-muted;
     -fx-padding: 8 8 8 8;
     -fx-cursor: hand;
-    -fx-min-width: 36px; -fx-min-height: 36px;
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
 }
-.btn-icon-ghost:hover { -fx-background-color: #F8FAFC; -fx-text-fill: #3FC2E8; }
+.btn-icon-ghost:hover { -fx-background-color: cursos-surface-hover; -fx-text-fill: cursos-accent; }
 
-/* Link */
 .btn-link {
     -fx-background-color: transparent;
     -fx-border-width: 0;
-    -fx-text-fill: #3FC2E8;
+    -fx-text-fill: cursos-accent;
     -fx-font-size: 13px;
     -fx-font-weight: 600;
     -fx-cursor: hand;
     -fx-padding: 4 0 4 0;
 }
-.btn-link:hover { -fx-text-fill: #2dafd4; }
+.btn-link:hover { -fx-text-fill: cursos-accent-hover; }
 
 .btn-link-primary {
     -fx-background-color: transparent;
     -fx-border-width: 0;
-    -fx-text-fill: #004ac6;
+    -fx-text-fill: cursos-accent-blue;
     -fx-font-size: 13px;
     -fx-font-weight: 600;
     -fx-cursor: hand;
 }
 .btn-link-primary:hover { -fx-text-fill: #0053db; }
 
-/* Icono en botones */
-.btn-icon       { -fx-text-fill: #64748B; -fx-font-size: 15px; }
+.btn-icon       { -fx-text-fill: cursos-text-muted; -fx-font-size: 15px; }
 .btn-icon--white { -fx-text-fill: #ffffff; -fx-font-size: 15px; }
 
-
-/* ──────────────────────────────────────────────────────
-   10. AVATARES
-────────────────────────────────────────────────────── */
-
+/* ── AVATARS ─────────────────────────────────────────────── */
 .avatar { -fx-alignment: CENTER; }
 
 .avatar--sm  {
@@ -524,77 +477,55 @@
 .avatar__initials {
     -fx-font-size: 12px;
     -fx-font-weight: 700;
-    -fx-text-fill: #1E293B;
+    -fx-text-fill: cursos-text-primary;
 }
 
-/* Variantes */
-.avatar--primary { -fx-background-color: #3FC2E8; }
+.avatar--primary { -fx-background-color: cursos-accent; }
 .avatar--primary .avatar__initials { -fx-text-fill: #ffffff; }
-
 .avatar--blue    { -fx-background-color: #b4c5ff; }
 .avatar--blue    .avatar__initials { -fx-text-fill: #00174b; }
-
 .avatar--cyan    { -fx-background-color: #7bd1fa; }
 .avatar--cyan    .avatar__initials { -fx-text-fill: #001e2b; }
-
 .avatar--grey    { -fx-background-color: #bfc8ce; }
 .avatar--grey    .avatar__initials { -fx-text-fill: #141d21; }
-
 .avatar--green   { -fx-background-color: #c0e8ff; }
 .avatar--green   .avatar__initials { -fx-text-fill: #001e2b; }
-
 .avatar--amber   { -fx-background-color: #dbe4ea; }
 .avatar--amber   .avatar__initials { -fx-text-fill: #141d21; }
-
 .avatar--teal    { -fx-background-color: #7ed4fd; }
 .avatar--teal    .avatar__initials { -fx-text-fill: #001e2b; }
-
 .avatar--course-red    { -fx-background-color: #FEE2E2; }
 .avatar--course-green  { -fx-background-color: #D1FAE5; }
 .avatar--course-purple { -fx-background-color: #EDE9FE; }
 .avatar--course-orange { -fx-background-color: #FEF3C7; }
 
-
-/* ──────────────────────────────────────────────────────
-   11. CARDS (Vista Detalle)
-────────────────────────────────────────────────────── */
-
+/* ── CARDS ───────────────────────────────────────────────── */
 .card {
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: cursos-surface;
     -fx-background-radius: 16px;
-    -fx-border-color: #E2E8F0;
+    -fx-border-color: cursos-border;
     -fx-border-radius: 16px;
     -fx-border-width: 1px;
-<<<<<<< HEAD:demo/src/main/resources/com/example/demo/styles/Cursos.css
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);
+    -fx-effect: dropshadow(gaussian, cursos-shadow, 8, 0, 0, 2);
     -fx-padding: 24 24 24 24;
-=======
--fx-padding: 24 24 24 24;
->>>>>>> 514a3e54e1212fbc2f52fc9b8654554dbadb4d6d:src/main/resources/css/Cursos.css
 }
-.card__title   { -fx-font-size: 16px; -fx-font-weight: 700; -fx-text-fill: #1E293B; }
-.card__subtitle { -fx-font-size: 12px; -fx-text-fill: #64748B; }
+.card__title   { -fx-font-size: 16px; -fx-font-weight: 700; -fx-text-fill: cursos-text-primary; }
+.card__subtitle { -fx-font-size: 12px; -fx-text-fill: cursos-text-muted; }
 
-/* Bento grid */
 .bento-grid { -fx-hgap: 24; -fx-vgap: 24; }
 
-/* Badge */
 .badge {
     -fx-font-size: 10px;
     -fx-font-weight: 700;
     -fx-padding: 4 10 4 10;
     -fx-background-radius: 24px;
 }
-.badge--surface { -fx-background-color: #E2E8F0; -fx-text-fill: #475569; }
+.badge--surface { -fx-background-color: cursos-border; -fx-text-fill: cursos-text-muted; }
 
-
-/* ──────────────────────────────────────────────────────
-   12. COURSE IMAGE (overview card)
-────────────────────────────────────────────────────── */
-
+/* ── COURSE IMAGE ────────────────────────────────────────── */
 .course-image-container {
     -fx-background-radius: 10px;
-    -fx-background-color: #CBD5E1;
+    -fx-background-color: cursos-border;
     -fx-pref-height: 192px;
     -fx-min-height: 192px;
     -fx-max-height: 192px;
@@ -611,13 +542,9 @@
 .caption-subtitle { -fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.82); }
 .caption-title    { -fx-font-size: 14px; -fx-font-weight: 700; -fx-text-fill: #ffffff; }
 
-
-/* ──────────────────────────────────────────────────────
-   13. STAT ROWS
-────────────────────────────────────────────────────── */
-
+/* ── STAT ROWS ───────────────────────────────────────────── */
 .stat-row {
-    -fx-background-color: #F8FAFC;
+    -fx-background-color: cursos-surface-hover;
     -fx-background-radius: 10px;
     -fx-padding: 10 14 10 14;
 }
@@ -627,51 +554,42 @@
     -fx-background-radius: 20px;
     -fx-alignment: CENTER;
 }
-.stat-icon--primary   { -fx-background-color: #3FC2E8; }
+.stat-icon--primary   { -fx-background-color: cursos-accent; }
 .stat-icon--secondary { -fx-background-color: #7ed4fd; }
-.stat-icon--neutral   { -fx-background-color: #E2E8F0; }
-.stat-label { -fx-font-size: 11px; -fx-text-fill: #64748B; }
-.stat-value { -fx-font-size: 14px; -fx-font-weight: 700; -fx-text-fill: #1E293B; }
+.stat-icon--neutral   { -fx-background-color: cursos-border; }
+.stat-label { -fx-font-size: 11px; -fx-text-fill: cursos-text-muted; }
+.stat-value { -fx-font-size: 14px; -fx-font-weight: 700; -fx-text-fill: cursos-text-primary; }
 
-
-/* ──────────────────────────────────────────────────────
-   14. TEACHER CARDS
-────────────────────────────────────────────────────── */
-
+/* ── TEACHER CARDS ───────────────────────────────────────── */
 .teacher-card {
     -fx-padding: 10 14 10 14;
     -fx-background-radius: 10px;
-    -fx-border-color: #F1F5F9;
+    -fx-border-color: cursos-border-light;
     -fx-border-radius: 10px;
     -fx-border-width: 1px;
     -fx-cursor: hand;
 }
 .teacher-card:hover { -fx-border-color: #b4c5ff; }
-.teacher-name    { -fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #1E293B; }
-.teacher-subject { -fx-font-size: 11px; -fx-text-fill: #64748B; }
+.teacher-name    { -fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: cursos-text-primary; }
+.teacher-subject { -fx-font-size: 11px; -fx-text-fill: cursos-text-muted; }
 
-
-/* ──────────────────────────────────────────────────────
-   15. STUDENTS CARD & TABLE
-────────────────────────────────────────────────────── */
-
+/* ── STUDENTS CARD & TABLE ───────────────────────────────── */
 .students-card { -fx-padding: 0; }
 
 .students-card__header {
     -fx-padding: 20 24 20 24;
-    -fx-border-color: #E2E8F0;
+    -fx-border-color: cursos-border;
     -fx-border-width: 0 0 1 0;
 }
 .students-card__footer {
     -fx-padding: 12 24 14 24;
-    -fx-border-color: #E2E8F0;
+    -fx-border-color: cursos-border;
     -fx-border-width: 1 0 0 0;
     -fx-alignment: CENTER;
 }
 
-/* View Toggle */
 .view-toggle {
-    -fx-background-color: #F1F5F9;
+    -fx-background-color: cursos-pagination-bg;
     -fx-background-radius: 8px;
     -fx-padding: 3 3 3 3;
 }
@@ -679,7 +597,7 @@
     -fx-background-color: transparent;
     -fx-background-radius: 6px;
     -fx-border-width: 0;
-    -fx-text-fill: #64748B;
+    -fx-text-fill: cursos-text-muted;
     -fx-font-size: 12px;
     -fx-font-weight: 500;
     -fx-padding: 4 12 4 12;
@@ -687,17 +605,13 @@
 }
 .view-toggle__btn--active,
 .view-toggle__btn:selected {
-    -fx-background-color: #FFFFFF;
-    -fx-text-fill: #1E293B;
+    -fx-background-color: cursos-surface;
+    -fx-text-fill: cursos-text-primary;
     -fx-font-weight: 700;
-<<<<<<< HEAD:demo/src/main/resources/com/example/demo/styles/Cursos.css
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.09), 3, 0, 0, 1);
-=======
->>>>>>> 514a3e54e1212fbc2f52fc9b8654554dbadb4d6d:src/main/resources/css/Cursos.css
+    -fx-effect: dropshadow(gaussian, cursos-shadow-heavy, 3, 0, 0, 1);
 }
-.view-toggle__btn:hover:selected { -fx-text-fill: #1E293B; }
+.view-toggle__btn:hover:selected { -fx-text-fill: cursos-text-primary; }
 
-/* Students TableView */
 .students-table {
     -fx-background-color: transparent;
     -fx-border-width: 0;
@@ -705,8 +619,8 @@
     -fx-padding: 0;
 }
 .students-table .column-header-background {
-    -fx-background-color: #F8FAFC;
-    -fx-border-color: #E2E8F0;
+    -fx-background-color: cursos-table-header-bg;
+    -fx-border-color: cursos-border;
     -fx-border-width: 0 0 1 0;
 }
 .students-table .column-header {
@@ -715,125 +629,124 @@
     -fx-padding: 10 24 10 24;
 }
 .students-table .column-header .label {
-    -fx-text-fill: #94A3B8;
+    -fx-text-fill: cursos-text-extra-muted;
     -fx-font-size: 11px;
     -fx-font-weight: 800;
 }
 .students-table .table-row-cell {
-    -fx-background-color: #FFFFFF;
-    -fx-border-color: #F1F5F9;
+    -fx-background-color: cursos-surface;
+    -fx-border-color: cursos-border-light;
     -fx-border-width: 0 0 1 0;
     -fx-pref-height: 60px;
 }
-.students-table .table-row-cell:hover    { -fx-background-color: #F8FAFC; }
-.students-table .table-row-cell:selected { -fx-background-color: #EEF2FF; }
+.students-table .table-row-cell:hover    { -fx-background-color: cursos-surface-hover; }
+.students-table .table-row-cell:selected { -fx-background-color: cursos-surface-active; }
 .students-table .table-cell {
     -fx-padding: 8 24 8 24;
     -fx-border-width: 0;
     -fx-alignment: CENTER_LEFT;
     -fx-font-size: 13px;
-    -fx-text-fill: #334155;
+    -fx-text-fill: cursos-text-secondary;
 }
 
-/* Cell labels */
-.cell-student-name  { -fx-font-size: 13px; -fx-font-weight: 700; -fx-text-fill: #1E293B; }
-.cell-student-email { -fx-font-size: 11px; -fx-text-fill: #64748B; }
-.cell-matricula     { -fx-font-size: 13px; -fx-text-fill: #334155; }
+.cell-student-name  { -fx-font-size: 13px; -fx-font-weight: 700; -fx-text-fill: cursos-text-primary; }
+.cell-student-email { -fx-font-size: 11px; -fx-text-fill: cursos-text-muted; }
+.cell-matricula     { -fx-font-size: 13px; -fx-text-fill: cursos-text-secondary; }
 
-/* Attendance bar */
 .attendance-bar {
     -fx-pref-width: 100px; -fx-max-width: 100px;
     -fx-pref-height: 6px;
     -fx-background-radius: 3px;
-    -fx-accent: #3FC2E8;
+    -fx-accent: cursos-accent;
 }
 .attendance-bar > .track {
-    -fx-background-color: #E2E8F0;
+    -fx-background-color: cursos-border;
     -fx-background-radius: 3px;
 }
 .attendance-bar > .bar {
-    -fx-background-color: #3FC2E8;
+    -fx-background-color: cursos-accent;
     -fx-background-radius: 3px;
     -fx-background-insets: 0;
     -fx-padding: 3px;
 }
-.attendance-bar--low > .bar { -fx-background-color: #EF4444; }
+.attendance-bar--low > .bar { -fx-background-color: cursos-danger; }
 
-.cell-attendance-pct     { -fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: #64748B; }
-.cell-attendance-pct--low { -fx-text-fill: #EF4444; }
+.cell-attendance-pct     { -fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: cursos-text-muted; }
+.cell-attendance-pct--low { -fx-text-fill: cursos-danger; }
 
-/* Action button */
 .btn-action-menu {
     -fx-background-color: transparent;
     -fx-border-width: 0;
-    -fx-text-fill: #94A3B8;
+    -fx-text-fill: cursos-text-extra-muted;
     -fx-font-size: 18px;
     -fx-padding: 2 6 2 6;
     -fx-cursor: hand;
     -fx-background-radius: 4px;
 }
-.btn-action-menu:hover { -fx-text-fill: #3FC2E8; -fx-background-color: #F1F5F9; }
+.btn-action-menu:hover { -fx-text-fill: cursos-accent; -fx-background-color: cursos-border-light; }
 
-
-/* ──────────────────────────────────────────────────────
-   16. MISC
-────────────────────────────────────────────────────── */
-
+/* ── MISC ────────────────────────────────────────────────── */
 .icon-label { -fx-font-size: 16px; }
 
-
-/* ──────────────────────────────────────────────────────
-   17. SVGPath ICONS
-────────────────────────────────────────────────────── */
-
-/* Icono nav normal (gris) */
+/* ── SVGPath ICONS ───────────────────────────────────────── */
 .nav-svg-icon {
-    -fx-fill: #64748B;
+    -fx-fill: cursos-text-muted;
     -fx-min-width: 20px;
     -fx-min-height: 20px;
 }
+.nav-svg-icon--active { -fx-fill: #ffffff; }
+.nav-item--active .nav-svg-icon { -fx-fill: #ffffff; }
+.nav-item:hover .nav-svg-icon { -fx-fill: cursos-accent; }
 
-/* Icono nav ítem activo (blanco) */
-.nav-svg-icon--active {
-    -fx-fill: #ffffff;
+.search-svg-icon { -fx-fill: cursos-text-extra-muted; }
+.btn-svg-icon { -fx-fill: cursos-text-muted; }
+.btn-svg-icon--white { -fx-fill: #ffffff; }
+.stat-svg-icon { -fx-fill: #ffffff; }
+.stat-svg-icon--dark { -fx-fill: cursos-text-muted; }
+
+/* ── LAUNCHER-SPECIFIC ───────────────────────────────────── */
+.launcher-titlebar {
+    -fx-background-color: cursos-surface;
+    -fx-padding: 0 12 0 16;
+    -fx-min-height: 36px;
+    -fx-pref-height: 36px;
+    -fx-border-color: cursos-border-light;
+    -fx-border-width: 0 0 1 0;
+}
+.launcher-titlebar__label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: cursos-text-muted;
+}
+.launcher-window-btn {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-min-width: 46px;
+    -fx-min-height: 32px;
+}
+.launcher-window-btn:hover { -fx-background-color: cursos-surface-hover; }
+.launcher-window-btn--close:hover { -fx-background-color: #e81123; }
+.launcher-window-btn--close:hover .launcher-icon { -fx-fill: #ffffff; }
+
+.launcher-header-actions {
+    -fx-spacing: 8;
+    -fx-padding: 0 24 0 0;
 }
 
-/* Cuando el HBox padre tiene nav-item--active, todos sus SVGPath se ponen blancos */
-.nav-item--active .nav-svg-icon {
-    -fx-fill: #ffffff;
+.launcher-toggle-btn {
+    -fx-background-color: cursos-input-bg;
+    -fx-background-radius: 8px;
+    -fx-border-color: cursos-input-border;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 6 12 6 12;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: cursos-text-muted;
 }
-
-/* Hover: el SVG hereda el color del hover del nav-item */
-.nav-item:hover .nav-svg-icon {
-    -fx-fill: #3FC2E8;
+.launcher-toggle-btn:hover {
+    -fx-background-color: cursos-surface-hover;
+    -fx-text-fill: cursos-accent;
+    -fx-border-color: cursos-accent;
 }
-
-/* Icono en la barra de búsqueda */
-.search-svg-icon {
-    -fx-fill: #94A3B8;
-}
-
-/* Icono en botones (outlined / primary) */
-.btn-svg-icon {
-    -fx-fill: #64748B;
-}
-.btn-svg-icon--white {
-    -fx-fill: #ffffff;
-}
-
-/* Iconos dentro de stat cards */
-.stat-svg-icon {
-    -fx-fill: #ffffff;
-}
-.stat-svg-icon--dark {
-    -fx-fill: #475569;
-}
-
-
-
-
-
-
-
-
-

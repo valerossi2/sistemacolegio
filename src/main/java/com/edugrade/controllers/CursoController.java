@@ -1,274 +1,224 @@
 package com.edugrade.controllers;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-
-import java.io.IOException;
-import java.util.Locale;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.util.Callback;
+import theme.ThemeManager;
+import util.LanguageManager;
 
 public class CursoController {
 
-    @FXML
-    private TextField searchField;
+    private static final String[] GRADOS = {"5to", "4to", "3ro", "2do", "1ro"};
+    private static final String[] ENCARGADOS = {"Prof. Laura Mendez", "Prof. Carlos Ruiz", "Prof. Elena Torres", "Prof. Ana Silva", "Prof. Miguel Soto"};
+    private static final String[] SECCIONES = {"E", "A", "B", "C", "A"};
+    private static final String[] ALUMNOS = {"32", "29", "31", "28", "35"};
+    private static final String[] RENDIMIENTOS = {"91%", "88%", "86%", "82%", "79%"};
 
-    @FXML
-    private Label lblTotalCursos;
+    @FXML private Text pageTitle;
+    @FXML private Text pageSubtitle;
+    @FXML private Label lblTotalCursos;
+    @FXML private Label lblPaginacion;
+    @FXML private TableView<CourseRow> cursosTable;
+    @FXML private TableColumn<CourseRow, String> colGrado;
+    @FXML private TableColumn<CourseRow, String> colEncargado;
+    @FXML private TableColumn<CourseRow, String> colSeccion;
+    @FXML private TableColumn<CourseRow, String> colAlumnos;
+    @FXML private TableColumn<CourseRow, String> colRendimiento;
+    @FXML private TableColumn<CourseRow, String> colEstado;
+    @FXML private Button filterTodos;
+    @FXML private Button filterActivos;
+    @FXML private Button btnPage1;
+    @FXML private Button btnPage2;
+    @FXML private Button btnPage3;
+    @FXML private Button btnPageNext;
 
-    @FXML
-    private Label lblPaginacion;
-
-    @FXML
-    private Label breadcrumbCursoActual;
-
-    @FXML
-    private Label pageTitle;
-
-    @FXML
-    private Label lblTutorPrincipal;
-
-    @FXML
-    private Label totalStudents;
-
-    @FXML
-    private Label totalTeachers;
-
-    @FXML
-    private Label assignedRoom;
-
-    @FXML
-    private Label studentsSubtitle;
-
-    @FXML
-    private ScrollPane vistaListaCursos;
-
-    @FXML
-    private ScrollPane vistaDetalleCurso;
-
-    @FXML
-    private TableView<CourseRow> cursosTable;
-
-    @FXML
-    private TableColumn<CourseRow, String> colGrado;
-
-    @FXML
-    private TableColumn<CourseRow, String> colEncargado;
-
-    @FXML
-    private TableColumn<CourseRow, String> colSeccion;
-
-    @FXML
-    private TableColumn<CourseRow, String> colAlumnos;
-
-    @FXML
-    private TableColumn<CourseRow, String> colRendimiento;
-
-    @FXML
-    private TableColumn<CourseRow, String> colEstado;
-
-    private final ObservableList<CourseRow> allCourses = FXCollections.observableArrayList(
-            new CourseRow("5to", "Prof. Laura Mendez", "E", "32", "91%", "Activo"),
-            new CourseRow("4to", "Prof. Carlos Ruiz", "A", "29", "88%", "Activo"),
-            new CourseRow("3ro", "Prof. Elena Torres", "B", "31", "86%", "Activo"),
-            new CourseRow("2do", "Prof. Ana Silva", "C", "28", "82%", "Activo"),
-            new CourseRow("1ro", "Prof. Miguel Soto", "A", "35", "79%", "Activo")
-    );
+    private final ObservableList<CourseRow> allCourses = FXCollections.observableArrayList();
+    private LanguageManager lang;
+    private ThemeManager theme;
 
     @FXML
     private void initialize() {
+        lang = LanguageManager.getInstance();
+        theme = new ThemeManager();
+
+        buildSampleData();
         configureCourseTable();
         cursosTable.setItems(allCourses);
+        updateTexts();
         updateCourseCount(allCourses.size());
 
-        cursosTable.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2 && cursosTable.getSelectionModel().getSelectedItem() != null) {
-                showCourseDetail(cursosTable.getSelectionModel().getSelectedItem());
-            }
+        lang.addListener(this::onLanguageChanged);
+    }
+
+    public void setThemeManager(ThemeManager theme) {
+        this.theme = theme;
+    }
+
+    private void onLanguageChanged() {
+        Platform.runLater(() -> {
+            updateTexts();
+            cursosTable.refresh();
         });
     }
 
-    @FXML
-    private void onSearch(KeyEvent event) {
-        String query = searchField.getText();
-        if (query == null || query.isBlank()) {
-            cursosTable.setItems(allCourses);
-            updateCourseCount(allCourses.size());
-            return;
-        }
-
-        String normalizedQuery = query.toLowerCase(Locale.ROOT);
-        ObservableList<CourseRow> filtered = allCourses.filtered(course ->
-                course.grado().toLowerCase(Locale.ROOT).contains(normalizedQuery)
-                        || course.encargado().toLowerCase(Locale.ROOT).contains(normalizedQuery)
-                        || course.seccion().toLowerCase(Locale.ROOT).contains(normalizedQuery)
-                        || course.estado().toLowerCase(Locale.ROOT).contains(normalizedQuery)
-        );
-        cursosTable.setItems(filtered);
-        updateCourseCount(filtered.size());
-    }
-
-    @FXML
-    private void onFilterTodos(ActionEvent event) {
-        cursosTable.setItems(allCourses);
+    private void updateTexts() {
+        pageTitle.setText(lang.get("courses.pageTitle", "Listado Completo de Cursos"));
+        pageSubtitle.setText(lang.get("courses.pageSubtitle", "Gestiona los cursos activos del instituto."));
+        filterTodos.setText(lang.get("courses.filterAll", "Todos"));
+        filterActivos.setText(lang.get("courses.filterActive", "Activos"));
+        colGrado.setText(lang.get("courses.colGrado", "Grado"));
+        colEncargado.setText(lang.get("courses.colEncargado", "Encargado"));
+        colSeccion.setText(lang.get("courses.colSeccion", "Sección"));
+        colAlumnos.setText(lang.get("courses.colAlumnos", "Alumnos"));
+        colRendimiento.setText(lang.get("courses.colRendimiento", "Rendimiento Promedio"));
+        colEstado.setText(lang.get("courses.colEstado", "Estado"));
         updateCourseCount(allCourses.size());
     }
 
-    @FXML
-    private void onFilterActivos(ActionEvent event) {
-        ObservableList<CourseRow> activeCourses = allCourses.filtered(course -> "Activo".equals(course.estado()));
-        cursosTable.setItems(activeCourses);
-        updateCourseCount(activeCourses.size());
+    private void buildSampleData() {
+        allCourses.clear();
+        for (int i = 0; i < GRADOS.length; i++) {
+            allCourses.add(new CourseRow(
+                    GRADOS[i],
+                    ENCARGADOS[i],
+                    SECCIONES[i],
+                    ALUMNOS[i],
+                    RENDIMIENTOS[i],
+                    "Activo"
+            ));
+        }
     }
 
     @FXML
-    private void onBreadcrumbCursos(MouseEvent event) {
-        vistaDetalleCurso.setVisible(false);
-        vistaDetalleCurso.setManaged(false);
-        vistaListaCursos.setVisible(true);
-        vistaListaCursos.setManaged(true);
+    private void onFilterTodos() {
+        cursosTable.setItems(allCourses);
+        updateCourseCount(allCourses.size());
+        filterTodos.getStyleClass().add("filter-pill--active");
+        filterActivos.getStyleClass().remove("filter-pill--active");
     }
 
     @FXML
-    private void onEditarCurso(ActionEvent event) {
-        showInfo("Editar curso", "La edicion de cursos todavia no esta implementada.");
+    private void onFilterActivos() {
+        ObservableList<CourseRow> active = allCourses.filtered(c -> "Activo".equals(c.estado()));
+        cursosTable.setItems(active);
+        updateCourseCount(active.size());
+        filterActivos.getStyleClass().add("filter-pill--active");
+        filterTodos.getStyleClass().remove("filter-pill--active");
     }
 
     @FXML
-    private void onImprimirReporte(ActionEvent event) {
-        showInfo("Reporte", "La impresion del reporte todavia no esta implementada.");
-    }
+    private void onPage1() { lblPaginacion.setText("Página 1"); }
 
     @FXML
-    private void onVerTodosDocentes(ActionEvent event) {
-        showInfo("Docentes", "La lista completa de docentes todavia no esta implementada.");
-    }
+    private void onPage2() { lblPaginacion.setText("Página 2"); }
 
     @FXML
-    private void onCargarMas(ActionEvent event) {
-        showInfo("Estudiantes", "No hay mas estudiantes para cargar en esta vista de ejemplo.");
-    }
+    private void onPage3() { lblPaginacion.setText("Página 3"); }
 
     @FXML
-    private void onPage1(ActionEvent event) {
-        lblPaginacion.setText("Mostrando pagina 1");
-    }
-
-    @FXML
-    private void onPage2(ActionEvent event) {
-        lblPaginacion.setText("Mostrando pagina 2");
-    }
-
-    @FXML
-    private void onPage3(ActionEvent event) {
-        lblPaginacion.setText("Mostrando pagina 3");
-    }
-
-    @FXML
-    private void onPageNext(ActionEvent event) {
-        lblPaginacion.setText("Mostrando pagina siguiente");
-    }
-
-    @FXML
-    private void onNavinicio(MouseEvent event) throws IOException {
-        navigate(event, "/fxml/Admin/AdminDashboard.fxml");
-    }
-
-    @FXML
-    private void onNavCursos(MouseEvent event) {
-        // Already on courses.
-    }
-
-    @FXML
-    private void onNavEstudiantes(MouseEvent event) throws IOException {
-        navigate(event, "/fxml/Admin/AdminEstudiantes.fxml");
-    }
-
-    @FXML
-    private void onNavHorario(MouseEvent event) throws IOException {
-        navigate(event, "/fxml/Admin/AdminHorario.fxml");
-    }
-
-    @FXML
-    private void onNavConfig(MouseEvent event) throws IOException {
-        navigate(event, "/fxml/Admin/AdminConfiguracion.fxml");
-    }
-
-    @FXML
-    private void onLogout(ActionEvent event) throws IOException {
-        navigate(event, "/fxml/Login.fxml");
-    }
+    private void onPageNext() { lblPaginacion.setText("Siguiente página"); }
 
     private void configureCourseTable() {
-        colGrado.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().grado()));
-        colEncargado.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().encargado()));
-        colSeccion.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().seccion()));
-        colAlumnos.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().alumnos()));
-        colRendimiento.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().rendimiento()));
-        colEstado.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().estado()));
+        colGrado.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().grado()));
+        colGrado.setCellFactory(styledCell("cell-grado"));
+
+        colEncargado.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().encargado()));
+        colEncargado.setCellFactory(styledCell("cell-teacher-name"));
+
+        colSeccion.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().seccion()));
+        colSeccion.setCellFactory(styledCell("cell-seccion"));
+
+        colAlumnos.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().alumnos()));
+        colAlumnos.setCellFactory(alumnosCell());
+
+        colRendimiento.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().rendimiento()));
+        colRendimiento.setCellFactory(styledCell("cell-rendimiento"));
+
+        colEstado.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().estado()));
+        colEstado.setCellFactory(statusCell());
     }
 
-    private void showCourseDetail(CourseRow course) {
-        vistaListaCursos.setVisible(false);
-        vistaListaCursos.setManaged(false);
-        vistaDetalleCurso.setVisible(true);
-        vistaDetalleCurso.setManaged(true);
+    private Callback<TableColumn<CourseRow, String>, TableCell<CourseRow, String>> styledCell(String styleClass) {
+        return col -> new TableCell<>() {
+            private final Label label = new Label();
+            {
+                label.getStyleClass().add(styleClass);
+                setGraphic(label);
+            }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    label.setText(null);
+                } else {
+                    label.setText(item);
+                }
+            }
+        };
+    }
 
-        String courseName = course.grado() + " " + course.seccion();
-        breadcrumbCursoActual.setText(courseName);
-        pageTitle.setText("Detalles del Curso: " + courseName);
-        lblTutorPrincipal.setText(course.encargado());
-        totalStudents.setText(course.alumnos());
-        totalTeachers.setText("8");
-        assignedRoom.setText("Pabellon B - Aula 204");
-        studentsSubtitle.setText(course.alumnos() + " alumnos inscritos en el ciclo actual");
+    private Callback<TableColumn<CourseRow, String>, TableCell<CourseRow, String>> alumnosCell() {
+        return col -> new TableCell<>() {
+            private final VBox box = new VBox(0);
+            private final Label count = new Label();
+            private final Label lbl = new Label();
+            {
+                count.getStyleClass().add("cell-alumnos-count");
+                lbl.getStyleClass().add("cell-alumnos-label");
+                box.getChildren().addAll(count, lbl);
+                setGraphic(box);
+            }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    count.setText(null);
+                    lbl.setText(null);
+                } else {
+                    count.setText(item);
+                    lbl.setText(lang.get("courses.studentsLabel", "Estudiantes"));
+                }
+            }
+        };
+    }
+
+    private Callback<TableColumn<CourseRow, String>, TableCell<CourseRow, String>> statusCell() {
+        return col -> new TableCell<>() {
+            private final Label label = new Label();
+            {
+                setGraphic(label);
+            }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    label.setText(null);
+                    label.getStyleClass().removeAll("status-pill", "status-pill--active", "status-pill--break");
+                } else {
+                    label.setText(item);
+                    label.getStyleClass().add("status-pill");
+                    if ("Activo".equals(item)) {
+                        label.getStyleClass().add("status-pill--active");
+                    } else {
+                        label.getStyleClass().add("status-pill--break");
+                    }
+                }
+            }
+        };
     }
 
     private void updateCourseCount(int count) {
-        lblTotalCursos.setText("Todos los Cursos(" + count + ")");
-        lblPaginacion.setText("Mostrando " + count + " de " + allCourses.size() + " cursos");
+        String pag = lang.get("courses.pagination", "Mostrando {0} de {1} cursos");
+        pag = pag.replace("{0}", String.valueOf(count)).replace("{1}", String.valueOf(allCourses.size()));
+        lblTotalCursos.setText(lang.get("courses.totalLabel", "Todos los Cursos ({0})").replace("{0}", String.valueOf(count)));
+        lblPaginacion.setText(pag);
     }
 
-    private void navigate(ActionEvent event, String resource) throws IOException {
-        navigate((Node) event.getSource(), resource);
-    }
-
-    private void navigate(MouseEvent event, String resource) throws IOException {
-        navigate((Node) event.getSource(), resource);
-    }
-
-    private void navigate(Node source, String resource) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource(resource));
-        source.getScene().setRoot(root);
-    }
-
-    private void showInfo(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private record CourseRow(
-            String grado,
-            String encargado,
-            String seccion,
-            String alumnos,
-            String rendimiento,
-            String estado
-    ) {
-    }
+    public record CourseRow(String grado, String encargado, String seccion, String alumnos, String rendimiento, String estado) {}
 }

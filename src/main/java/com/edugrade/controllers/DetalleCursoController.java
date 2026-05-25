@@ -107,6 +107,11 @@ public class DetalleCursoController {
         colMatricula.setCellValueFactory(new PropertyValueFactory<>("matricula"));
         colAsistencia.setCellValueFactory(new PropertyValueFactory<>("status"));
         colAsistencia.setCellFactory(col -> new TableCell<StudentRow, String>() {
+            private final Button btn = new Button();
+            {
+                btn.getStyleClass().add("attendance-btn");
+            }
+
             @Override
             protected void updateItem(String status, boolean empty) {
                 super.updateItem(status, empty);
@@ -114,8 +119,9 @@ public class DetalleCursoController {
                     setGraphic(null);
                     setText(null);
                 } else {
-                    Button btn = new Button();
-                    btn.getStyleClass().add("attendance-btn");
+                    btn.getStyleClass().removeAll(
+                        "attendance-btn--presente", "attendance-btn--ausente", "attendance-btn--excusa"
+                    );
                     switch (status) {
                         case "presente" -> {
                             btn.setText("Presente");

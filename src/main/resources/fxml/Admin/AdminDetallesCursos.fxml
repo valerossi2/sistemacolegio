@@ -38,7 +38,8 @@
                     <Label text="›" styleClass="breadcrumb__separator"/>
                     <Label fx:id="breadcrumbCursoActual"
                            text="5to E"
-                           styleClass="breadcrumb__current"/>
+                           styleClass="breadcrumb__current breadcrumb__link"
+                           onMouseClicked="#onBreadcrumbCursoActual"/>
                 </HBox>
                 <Label fx:id="pageTitle"
                        text="Detalles del Curso: 5to E"

@@ -1,6 +1,8 @@
 package com.edugrade.controllers;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -10,6 +12,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
@@ -57,6 +61,20 @@ public class DetalleCursoController {
     @FXML private TableColumn<StudentRow, String> colMatricula;
     @FXML private TableColumn<StudentRow, String> colAsistencia;
     @FXML private Button btnLoadMore;
+
+    private CursoController.CourseRow currentCourse;
+    private List<CursoController.CourseRow> allCourses;
+    private Consumer<CursoController.CourseRow> navigateToCourse;
+
+    public void setCourse(CursoController.CourseRow course, List<CursoController.CourseRow> allCourses,
+                          Consumer<CursoController.CourseRow> navigator) {
+        this.currentCourse = course;
+        this.allCourses = allCourses;
+        this.navigateToCourse = navigator;
+        String label = course.grado() + " " + course.seccion();
+        breadcrumbCursoActual.setText(label);
+        pageTitle.setText(lang.get("detalle.pageTitle", "Detalles del Curso") + ": " + label);
+    }
 
     @FXML
     private void initialize() {
@@ -256,6 +274,30 @@ public class DetalleCursoController {
 
     @FXML
     private void onBreadcrumbCursos(MouseEvent event) {
+        if (allCourses != null && !allCourses.isEmpty())
+            showCourseMenu(event);
+    }
+
+    @FXML
+    private void onBreadcrumbCursoActual(MouseEvent event) {
+        if (allCourses != null && !allCourses.isEmpty())
+            showCourseMenu(event);
+    }
+
+    private void showCourseMenu(MouseEvent event) {
+        ContextMenu menu = new ContextMenu();
+        for (CursoController.CourseRow c : allCourses) {
+            String name = c.grado() + " " + c.seccion();
+            MenuItem item = new MenuItem(name);
+            if (currentCourse != null && name.equals(currentCourse.grado() + " " + currentCourse.seccion()))
+                item.setDisable(true);
+            item.setOnAction(e -> {
+                if (navigateToCourse != null)
+                    navigateToCourse.accept(c);
+            });
+            menu.getItems().add(item);
+        }
+        menu.show(((Node) event.getSource()), Side.BOTTOM, 0, 0);
     }
 
     @FXML

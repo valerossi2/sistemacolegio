@@ -428,6 +428,8 @@ public class CursoController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Admin/AdminDetallesCursos.fxml"));
             Node detailView = loader.load();
+            DetalleCursoController ctrl = loader.getController();
+            ctrl.setCourse(course, allCourses, this::handleVerDetalles);
             cursosCard.getChildren().setAll(detailView);
         } catch (IOException e) {
             e.printStackTrace();

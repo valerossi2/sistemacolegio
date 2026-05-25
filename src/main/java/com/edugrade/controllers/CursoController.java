@@ -5,8 +5,10 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -422,17 +424,13 @@ public class CursoController {
     }
 
     private void handleVerDetalles(CourseRow course) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(lang.get("courses.detallesTitle", "Detalles del Curso"));
-        alert.setHeaderText(course.grado() + " " + lang.get("courses.colSeccion", "SECCIÓN") + " " + course.seccion());
-        alert.setContentText(
-            lang.get("courses.colGrado", "Grado") + ": " + course.grado()
-            + "\n" + lang.get("courses.colEncargado", "Encargado") + ": " + NAMES[course.teacherIdx()] + " " + SURNAMES[course.teacherIdx()]
-            + "\n" + lang.get("courses.colAlumnos", "Alumnos") + ": " + course.alumnos()
-            + "\n" + lang.get("courses.colRendimiento", "Rendimiento Promedio") + ": " + course.rendimiento()
-            + "\n" + lang.get("courses.colEstado", "Estado") + ": " + course.estado()
-        );
-        alert.showAndWait();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Admin/AdminDetallesCursos.fxml"));
+            Node detailView = loader.load();
+            cursosCard.getChildren().setAll(detailView);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateCourseCount(int count) {

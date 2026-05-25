@@ -9,7 +9,7 @@
 <HBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.edugrade.controller.AsistenciaController"
-      stylesheets="@asistencia_styles.css"
+      stylesheets="@Asistencia_styles.css"
       styleClass="root-container">
 
     <!-- ═══════════════════════════════════════════
@@ -166,30 +166,14 @@
 
                         <HBox styleClass="selector-card" alignment="CENTER_LEFT" spacing="6">
                             <Label text="Grado:" styleClass="selector-label"/>
-                            <ComboBox fx:id="gradeSelector" styleClass="selector-combo">
-                                <items>
-                                    <javafx.collections.FXCollections fx:factory="observableArrayList">
-                                        <String fx:value="5to"/>
-                                        <String fx:value="4to"/>
-                                        <String fx:value="3ro"/>
-                                    </javafx.collections.FXCollections>
-                                </items>
-                                <value><String fx:value="5to"/></value>
-                            </ComboBox>
+                            <ComboBox fx:id="gradeSelector" styleClass="selector-combo"/>
+
                         </HBox>
 
                         <HBox styleClass="selector-card" alignment="CENTER_LEFT" spacing="6">
                             <Label text="Sección:" styleClass="selector-label"/>
-                            <ComboBox fx:id="sectionSelector" styleClass="selector-combo">
-                                <items>
-                                    <javafx.collections.FXCollections fx:factory="observableArrayList">
-                                        <String fx:value="E"/>
-                                        <String fx:value="A"/>
-                                        <String fx:value="B"/>
-                                    </javafx.collections.FXCollections>
-                                </items>
-                                <value><String fx:value="E"/></value>
-                            </ComboBox>
+                            <ComboBox fx:id="sectionSelector" styleClass="selector-combo"/>
+
                         </HBox>
 
                     </HBox>

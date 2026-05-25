@@ -33,8 +33,7 @@
                 <HBox spacing="6" alignment="CENTER_LEFT">
                     <Label fx:id="breadcrumbCursos"
                            text="Cursos"
-                           styleClass="breadcrumb__parent breadcrumb__link"
-                           onMouseClicked="#onBreadcrumbCursos"/>
+                           styleClass="breadcrumb__parent breadcrumb__link"/>
                     <Label text="›" styleClass="breadcrumb__separator"/>
                     <Label fx:id="breadcrumbCursoActual"
                            text="5to E"

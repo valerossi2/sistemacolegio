@@ -44,11 +44,19 @@ public class DetalleCursoController {
         lang = LanguageManager.getInstance();
         theme = ThemeManager.getInstance();
 
+        loadStylesheets();
         updateTexts();
         applyTheme();
 
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);
+    }
+
+    private void loadStylesheets() {
+        var baseUrl = getClass().getResource("/css/base.css");
+        var detalleUrl = getClass().getResource("/css/DetallesCurso.css");
+        if (baseUrl != null) root.getStylesheets().add(baseUrl.toExternalForm());
+        if (detalleUrl != null) root.getStylesheets().add(detalleUrl.toExternalForm());
     }
 
     private void onLanguageChanged() {

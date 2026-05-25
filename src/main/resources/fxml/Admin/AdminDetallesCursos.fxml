@@ -18,7 +18,6 @@
             fx:controller="com.edugrade.controllers.DetalleCursoController"
             fx:id="vistaDetalleCurso"
             styleClass="main-scroll-pane"
-            stylesheets="@../../css/base.css,@../../css/DetallesCurso.css"
             fitToWidth="true"
             hbarPolicy="NEVER"
             vbarPolicy="AS_NEEDED">

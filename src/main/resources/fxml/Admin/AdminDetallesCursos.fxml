@@ -171,6 +171,9 @@
                     <TableView fx:id="teacherTable"
                                styleClass="teacher-table"
                                VBox.vgrow="NEVER">
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                        </columnResizePolicy>
                         <columns>
                             <TableColumn fx:id="colTeacherName" text="DOCENTE" prefWidth="220"/>
                             <TableColumn fx:id="colTeacherSubject" text="MATERIA" prefWidth="220"/>

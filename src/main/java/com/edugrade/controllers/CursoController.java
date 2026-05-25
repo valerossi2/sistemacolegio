@@ -51,6 +51,8 @@ public class CursoController {
 
     @FXML private VBox cursosRoot;
     @FXML private VBox cursosCard;
+    @FXML private VBox headerBox;
+    @FXML private HBox countBox;
     @FXML private Text pageTitle;
     @FXML private Text pageSubtitle;
     @FXML private Label lblTotalCursos;
@@ -62,6 +64,12 @@ public class CursoController {
     @FXML private TableColumn<CourseRow, String> colRendimiento;
     @FXML private TableColumn<CourseRow, String> colEstado;
     @FXML private TableColumn<CourseRow, String> colAcciones;
+
+    private static final Insets HEADER_PADDING_DEFAULT = new Insets(32, 40, 0, 40);
+    private static final Insets HEADER_PADDING_COMPACT = new Insets(16, 16, 0, 16);
+    private static final Insets COUNT_PADDING_DEFAULT = new Insets(24, 40, 16, 40);
+    private static final Insets COUNT_PADDING_COMPACT = new Insets(12, 16, 8, 16);
+    private static final double COMPACT_THRESHOLD = 700;
 
     private final ObservableList<CourseRow> allCourses = FXCollections.observableArrayList();
 
@@ -82,8 +90,27 @@ public class CursoController {
                 cursosRoot.minHeightProperty().bind(sp.viewportBoundsProperty().map(b -> b.getHeight()));
         }));
 
+        setupResponsive();
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);
+    }
+
+    private void setupResponsive() {
+        cursosRoot.widthProperty().addListener((obs, oldVal, newVal) -> {
+            double w = newVal.doubleValue();
+            boolean compact = w < COMPACT_THRESHOLD;
+            boolean wasCompact = oldVal.doubleValue() < COMPACT_THRESHOLD;
+            if (compact == wasCompact) return;
+            if (compact) {
+                cursosRoot.getStyleClass().add("cursos-compact");
+                headerBox.setPadding(HEADER_PADDING_COMPACT);
+                countBox.setPadding(COUNT_PADDING_COMPACT);
+            } else {
+                cursosRoot.getStyleClass().remove("cursos-compact");
+                headerBox.setPadding(HEADER_PADDING_DEFAULT);
+                countBox.setPadding(COUNT_PADDING_DEFAULT);
+            }
+        });
     }
 
     private void onLanguageChanged() {

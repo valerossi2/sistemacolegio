@@ -16,13 +16,13 @@
       stylesheets="@../../css/base.css,@../../css/Cursos.css">
 
     <VBox fx:id="maestrosCard" styleClass="cursos-card" VBox.vgrow="ALWAYS" spacing="0">
-        <VBox spacing="6">
+        <VBox fx:id="headerBox" spacing="6">
             <padding><Insets top="32" right="40" bottom="0" left="40"/></padding>
             <Text fx:id="pageTitle" text="Listado de Profesores" styleClass="cursos-page-title" />
             <Text fx:id="pageSubtitle" text="Gestiona los profesores activos del instituto." styleClass="cursos-page-subtitle" />
         </VBox>
 
-        <HBox alignment="CENTER_LEFT">
+        <HBox fx:id="countBox" alignment="CENTER_LEFT">
             <padding><Insets top="24" right="40" bottom="16" left="40"/></padding>
             <Label fx:id="lblTotalMaestros" text="Todos los Profesores (5)" styleClass="cursos-card__title" />
         </HBox>

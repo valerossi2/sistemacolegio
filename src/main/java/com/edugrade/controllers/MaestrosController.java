@@ -31,6 +31,8 @@ public class MaestrosController {
 
     @FXML private VBox root;
     @FXML private VBox maestrosCard;
+    @FXML private VBox headerBox;
+    @FXML private HBox countBox;
     @FXML private Text pageTitle;
     @FXML private Text pageSubtitle;
     @FXML private Label lblTotalMaestros;
@@ -41,6 +43,12 @@ public class MaestrosController {
     @FXML private TableColumn<TeacherRow, String> colSeccion;
     @FXML private TableColumn<TeacherRow, String> colEstado;
     @FXML private TableColumn<TeacherRow, String> colAcciones;
+
+    private static final Insets HEADER_PADDING_DEFAULT = new Insets(32, 40, 0, 40);
+    private static final Insets HEADER_PADDING_COMPACT = new Insets(16, 16, 0, 16);
+    private static final Insets COUNT_PADDING_DEFAULT = new Insets(24, 40, 16, 40);
+    private static final Insets COUNT_PADDING_COMPACT = new Insets(12, 16, 8, 16);
+    private static final double COMPACT_THRESHOLD = 700;
 
     private final ObservableList<TeacherRow> allTeachers = FXCollections.observableArrayList(
         new TeacherRow("Prof. Laura Méndez", "laura.mendez@edu.com", "Matemáticas", "5to E", "Activo", 0),
@@ -73,8 +81,27 @@ public class MaestrosController {
                 root.minHeightProperty().bind(sp.viewportBoundsProperty().map(b -> b.getHeight()));
         }));
 
+        setupResponsive();
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);
+    }
+
+    private void setupResponsive() {
+        root.widthProperty().addListener((obs, oldVal, newVal) -> {
+            double w = newVal.doubleValue();
+            boolean compact = w < COMPACT_THRESHOLD;
+            boolean wasCompact = oldVal.doubleValue() < COMPACT_THRESHOLD;
+            if (compact == wasCompact) return;
+            if (compact) {
+                root.getStyleClass().add("cursos-compact");
+                headerBox.setPadding(HEADER_PADDING_COMPACT);
+                countBox.setPadding(COUNT_PADDING_COMPACT);
+            } else {
+                root.getStyleClass().remove("cursos-compact");
+                headerBox.setPadding(HEADER_PADDING_DEFAULT);
+                countBox.setPadding(COUNT_PADDING_DEFAULT);
+            }
+        });
     }
 
     private void onLanguageChanged() {

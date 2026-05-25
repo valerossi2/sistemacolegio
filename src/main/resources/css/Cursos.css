@@ -27,6 +27,7 @@
 /* ── MAIN CARD ───────────────────────────────────────────── */
 .cursos-card {
     -fx-spacing: 0;
+    -fx-padding: 0 0 150 0;
 }
 .cursos-card-dark {
 }
@@ -233,4 +234,62 @@
 }
 .cursos-root-dark .cursos-placeholder {
     -fx-text-fill: #64748B;
+}
+
+/* ── COMPACT (RESPONSIVE) ──────────────────────────────── */
+.cursos-root.cursos-compact {
+    -fx-font-size: 12px;
+}
+.cursos-compact .cursos-page-title {
+    -fx-font-size: 15px;
+}
+.cursos-compact .cursos-page-subtitle {
+    -fx-font-size: 11px;
+}
+.cursos-compact .cursos-card__title {
+    -fx-font-size: 12px;
+}
+.cursos-compact .cursos-card {
+    -fx-padding: 0 0 12 0;
+}
+.cursos-compact .cursos-table .column-header .label {
+    -fx-font-size: 10px;
+}
+.cursos-compact .cursos-table .table-row-cell {
+    -fx-pref-height: 44px;
+    -fx-cell-size: 44px;
+}
+.cursos-compact .cursos-table .table-cell {
+    -fx-font-size: 12px;
+}
+.cursos-compact .cell-grado {
+    -fx-font-size: 12px;
+}
+.cursos-compact .cell-seccion {
+    -fx-font-size: 12px;
+}
+.cursos-compact .cell-rendimiento {
+    -fx-font-size: 12px;
+}
+.cursos-compact .cell-encargado-name {
+    -fx-font-size: 12px;
+}
+.cursos-compact .cell-encargado-surname {
+    -fx-font-size: 11px;
+}
+.cursos-compact .cell-alumnos-count {
+    -fx-font-size: 12px;
+}
+.cursos-compact .cell-alumnos-label {
+    -fx-font-size: 11px;
+}
+.cursos-compact .btn-ver-detalles {
+    -fx-font-size: 12px;
+    -fx-padding: 6 12 6 12;
+    -fx-min-width: 80px;
+}
+.cursos-compact .status-pill {
+    -fx-font-size: 11px;
+    -fx-min-width: 70px;
+    -fx-min-height: 20px;
 }

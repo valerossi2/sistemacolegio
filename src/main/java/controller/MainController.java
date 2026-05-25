@@ -287,7 +287,12 @@ public class MainController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Node view = loader.load();
-            setCenterView(view);
+            boolean noOuterScroll = fxmlPath.contains("AdminMaestros") || fxmlPath.contains("AdminCursos");
+            if (noOuterScroll) {
+                setCenterViewDirect(view);
+            } else {
+                setCenterView(view);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -335,6 +340,22 @@ public class MainController {
         sp.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent; -fx-padding: 0;");
         sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         sp.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        
+        StackPane container = new StackPane(node);
+        container.setAlignment(Pos.TOP_LEFT);
+        container.setStyle("-fx-background-color: transparent;");
+        sp.setContent(container);
+        
+        centerWrapper.getChildren().setAll(sp);
+    }
+
+    private void setCenterViewDirect(Node node) {
+        ScrollPane sp = new ScrollPane();
+        sp.setFitToWidth(true);
+        sp.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent; -fx-padding: 0;");
+        sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        sp.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        sp.setVvalue(0.0);
         
         StackPane container = new StackPane(node);
         container.setAlignment(Pos.TOP_LEFT);

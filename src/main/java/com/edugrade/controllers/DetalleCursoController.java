@@ -61,8 +61,12 @@ public class DetalleCursoController {
 
     private void applyTheme() {
         boolean dark = theme.isDark();
+        root.getStyleClass().removeAll("root-dark");
         courseOverviewCard.getStyleClass().removeAll("cursos-card-dark");
-        if (dark) courseOverviewCard.getStyleClass().add("cursos-card-dark");
+        if (dark) {
+            root.getStyleClass().add("root-dark");
+            courseOverviewCard.getStyleClass().add("cursos-card-dark");
+        }
     }
 
     private void updateTexts() {

@@ -276,17 +276,17 @@ public class MainController {
         } else if (index == 3) {
             loadView("/fxml/Admin/AdminCursos.fxml");
         } else if (index == 4) {
-<<<<<<< HEAD
+
             AdminAttendanceView attendanceView = new AdminAttendanceView(theme);
             attendanceView.attachSearchField(searchField);
             setCenterView(attendanceView.getView());
         } else if (index == 6) {
-            controller.Configuracion config = new controller.Configuracion(theme);
-=======
+            controller.Configuracion config = new controller.Configuracion();
+
             loadView("/fxml/Admin/AdminHorario.fxml");
         } else if (index == 5) {
             controller.Configuracion config = new controller.Configuracion();
->>>>>>> 9e419ed6b52f1f5ffc09d3d4091fbd66dbb9a369
+
             config.setOwnerStage(stage);
             setCenterView(config.getView());
         }

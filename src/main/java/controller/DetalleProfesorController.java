@@ -1,8 +1,5 @@
-package com.lumina.controller;
+package controller;
 
-import com.lumina.model.AsistenciaRecord;
-import com.lumina.model.Profesor;
-import com.lumina.model.Profesor.Genero;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -41,11 +38,11 @@ public class DetalleProfesorController implements Initializable {
     @FXML private Label         professorName;
     @FXML private Label         professorSubject;
 
-    @FXML private TableView<AsistenciaRecord>   attendanceTable;
-    @FXML private TableColumn<AsistenciaRecord, String> colFecha;
-    @FXML private TableColumn<AsistenciaRecord, String> colEntrada;
-    @FXML private TableColumn<AsistenciaRecord, String> colSalida;
-    @FXML private TableColumn<AsistenciaRecord, String> colEstado;
+    @FXML private TableView<Asistencia>   attendanceTable;
+    @FXML private TableColumn<Asistencia, String> colFecha;
+    @FXML private TableColumn<Asistencia, String> colEntrada;
+    @FXML private TableColumn<Asistencia, String> colSalida;
+    @FXML private TableColumn<Asistencia, String> colEstado;
 
     // ─────────────────────── SVG Path Constants ────────────────────────────
 
@@ -75,8 +72,9 @@ public class DetalleProfesorController implements Initializable {
         // the stage is shown (e.g. from a list controller).
         Profesor demo = new Profesor(
                 "Dr. Roberto Sánchez",
+
                 "Profesor de Matemáticas y Cálculo",
-                Genero.MASCULINO
+                Profesor.Genero.MASCULINO
         );
         loadProfesor(demo);
         setupAttendanceTable();
@@ -107,12 +105,12 @@ public class DetalleProfesorController implements Initializable {
      * Creates a gender-appropriate SVGPath node and injects it into the
      * circular {@code avatarContainer} StackPane declared in the FXML.
      *
-     * @param genero  {@link Genero#MASCULINO} or {@link Genero#FEMENINO}
+     * @param genero  {@link Profesor.Genero#MASCULINO} or {@link Profesor.Genero#FEMENINO}
      */
-    private void injectAvatarSVG(Genero genero) {
+    private void injectAvatarSVG(Profesor.Genero genero) {
         SVGPath avatar = new SVGPath();
 
-        if (genero == Genero.FEMENINO) {
+        if (genero == Profesor.Genero.FEMENINO) {
             avatar.setContent(SVG_FEMALE);
             avatar.getStyleClass().add("avatar-svg-female");
         } else {
@@ -207,10 +205,10 @@ public class DetalleProfesorController implements Initializable {
 
     private void loadSampleAttendance() {
         attendanceTable.getItems().addAll(
-            new AsistenciaRecord("14/05/2024", "08:55 AM", "01:45 PM", "Presente"),
-            new AsistenciaRecord("13/05/2024", "09:00 AM", "01:30 PM", "Presente"),
-            new AsistenciaRecord("10/05/2024", "08:58 AM", "01:40 PM", "Presente"),
-            new AsistenciaRecord("09/05/2024", "09:15 AM", "01:35 PM", "Tardanza")
+            new Asistencia("14/05/2024", "08:55 AM", "01:45 PM", "Presente"),
+            new Asistencia("13/05/2024", "09:00 AM", "01:30 PM", "Presente"),
+            new Asistencia("10/05/2024", "08:58 AM", "01:40 PM", "Presente"),
+            new Asistencia("09/05/2024", "09:15 AM", "01:35 PM", "Tardanza")
         );
     }
 
@@ -258,15 +256,15 @@ class Profesor {
 // File: com/lumina/model/AsistenciaRecord.java
 // ─────────────────────────────────────────────────────────────────────────────
 
-class AsistenciaRecord {
+class Asistencia {
 
     private final String fecha;
     private final String horaEntrada;
     private final String horaSalida;
     private final String estado;
 
-    public AsistenciaRecord(String fecha, String horaEntrada,
-                             String horaSalida, String estado) {
+    public Asistencia(String fecha, String horaEntrada,
+                       String horaSalida, String estado) {
         this.fecha       = fecha;
         this.horaEntrada = horaEntrada;
         this.horaSalida  = horaSalida;

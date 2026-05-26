@@ -192,12 +192,13 @@ public class MainController {
 
     private void setupNavigation() {
         LanguageManager lang = LanguageManager.getInstance();
-        String[] navKeys = {"sidebar.home", "sidebar.students", "sidebar.teachers", "sidebar.courses", "sidebar.schedule", "sidebar.settings"};
+        String[] navKeys = {"sidebar.home", "sidebar.students", "sidebar.teachers", "sidebar.courses", "sidebar.attendance", "sidebar.schedule", "sidebar.settings"};
         String[][] items = {
             {lang.get("sidebar.home"), ICON_HOME},
             {lang.get("sidebar.students"), ICON_SCHOOL},
             {lang.get("sidebar.teachers"), ICON_GROUP},
             {lang.get("sidebar.courses"), ICON_BOOK},
+            {lang.get("sidebar.attendance"), ICON_CHECK_CIRCLE},
             {lang.get("sidebar.schedule"), ICON_CALENDAR},
             {lang.get("sidebar.settings"), ICON_SETTINGS}
         };
@@ -276,7 +277,11 @@ public class MainController {
             loadView("/fxml/Admin/AdminMaestros.fxml");
         } else if (index == 3) {
             loadView("/fxml/Admin/AdminCursos.fxml");
-        } else if (index == 5) {
+        } else if (index == 4) {
+            AdminAttendanceView attendanceView = new AdminAttendanceView(theme);
+            attendanceView.attachSearchField(searchField);
+            setCenterView(attendanceView.getView());
+        } else if (index == 6) {
             controller.Configuracion config = new controller.Configuracion(theme);
             config.setOwnerStage(stage);
             setCenterView(config.getView());
@@ -958,7 +963,7 @@ public class MainController {
         btnAll.setText(lang.get("course.viewAll"));
         searchField.setPromptText(lang.get("search.prompt"));
         // Update sidebar labels
-        String[] navKeys = {"sidebar.home", "sidebar.students", "sidebar.teachers", "sidebar.courses", "sidebar.schedule", "sidebar.settings"};
+        String[] navKeys = {"sidebar.home", "sidebar.students", "sidebar.teachers", "sidebar.courses", "sidebar.attendance", "sidebar.schedule", "sidebar.settings"};
         for (int i = 0; i < navLabelList.size() && i < navKeys.length; i++) {
             navLabelList.get(i).setText(lang.get(navKeys[i]));
         }

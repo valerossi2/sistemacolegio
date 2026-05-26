@@ -1,5 +1,6 @@
 package com.edugrade.controllers;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
@@ -76,12 +77,14 @@ public class DetalleCursoController {
     private CursoController.CourseRow currentCourse;
     private List<CursoController.CourseRow> allCourses;
     private Consumer<CursoController.CourseRow> navigateToCourse;
+    private Runnable onBackToList;
 
     public void setCourse(CursoController.CourseRow course, List<CursoController.CourseRow> allCourses,
-                          Consumer<CursoController.CourseRow> navigator) {
+                          Consumer<CursoController.CourseRow> navigator, Runnable onBackToList) {
         this.currentCourse = course;
         this.allCourses = allCourses;
         this.navigateToCourse = navigator;
+        this.onBackToList = onBackToList;
         String label = course.grado() + " " + course.seccion();
         breadcrumbCursoActual.setText(label);
         pageTitle.setText(lang.get("detalle.pageTitle", "Detalles del Curso") + ": " + label);
@@ -424,8 +427,8 @@ public class DetalleCursoController {
 
     @FXML
     private void onBreadcrumbCursos(MouseEvent event) {
-        if (allCourses != null && !allCourses.isEmpty())
-            showCourseMenu(event);
+        if (onBackToList != null)
+            onBackToList.run();
     }
 
     @FXML

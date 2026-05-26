@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -443,12 +444,17 @@ public class CursoController {
         };
     }
 
+    private final List<Node> cursosCardChildren = new java.util.ArrayList<>();
+
     private void handleVerDetalles(CourseRow course) {
         try {
+            if (cursosCardChildren.isEmpty())
+                cursosCardChildren.addAll(cursosCard.getChildren());
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Admin/AdminDetallesCursos.fxml"));
             Node detailView = loader.load();
             DetalleCursoController ctrl = loader.getController();
-            ctrl.setCourse(course, allCourses, this::handleVerDetalles);
+            ctrl.setCourse(course, allCourses, this::handleVerDetalles, () ->
+                cursosCard.getChildren().setAll(cursosCardChildren));
             cursosCard.getChildren().setAll(detailView);
         } catch (IOException e) {
             e.printStackTrace();

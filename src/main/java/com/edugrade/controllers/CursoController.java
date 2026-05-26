@@ -1,6 +1,5 @@
 package com.edugrade.controllers;
 
-import config.Hibernate_config;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -25,8 +24,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
-import model.Curso;
-import org.hibernate.Session;
 import theme.ThemeManager;
 import util.LanguageManager;
 
@@ -180,22 +177,6 @@ public class CursoController {
     private void buildSampleData() {
         allCourses.clear();
         var rng = ThreadLocalRandom.current();
-        try (Session s = Hibernate_config.getSessionFactory().openSession()) {
-            var list = s.createQuery("FROM Curso c JOIN FETCH c.seccion sec JOIN FETCH sec.grado g JOIN FETCH c.materia", Curso.class).list();
-            int idx = 0;
-            for (Curso c : list) {
-                String gradoNombre = c.getSeccion().getGrado().getNombre();
-                String seccionNombre = c.getSeccion().getNombre();
-                int alumnos = rng.nextInt(1, 41);
-                int profesores = rng.nextInt(1, 10);
-                allCourses.add(new CourseRow(c.getId(), gradoNombre, idx % 8, seccionNombre, alumnos, profesores, 0, "En clase"));
-                idx++;
-            }
-            if (!allCourses.isEmpty()) return;
-        } catch (Exception e) {
-            System.err.println("Error cargando cursos desde DB: " + e.getMessage());
-        }
-
         String[] grados = {"1ro","2do","3ro","4to","5to","6to"};
         String[] secciones = {"A","B","C","D","E"};
         String[] estados = {"En clase","Descanso"};

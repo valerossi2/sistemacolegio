@@ -91,7 +91,7 @@ public class MainController {
     private final List<Text> scheduleDetList = new ArrayList<>();
     private final List<Rectangle> perfBarsList = new ArrayList<>();
     private final List<Text> perfBarLabelList = new ArrayList<>();
-    private final int[] perfOriginalHeights = new int[6];
+    private int[] perfOriginalHeights;
     private int selectedPerfBar = -1;
     private int defaultHighlightBar = -1;
     private static final int PERF_BAR_GROW = 6;
@@ -752,6 +752,25 @@ public class MainController {
         return row;
     }
 
+    private record CoursePerf(String name, double score) {}
+
+    private List<CoursePerf> getTopCourses() {
+        return List.of(
+            new CoursePerf("IA", 9.2),
+            new CoursePerf("UX/UI", 8.8),
+            new CoursePerf("Literatura", 8.5),
+            new CoursePerf("Redes", 8.3),
+            new CoursePerf("BDatos", 8.1),
+            new CoursePerf("Calculo", 7.8),
+            new CoursePerf("Fisica", 7.6),
+            new CoursePerf("Historia", 7.4),
+            new CoursePerf("Quimica", 7.1),
+            new CoursePerf("Ingles", 6.9),
+            new CoursePerf("Deporte", 6.5),
+            new CoursePerf("Arte", 6.2)
+        ).stream().sorted((a, b) -> Double.compare(b.score, a.score)).toList();
+    }
+
     private void setupPerformancePanel() {
         HBox head = new HBox();
         perfTitleText = new Text(LanguageManager.getInstance().get("performance.title"));
@@ -770,51 +789,42 @@ public class MainController {
         perfSubText.setFont(Font.font("Plus Jakarta Sans", 12));
         perfSubText.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
 
-        HBox chart = new HBox(12);
+        HBox chart = new HBox(8);
         chart.setAlignment(Pos.BOTTOM_CENTER);
-        chart.setPrefHeight(120);
+        chart.setPrefHeight(110);
 
-        String[] labels = {"5to E", "6to A", "4to B", "4to C", "5to A", "6to B"};
-        int[] heights = {60, 70, 80, 60, 110, 90};
-        int maxH = 0;
-        for (int h : heights) { if (h > maxH) maxH = h; }
+        var courses = getTopCourses();
+        int n = courses.size();
+        perfOriginalHeights = new int[n];
+        double maxScore = courses.get(0).score;
+        defaultHighlightBar = 0;
 
         List<Rectangle> bars = new ArrayList<>();
         List<Text> barLabels = new ArrayList<>();
 
-        for (int i = 0; i < heights.length; i++) {
-            perfOriginalHeights[i] = heights[i];
-            if (heights[i] == maxH) defaultHighlightBar = i;
+        for (int i = 0; i < n; i++) {
+            int h = (int)(courses.get(i).score / maxScore * 90 + 10);
+            perfOriginalHeights[i] = h;
+            if (courses.get(i).score == maxScore) defaultHighlightBar = i;
 
             int idx = i;
-            VBox barBox = new VBox(8);
+            VBox barBox = new VBox(4);
             barBox.setAlignment(Pos.BOTTOM_CENTER);
-            Rectangle bar = new Rectangle(20, heights[i], Color.web(heights[i] == maxH ? c(L_PRIMARY, D_PRIMARY) : c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
-            bar.setArcWidth(10); bar.setArcHeight(10);
-            Text lbl = new Text(labels[i]);
-            lbl.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
-            lbl.setFill(Color.web(heights[i] == maxH ? c(L_PRIMARY, D_ON_SURFACE) : c(L_OUTLINE, D_OUTLINE)));
+            Rectangle bar = new Rectangle(10, h, Color.web(courses.get(i).score == maxScore ? c(L_PRIMARY, D_PRIMARY) : c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
+            bar.setArcWidth(6); bar.setArcHeight(6);
+            Text lbl = new Text(courses.get(i).name);
+            lbl.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 8));
+            lbl.setFill(Color.web(courses.get(i).score == maxScore ? c(L_PRIMARY, D_ON_SURFACE) : c(L_OUTLINE, D_OUTLINE)));
 
             bar.setOnMouseEntered(e -> {
-                if (selectedPerfBar == -1) {
-                    growBar(idx);
-                }
+                if (selectedPerfBar == -1) growBar(idx);
             });
             bar.setOnMouseExited(e -> {
-                if (selectedPerfBar == -1) {
-                    restoreBars();
-                } else {
-                    growBar(selectedPerfBar);
-                }
+                if (selectedPerfBar == -1) restoreBars(); else growBar(selectedPerfBar);
             });
             bar.setOnMouseClicked(e -> {
-                if (selectedPerfBar == idx) {
-                    selectedPerfBar = -1;
-                    restoreBars();
-                } else {
-                    selectedPerfBar = idx;
-                    growBar(idx);
-                }
+                if (selectedPerfBar == idx) { selectedPerfBar = -1; restoreBars(); }
+                else { selectedPerfBar = idx; growBar(idx); }
             });
 
             barBox.getChildren().addAll(bar, lbl);
@@ -1003,9 +1013,9 @@ public class MainController {
         perfTitleText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18 * s));
         perfSubText.setFont(Font.font("Plus Jakarta Sans", 12 * s));
         for (Rectangle bar : perfBarsList) {
-            bar.setWidth(20 * s);
-            bar.setArcWidth(10 * s);
-            bar.setArcHeight(10 * s);
+            bar.setWidth(10 * s);
+            bar.setArcWidth(6 * s);
+            bar.setArcHeight(6 * s);
         }
 
         scheduleBox.setPadding(new Insets(12 * s, 12 * s, 28 * s, 12 * s));
@@ -1093,12 +1103,6 @@ public class MainController {
             courseStudNumTexts.get(i).setText(lang.get("course.row" + (i + 1) + ".students", stDefs[i]));
             courseStudLabelTexts.get(i).setText(lang.get("course.studentsLabel", "Estudiantes"));
             courseScoreTexts.get(i).setText(lang.get(scoreKey, scoreDefs[i]));
-        }
-        // Update performance bar labels
-        String[] perfKeys = {"perf.label1", "perf.label2", "perf.label3", "perf.label4", "perf.label5", "perf.label6"};
-        String[] perfDefs = {"5to E", "6to A", "4to B", "4to C", "5to A", "6to B"};
-        for (int i = 0; i < perfBarLabelList.size() && i < perfKeys.length; i++) {
-            perfBarLabelList.get(i).setText(lang.get(perfKeys[i], perfDefs[i]));
         }
         // Update schedule items
         String[] timeKeys = {"schedule.row1.time", "schedule.row2.time", "schedule.row3.time", "schedule.row4.time", "schedule.row5.time", "schedule.row6.time"};

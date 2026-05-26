@@ -66,7 +66,6 @@ public class AdminAttendanceView {
     private final Label tutorName = new Label();
     private final Label listTitle = new Label();
     private final Label listSubtitle = new Label();
-    private final Button loadMoreButton = new Button();
     private final Button saveButton = new Button();
     private final Label gradeLabel = new Label("5to");
     private final Label sectionLabel = new Label("E");
@@ -79,7 +78,6 @@ public class AdminAttendanceView {
     public AdminAttendanceView(ThemeManager theme) {
         this.theme = theme;
         System.out.println("[AdminAttendanceView] CREADO. isDark=" + theme.isDark() + " text()=" + text() + " textMuted()=" + textMuted());
-        loadInitialData();
         buildView();
         wireEvents();
         updateLanguage();
@@ -265,11 +263,7 @@ public class AdminAttendanceView {
         rowScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         rowScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        HBox tableFooter = new HBox(loadMoreButton);
-        tableFooter.setAlignment(Pos.CENTER);
-        tableFooter.setPadding(new Insets(14));
-
-        tableCard.getChildren().addAll(tableHeader, header, rowScroll, tableFooter);
+        tableCard.getChildren().addAll(tableHeader, header, rowScroll);
 
         HBox saveContent = new HBox(8, icon(ICON_SAVE, 17, "#ffffff"), new Label());
         saveContent.setAlignment(Pos.CENTER);
@@ -285,11 +279,9 @@ public class AdminAttendanceView {
             tableHeader.setStyle("-fx-border-color: transparent transparent " + borderSoft() + " transparent;");
             header.setStyle("-fx-background-color: " + surfaceLow() + "; -fx-border-color: transparent transparent " + borderSoft() + " transparent;");
             rowScroll.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
-            tableFooter.setStyle("-fx-background-color: " + card() + "; -fx-border-color: " + borderSoft() + " transparent transparent transparent;");
             listTitle.setTextFill(Color.web(text()));
             listSubtitle.setTextFill(Color.web(textMuted()));
             tableDateLabel.setTextFill(Color.web(textMuted()));
-            loadMoreButton.setStyle("-fx-background-color: transparent; -fx-text-fill: " + textSecondary() + "; -fx-font-weight: 600; -fx-cursor: hand;");
             saveButton.setStyle("-fx-background-color: #2563eb; -fx-background-radius: 16; -fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: 700; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.25), 8, 0.2, 0, 2);");
             ((Label) saveContent.getChildren().get(1)).setTextFill(Color.WHITE);
         });
@@ -431,14 +423,6 @@ public class AdminAttendanceView {
 
     private void wireEvents() {
         searchField.textProperty().addListener((obs, oldValue, newValue) -> refreshRows());
-        loadMoreButton.setOnAction(e -> {
-            int start = students.size() + 1;
-            students.addAll(
-                new StudentAttendance("Herrera Campos, Sebastián " + start, 0),
-                new StudentAttendance("Morales Vega, Isabella " + (start + 1), 1)
-            );
-            refreshRows();
-        });
         saveButton.setOnAction(e -> {
             long pending = students.stream().filter(s -> s.status == AttendanceStatus.UNMARKED).count();
             if (pending > 0) {
@@ -488,7 +472,6 @@ public class AdminAttendanceView {
         tutorName.setText(lang.get("attendance.tutorName"));
         listTitle.setText(lang.get("attendance.studentList"));
         listSubtitle.setText(lang.get("attendance.enrolledCount").replace("{0}", String.valueOf(students.size())));
-        loadMoreButton.setText(lang.get("attendance.loadMore"));
         searchField.setPromptText(lang.get("attendance.search"));
         languageUpdaters.forEach(Runnable::run);
     }
@@ -530,19 +513,6 @@ public class AdminAttendanceView {
     private String text() { return theme.isDark() ? "#F8FAFC" : "#0f172a"; }
     private String textSecondary() { return theme.isDark() ? "#CBD5E1" : "#1e293b"; }
     private String textMuted() { return theme.isDark() ? "#94A3B8" : "#334155"; }
-
-    private void loadInitialData() {
-        students.addAll(
-            new StudentAttendance("García López, Alejandro Miguel", 0),
-            new StudentAttendance("Martínez Ríos, Lucía Fernanda", 1),
-            new StudentAttendance("Pérez Soto, Carlos Andrés", 2),
-            new StudentAttendance("López Vargas, Sofía Elena", 3),
-            new StudentAttendance("Ramírez Cruz, Diego Antonio", 0),
-            new StudentAttendance("Torres Medina, Valentina Isabel", 1),
-            new StudentAttendance("Núñez Vera, Camila Alejandra", 2),
-            new StudentAttendance("Santos Rojas, Daniel Esteban", 3)
-        );
-    }
 
     private enum AttendanceStatus { UNMARKED, PRESENT, ABSENT, EXCUSE }
 

@@ -87,6 +87,7 @@ public class MainController {
     private final List<Text> scheduleDetList = new ArrayList<>();
     private final List<Rectangle> perfBarsList = new ArrayList<>();
     private final List<Text> perfBarLabelList = new ArrayList<>();
+    private int selectedPerfBar = -1;
     private Circle headerAvatar;
     private SVGPath headerAvatarSvg;
     private Preferences prefs = Preferences.userNodeForPackage(controller.Configuracion.class);
@@ -773,6 +774,7 @@ public class MainController {
         List<Text> barLabels = new ArrayList<>();
 
         for (int i = 0; i < labels.length; i++) {
+            int idx = i;
             VBox barBox = new VBox(8);
             barBox.setAlignment(Pos.BOTTOM_CENTER);
             Rectangle bar = new Rectangle(20, heights[i], Color.web(c(L_PRIMARY, D_PRIMARY)));
@@ -780,6 +782,29 @@ public class MainController {
             Text lbl = new Text(labels[i]);
             lbl.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
             lbl.setFill(Color.web(c(i == 4 ? L_PRIMARY : L_OUTLINE, D_ON_SURFACE)));
+
+            bar.setOnMouseEntered(e -> {
+                if (selectedPerfBar == -1 || selectedPerfBar != idx) {
+                    dimOtherBars(idx);
+                }
+            });
+            bar.setOnMouseExited(e -> {
+                if (selectedPerfBar == -1) {
+                    restoreBars();
+                } else {
+                    dimOtherBars(selectedPerfBar);
+                }
+            });
+            bar.setOnMouseClicked(e -> {
+                if (selectedPerfBar == idx) {
+                    selectedPerfBar = -1;
+                    restoreBars();
+                } else {
+                    selectedPerfBar = idx;
+                    dimOtherBars(idx);
+                }
+            });
+
             barBox.getChildren().addAll(bar, lbl);
             chart.getChildren().add(barBox);
             bars.add(bar);
@@ -814,6 +839,29 @@ public class MainController {
                 barLabels.get(i).setFill(Color.web(c(i == 4 ? L_PRIMARY : L_OUTLINE, D_ON_SURFACE)));
             }
         });
+    }
+
+    private void dimOtherBars(int activeIndex) {
+        for (int i = 0; i < perfBarsList.size(); i++) {
+            Rectangle bar = perfBarsList.get(i);
+            Text lbl = i < perfBarLabelList.size() ? perfBarLabelList.get(i) : null;
+            if (i == activeIndex) {
+                bar.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
+                if (lbl != null) lbl.setFill(Color.web(c(L_PRIMARY, D_ON_SURFACE)));
+            } else {
+                bar.setFill(Color.web(c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
+                if (lbl != null) lbl.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+            }
+        }
+    }
+
+    private void restoreBars() {
+        for (int i = 0; i < perfBarsList.size(); i++) {
+            Rectangle bar = perfBarsList.get(i);
+            Text lbl = i < perfBarLabelList.size() ? perfBarLabelList.get(i) : null;
+            bar.setFill(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY)));
+            if (lbl != null) lbl.setFill(Color.web(c(i == 4 ? L_PRIMARY : L_OUTLINE, D_ON_SURFACE)));
+        }
     }
 
     private void setupSchedulePanel() {

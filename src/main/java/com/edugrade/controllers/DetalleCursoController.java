@@ -130,6 +130,24 @@ public class DetalleCursoController {
         colTeacherSubject.setCellValueFactory(d -> d.getValue().materiaProperty());
     }
 
+    private Callback<TableColumn<TeacherRow, String>, TableCell<TeacherRow, String>> defaultSubjectCell() {
+        return col -> new TableCell<>() {
+            private final Label label = new Label();
+            { setGraphic(label); setPadding(new Insets(8, 16, 8, 16)); }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                var tv = getTableView();
+                if (empty || tv == null || getIndex() < 0 || getIndex() >= tv.getItems().size()) {
+                    label.setText(null);
+                } else {
+                    label.setText(tv.getItems().get(getIndex()).getMateria());
+                    label.getStyleClass().add("cell-docente-name");
+                }
+            }
+        };
+    }
+
     private Callback<TableColumn<TeacherRow, String>, TableCell<TeacherRow, String>> nombreCell() {
         return col -> new TableCell<>() {
             private final HBox box = new HBox(12);
@@ -559,7 +577,7 @@ public class DetalleCursoController {
 
         teacherTable.setEditable(false);
         colTeacherName.setCellFactory(nombreCell());
-        colTeacherSubject.setCellFactory(null);
+        colTeacherSubject.setCellFactory(defaultSubjectCell());
         teacherTable.refresh();
         studentsTable.refresh();
     }

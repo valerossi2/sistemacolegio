@@ -188,10 +188,9 @@ public class MainController {
 
     private void setupNavigation() {
         LanguageManager lang = LanguageManager.getInstance();
-        String[] navKeys = {"sidebar.home", "sidebar.students", "sidebar.teachers", "sidebar.courses", "sidebar.attendance", "sidebar.schedule", "sidebar.settings"};
+        String[] navKeys = {"sidebar.home", "sidebar.teachers", "sidebar.courses", "sidebar.attendance", "sidebar.schedule", "sidebar.settings"};
         String[][] items = {
             {lang.get("sidebar.home"), ICON_HOME},
-            {lang.get("sidebar.students"), ICON_SCHOOL},
             {lang.get("sidebar.teachers"), ICON_GROUP},
             {lang.get("sidebar.courses"), ICON_BOOK},
             {lang.get("sidebar.attendance"), ICON_CHECK_CIRCLE},
@@ -270,23 +269,17 @@ public class MainController {
             setCenterView(mainCanvas);
             loadHeaderProfileImage();
         } else if (index == 1) {
-            loadView("/fxml/Admin/AdminEstudiantes.fxml");
-        } else if (index == 2) {
             loadView("/fxml/Admin/AdminMaestros.fxml");
-        } else if (index == 3) {
+        } else if (index == 2) {
             loadView("/fxml/Admin/AdminCursos.fxml");
-        } else if (index == 4) {
-<<<<<<< HEAD
+        } else if (index == 3) {
             AdminAttendanceView attendanceView = new AdminAttendanceView(theme);
             attendanceView.attachSearchField(searchField);
             setCenterView(attendanceView.getView());
-        } else if (index == 6) {
-            controller.Configuracion config = new controller.Configuracion(theme);
-=======
+        } else if (index == 4) {
             loadView("/fxml/Admin/AdminHorario.fxml");
         } else if (index == 5) {
             controller.Configuracion config = new controller.Configuracion();
->>>>>>> 9e419ed6b52f1f5ffc09d3d4091fbd66dbb9a369
             config.setOwnerStage(stage);
             setCenterView(config.getView());
         }
@@ -1012,7 +1005,7 @@ public class MainController {
         btnAll.setText(lang.get("course.viewAll"));
         searchField.setPromptText(lang.get("search.prompt"));
         // Update sidebar labels
-        String[] navKeys = {"sidebar.home", "sidebar.students", "sidebar.teachers", "sidebar.courses", "sidebar.attendance", "sidebar.schedule", "sidebar.settings"};
+        String[] navKeys = {"sidebar.home", "sidebar.teachers", "sidebar.courses", "sidebar.attendance", "sidebar.schedule", "sidebar.settings"};
         for (int i = 0; i < navLabelList.size() && i < navKeys.length; i++) {
             navLabelList.get(i).setText(lang.get(navKeys[i]));
         }

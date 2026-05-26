@@ -774,26 +774,34 @@ public class MainController {
         chart.setAlignment(Pos.BOTTOM_CENTER);
         chart.setPrefHeight(120);
 
-        String[] labels = {"5to E", "6to A", "4to B", "4to C", "5to A", "6to B"};
-        int[] heights = {60, 70, 80, 60, 110, 90};
-        int maxH = 0;
-        for (int h : heights) { if (h > maxH) maxH = h; }
+        // Top 6 cursos por promedio (grado + seccion)
+        var topCourses = List.of(
+            new String[]{"5to A", "9.2"},
+            new String[]{"4to B", "8.8"},
+            new String[]{"6to A", "8.5"},
+            new String[]{"3ro C", "8.1"},
+            new String[]{"5to E", "7.6"},
+            new String[]{"4to C", "7.2"}
+        );
+        double maxScore = Double.parseDouble(topCourses.get(0)[1]);
 
         List<Rectangle> bars = new ArrayList<>();
         List<Text> barLabels = new ArrayList<>();
 
-        for (int i = 0; i < heights.length; i++) {
-            perfOriginalHeights[i] = heights[i];
-            if (heights[i] == maxH) defaultHighlightBar = i;
+        for (int i = 0; i < topCourses.size(); i++) {
+            int h = (int)(Double.parseDouble(topCourses.get(i)[1]) / maxScore * 90 + 10);
+            perfOriginalHeights[i] = h;
+            if (i == 0) defaultHighlightBar = i;
 
             int idx = i;
+            boolean isTop = i == 0;
             VBox barBox = new VBox(8);
             barBox.setAlignment(Pos.BOTTOM_CENTER);
-            Rectangle bar = new Rectangle(20, heights[i], Color.web(heights[i] == maxH ? c(L_PRIMARY, D_PRIMARY) : c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
+            Rectangle bar = new Rectangle(20, h, Color.web(isTop ? c(L_PRIMARY, D_PRIMARY) : c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
             bar.setArcWidth(10); bar.setArcHeight(10);
-            Text lbl = new Text(labels[i]);
+            Text lbl = new Text(topCourses.get(i)[0]);
             lbl.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
-            lbl.setFill(Color.web(heights[i] == maxH ? c(L_PRIMARY, D_ON_SURFACE) : c(L_OUTLINE, D_OUTLINE)));
+            lbl.setFill(Color.web(isTop ? c(L_PRIMARY, D_ON_SURFACE) : c(L_OUTLINE, D_OUTLINE)));
 
             bar.setOnMouseEntered(e -> {
                 if (selectedPerfBar == -1) {

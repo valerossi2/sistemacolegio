@@ -86,7 +86,7 @@
                     <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>
 
-                <Label text="Estadísticas y Rendimiento"
+                <Label fx:id="lblStatsTitle" text="Estadísticas y Rendimiento"
                        styleClass="card__title"/>
 
                 <VBox spacing="8">
@@ -97,7 +97,7 @@
                                      scaleX="0.7" scaleY="0.7"/>
                         </StackPane>
                         <VBox>
-                            <Label text="Total Estudiantes" styleClass="stat-label"/>
+                            <Label fx:id="lblTotalStudentsLabel" text="Total Estudiantes" styleClass="stat-label"/>
                             <Label fx:id="totalStudents" text="32" styleClass="stat-value"/>
                         </VBox>
                     </HBox>
@@ -109,7 +109,7 @@
                                      scaleX="0.7" scaleY="0.7"/>
                         </StackPane>
                         <VBox>
-                            <Label text="Total Profesores" styleClass="stat-label"/>
+                            <Label fx:id="lblTotalTeachersLabel" text="Total Profesores" styleClass="stat-label"/>
                             <Label fx:id="totalTeachers" text="8" styleClass="stat-value"/>
                         </VBox>
                     </HBox>
@@ -120,16 +120,16 @@
                 <VBox spacing="10">
                     <HBox spacing="8">
                         <VBox styleClass="stat-mini-card" HBox.hgrow="ALWAYS">
-                            <Label text="Promedio General" styleClass="stat-mini-card__label"/>
+                            <Label fx:id="lblPromedioGeneralLabel" text="Promedio General" styleClass="stat-mini-card__label"/>
                             <Label fx:id="lblPromedioGeneral" text="0.0" styleClass="stat-mini-card__value"/>
                         </VBox>
                         <VBox styleClass="stat-mini-card" HBox.hgrow="ALWAYS">
-                            <Label text="Aprobados / Reprobados" styleClass="stat-mini-card__label"/>
+                            <Label fx:id="lblAprobadosReprobadosLabel" text="Aprobados / Reprobados" styleClass="stat-mini-card__label"/>
                             <Label fx:id="lblAprobadosReprobados" text="0 / 0" styleClass="stat-mini-card__value"/>
                         </VBox>
                     </HBox>
                     <VBox styleClass="stat-mini-card">
-                        <Label text="Promedio por Materia" styleClass="stat-mini-card__label"/>
+                        <Label fx:id="lblPromedioMateriaLabel" text="Promedio por Materia" styleClass="stat-mini-card__label"/>
                         <Label fx:id="lblPromedioMateria" text="-" styleClass="stat-mini-card__value" wrapText="true"/>
                     </VBox>
                 </VBox>
@@ -137,7 +137,7 @@
                 <Region styleClass="card-divider"/>
 
                 <VBox spacing="8">
-                    <Label text="Distribución por Género" styleClass="card__subtitle"/>
+                    <Label fx:id="lblDistribucionGeneroLabel" text="Distribución por Género" styleClass="card__subtitle"/>
                     <PieChart fx:id="genderChart"
                               styleClass="gender-chart"
                               legendVisible="true"
@@ -156,7 +156,7 @@
                 <!-- Equipo Docente -->
                 <VBox styleClass="card" spacing="0">
                     <HBox styleClass="teacher-card__header" alignment="CENTER_LEFT">
-                        <Label text="Equipo Docente" styleClass="card__title"
+                        <Label fx:id="lblEquipoDocenteCard" text="Equipo Docente" styleClass="card__title"
                                HBox.hgrow="ALWAYS"/>
                         <Button fx:id="btnVerTodosDocentes" text="Ver Todos"
                                 styleClass="btn-link" mnemonicParsing="false"
@@ -181,7 +181,7 @@
                 <!-- Lista de Estudiantes -->
                 <VBox styleClass="card" spacing="0">
                     <HBox styleClass="teacher-card__header" alignment="CENTER_LEFT">
-                        <Label text="Lista de Estudiantes" styleClass="card__title"
+                        <Label fx:id="lblListaEstudiantesCard" text="Lista de Estudiantes" styleClass="card__title"
                                HBox.hgrow="ALWAYS"/>
                         <Button fx:id="btnLoadMore" text="Cargar más estudiantes"
                                 styleClass="btn-link" mnemonicParsing="false"

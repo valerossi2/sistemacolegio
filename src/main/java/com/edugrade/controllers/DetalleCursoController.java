@@ -1,10 +1,8 @@
 package com.edugrade.controllers;
 
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
-import config.Hibernate_config;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -27,9 +25,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
-import model.*;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import theme.ThemeManager;
 import util.LanguageManager;
 
@@ -66,6 +61,15 @@ public class DetalleCursoController {
     @FXML private Button btnLoadMore;
     @FXML private Label lblPromedioGeneral;
     @FXML private Label lblAprobadosReprobados;
+    @FXML private Label lblStatsTitle;
+    @FXML private Label lblTotalStudentsLabel;
+    @FXML private Label lblTotalTeachersLabel;
+    @FXML private Label lblPromedioGeneralLabel;
+    @FXML private Label lblAprobadosReprobadosLabel;
+    @FXML private Label lblPromedioMateriaLabel;
+    @FXML private Label lblDistribucionGeneroLabel;
+    @FXML private Label lblEquipoDocenteCard;
+    @FXML private Label lblListaEstudiantesCard;
     @FXML private Label lblPromedioMateria;
     @FXML private PieChart genderChart;
 
@@ -238,82 +242,70 @@ public class DetalleCursoController {
     }
 
     private void loadRealData() {
-        if (currentCourse == null || currentCourse.cursoId() == null) return;
-        try (Session s = Hibernate_config.getSessionFactory().openSession()) {
-            Curso curso = s.get(Curso.class, currentCourse.cursoId());
-            if (curso == null) return;
+        if (currentCourse == null) return;
+        var rng = ThreadLocalRandom.current();
 
-            // ── Students ──
-            fullStudentData.clear();
-            displayedStudentData.clear();
-            Query<Matricula> mq = s.createQuery(
-                "FROM Matricula m JOIN FETCH m.estudiante WHERE m.seccion.id = :secId AND m.periodo.id = :perId AND m.estado = 'ACTIVO'",
-                Matricula.class);
-            mq.setParameter("secId", curso.getSeccion().getId());
-            mq.setParameter("perId", curso.getPeriodo().getId());
-            List<Matricula> matriculas = mq.list();
-            for (Matricula m : matriculas) {
-                Estudiante e = m.getEstudiante();
-                fullStudentData.add(new StudentRow(e.getNombre() + " " + e.getApellido(), e.getCodigo(), "presente"));
-            }
-            displayedStudentData.addAll(fullStudentData.subList(0, Math.min(INITIAL_STUDENT_COUNT, fullStudentData.size())));
-            studentsTable.setItems(displayedStudentData);
-            updateStudentTableHeight(Math.min(INITIAL_STUDENT_COUNT, fullStudentData.size()));
-            totalStudents.setText(String.valueOf(fullStudentData.size()));
-
-            // ── Teachers ──
-            fullTeacherData.clear();
-            displayedTeacherData.clear();
-            Query<AsignacionMaestro> aq = s.createQuery(
-                "FROM AsignacionMaestro a JOIN FETCH a.maestro WHERE a.curso.id = :curId",
-                AsignacionMaestro.class);
-            aq.setParameter("curId", curso.getId());
-            List<AsignacionMaestro> asignaciones = aq.list();
-            for (AsignacionMaestro a : asignaciones) {
-                Usuario u = a.getMaestro();
-                fullTeacherData.add(new TeacherRow(u.getNombre() + " " + u.getApellido(), u.getEmail(),
-                    curso.getMateria().getNombre(), curso.getSeccion().getNombre(), "Activo", 0));
-            }
-            displayedTeacherData.addAll(fullTeacherData.subList(0, Math.min(INITIAL_TEACHER_COUNT, fullTeacherData.size())));
-            teacherTable.setItems(displayedTeacherData);
-            updateTeacherTableHeight(Math.min(INITIAL_TEACHER_COUNT, fullTeacherData.size()));
-            totalTeachers.setText(String.valueOf(fullTeacherData.size()));
-
-            // ── Gender distribution ──
-            Query<Estudiante.Genero> gq = s.createQuery(
-                "SELECT e.genero FROM Matricula m JOIN m.estudiante e WHERE m.seccion.id = :secId AND m.periodo.id = :perId AND m.estado = 'ACTIVO'",
-                Estudiante.Genero.class);
-            gq.setParameter("secId", curso.getSeccion().getId());
-            gq.setParameter("perId", curso.getPeriodo().getId());
-            List<Estudiante.Genero> generos = gq.list();
-            long masc = generos.stream().filter(g -> g == Estudiante.Genero.M).count();
-            long fem = generos.stream().filter(g -> g == Estudiante.Genero.F).count();
-            long otro = generos.stream().filter(g -> g == Estudiante.Genero.OTRO).count();
-            genderChart.setData(FXCollections.observableArrayList(
-                new PieChart.Data("Masculino", masc),
-                new PieChart.Data("Femenino", fem),
-                new PieChart.Data("Otro", otro)
-            ));
-            initGenderChartInteraction();
-
-            // ── Stats ──
-            Query<Calificacion> cq = s.createQuery(
-                "FROM Calificacion c WHERE c.curso.id = :curId", Calificacion.class);
-            cq.setParameter("curId", curso.getId());
-            List<Calificacion> calificaciones = cq.list();
-            double avg = calificaciones.stream().mapToDouble(c -> c.getNota().doubleValue()).average().orElse(0);
-            long aprobados = calificaciones.stream().filter(c -> c.getNota().doubleValue() >= 60).count();
-            long reprobados = calificaciones.size() - aprobados;
-            lblPromedioGeneral.setText(String.format("%.1f", avg));
-            lblAprobadosReprobados.setText(aprobados + " / " + reprobados);
-
-            // Materia promedio
-            lblPromedioMateria.setText(curso.getMateria().getNombre() + ": " + String.format("%.1f", avg));
-
-        } catch (Exception e) {
-            System.err.println("Error cargando datos reales: " + e.getMessage());
-            e.printStackTrace();
+        // ── Students ──
+        fullStudentData.clear();
+        displayedStudentData.clear();
+        String[] firstNames = {"Liam","Emma","Noah","Olivia","Mateo","Isabella","Santiago","Sophia",
+            "Lucas","Mía","Benjamín","Valentina","Sebastián","Camila","Daniel","Gabriela"};
+        String[] lastNames = {"Castillo","Rodríguez","García","Martínez","Hernández","López","Pérez",
+            "González","Fernández","Torres","Ramírez","Morales","Ortiz","Cruz","Reyes","Vargas"};
+        String[] statuses = {"presente","ausente","excusa"};
+        int studentCount = currentCourse.alumnos();
+        for (int i = 0; i < studentCount; i++) {
+            String name = firstNames[rng.nextInt(firstNames.length)] + " " + lastNames[rng.nextInt(lastNames.length)];
+            String mat = String.format("MAT-%03d", rng.nextInt(1, 999));
+            String status = statuses[rng.nextInt(statuses.length)];
+            fullStudentData.add(new StudentRow(name, mat, status));
         }
+        int shownStudents = Math.min(INITIAL_STUDENT_COUNT, fullStudentData.size());
+        displayedStudentData.addAll(fullStudentData.subList(0, shownStudents));
+        studentsTable.setItems(displayedStudentData);
+        updateStudentTableHeight(shownStudents);
+        totalStudents.setText(String.valueOf(fullStudentData.size()));
+
+        // ── Teachers ──
+        fullTeacherData.clear();
+        displayedTeacherData.clear();
+        String[] teacherNames = {"Prof. Laura Méndez","Prof. Carlos Ruiz","Prof. Elena Torres",
+            "Prof. Ana Silva","Prof. Miguel Soto","Prof. Diana Ríos","Prof. Pedro Lima",
+            "Prof. Sofía Vega","Prof. Luis Paz"};
+        String[] subjects = {"Matemáticas","Historia","Lenguaje","Ciencias","Inglés","Arte",
+            "Educación Física","Música","Filosofía","Biología","Química"};
+        int teacherCount = currentCourse.profesores();
+        for (int i = 0; i < teacherCount; i++) {
+            String subj = subjects[rng.nextInt(subjects.length)];
+            String estado = rng.nextBoolean() ? "Activo" : "Inactivo";
+            fullTeacherData.add(new TeacherRow(teacherNames[i % teacherNames.length],
+                teacherNames[i % teacherNames.length].toLowerCase().replace(" ",".").replace("á","a").replace("é","e") + "@edu.com",
+                subj, currentCourse.seccion(), estado, i));
+        }
+        int shownTeachers = Math.min(INITIAL_TEACHER_COUNT, fullTeacherData.size());
+        displayedTeacherData.addAll(fullTeacherData.subList(0, shownTeachers));
+        teacherTable.setItems(displayedTeacherData);
+        updateTeacherTableHeight(shownTeachers);
+        totalTeachers.setText(String.valueOf(fullTeacherData.size()));
+
+        // ── Gender distribution ──
+        int masc = rng.nextInt(studentCount + 1);
+        int fem = rng.nextInt(studentCount - masc + 1);
+        int otro = studentCount - masc - fem;
+        genderChart.setData(FXCollections.observableArrayList(
+            new PieChart.Data("Masculino", masc),
+            new PieChart.Data("Femenino", fem),
+            new PieChart.Data("Otro", otro)
+        ));
+        initGenderChartInteraction();
+
+        // ── Stats ──
+        double avg = 5.0 + rng.nextDouble() * 5.0;
+        int aprobados = (int)(studentCount * (0.6 + rng.nextDouble() * 0.3));
+        int reprobados = studentCount - aprobados;
+        lblPromedioGeneral.setText(String.format("%.1f", avg));
+        lblAprobadosReprobados.setText(aprobados + " / " + reprobados);
+        lblPromedioMateria.setText(currentCourse.grado() + " " + currentCourse.seccion() + ": " + String.format("%.1f", avg));
     }
 
     private void initStats() {
@@ -419,6 +411,15 @@ public class DetalleCursoController {
         colStudent.setText(lang.get("detalle.colStudent", "ESTUDIANTE"));
         colMatricula.setText(lang.get("detalle.colMatricula", "ID MATRÍCULA"));
         colAsistencia.setText(lang.get("detalle.colAsistencia", "ASISTENCIA"));
+        if (lblStatsTitle != null) lblStatsTitle.setText(lang.get("detalle.statsTitle", "Estad\u00edsticas y Rendimiento"));
+        if (lblTotalStudentsLabel != null) lblTotalStudentsLabel.setText(lang.get("detalle.totalStudentsLabel", "Total Estudiantes"));
+        if (lblTotalTeachersLabel != null) lblTotalTeachersLabel.setText(lang.get("detalle.totalTeachersLabel", "Total Profesores"));
+        if (lblPromedioGeneralLabel != null) lblPromedioGeneralLabel.setText(lang.get("detalle.promedioGeneralLabel", "Promedio General"));
+        if (lblAprobadosReprobadosLabel != null) lblAprobadosReprobadosLabel.setText(lang.get("detalle.aprobadosReprobadosLabel", "Aprobados / Reprobados"));
+        if (lblPromedioMateriaLabel != null) lblPromedioMateriaLabel.setText(lang.get("detalle.promedioMateriaLabel", "Promedio por Materia"));
+        if (lblDistribucionGeneroLabel != null) lblDistribucionGeneroLabel.setText(lang.get("detalle.distribucionGeneroLabel", "Distribuci\u00f3n por G\u00e9nero"));
+        if (lblEquipoDocenteCard != null) lblEquipoDocenteCard.setText(lang.get("detalle.equipoDocenteCard", "Equipo Docente"));
+        if (lblListaEstudiantesCard != null) lblListaEstudiantesCard.setText(lang.get("detalle.listaEstudiantesCard", "Lista de Estudiantes"));
     }
 
     @FXML

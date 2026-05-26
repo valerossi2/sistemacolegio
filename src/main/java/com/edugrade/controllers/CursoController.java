@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;
+import java.util.concurrent.ThreadLocalRandom;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -177,13 +178,16 @@ public class CursoController {
 
     private void buildSampleData() {
         allCourses.clear();
+        var rng = ThreadLocalRandom.current();
         try (Session s = Hibernate_config.getSessionFactory().openSession()) {
             var list = s.createQuery("FROM Curso c JOIN FETCH c.seccion sec JOIN FETCH sec.grado g JOIN FETCH c.materia", Curso.class).list();
             int idx = 0;
             for (Curso c : list) {
                 String gradoNombre = c.getSeccion().getGrado().getNombre();
                 String seccionNombre = c.getSeccion().getNombre();
-                allCourses.add(new CourseRow(c.getId(), gradoNombre, idx % 8, seccionNombre, 0, 0, "En clase"));
+                int alumnos = rng.nextInt(1, 41);
+                int profesores = rng.nextInt(1, 10);
+                allCourses.add(new CourseRow(c.getId(), gradoNombre, idx % 8, seccionNombre, alumnos, profesores, 0, "En clase"));
                 idx++;
             }
             if (!allCourses.isEmpty()) return;
@@ -191,22 +195,20 @@ public class CursoController {
             System.err.println("Error cargando cursos desde DB: " + e.getMessage());
         }
 
-        allCourses.add(new CourseRow(null, "5to", 0, "E", 32, 8.5, "En clase"));
-        allCourses.add(new CourseRow(null, "5to", 1, "A", 28, 8.5, "Descanso"));
-        allCourses.add(new CourseRow(null, "5to", 2, "C", 40, 8.5, "En clase"));
-        allCourses.add(new CourseRow(null, "4to", 1, "A", 24, 9.2, "Descanso"));
-        allCourses.add(new CourseRow(null, "6to", 0, "E", 32, 7.8, "En clase"));
-        allCourses.add(new CourseRow(null, "4to", 2, "A", 40, 8.5, "Descanso"));
-        allCourses.add(new CourseRow(null, "3ro", 6, "C", 24, 8.8, "En clase"));
-        allCourses.add(new CourseRow(null, "5to", 0, "E", 24, 9.2, "Descanso"));
-        allCourses.add(new CourseRow(null, "2do", 3, "B", 30, 8.0, "En clase"));
-        allCourses.add(new CourseRow(null, "6to", 4, "D", 36, 7.5, "En clase"));
-        allCourses.add(new CourseRow(null, "1ro", 5, "A", 28, 9.0, "Descanso"));
-        allCourses.add(new CourseRow(null, "3ro", 7, "B", 32, 8.2, "En clase"));
-        allCourses.add(new CourseRow(null, "4to", 0, "C", 26, 8.7, "En clase"));
-        allCourses.add(new CourseRow(null, "2do", 2, "A", 34, 7.9, "Descanso"));
-        allCourses.add(new CourseRow(null, "5to", 1, "B", 30, 8.3, "En clase"));
-        allCourses.add(new CourseRow(null, "6to", 6, "C", 28, 8.1, "En clase"));
+        String[] grados = {"1ro","2do","3ro","4to","5to","6to"};
+        String[] secciones = {"A","B","C","D","E"};
+        String[] estados = {"En clase","Descanso"};
+        for (int i = 0; i < 16; i++) {
+            int alumnos = rng.nextInt(1, 41);
+            int profesores = rng.nextInt(1, 10);
+            allCourses.add(new CourseRow(null,
+                grados[rng.nextInt(grados.length)],
+                i % 8,
+                secciones[rng.nextInt(secciones.length)],
+                alumnos, profesores,
+                5.0 + rng.nextDouble() * 5.0,
+                estados[rng.nextInt(estados.length)]));
+        }
     }
 
     private void configureCourseTable() {
@@ -457,5 +459,5 @@ public class CursoController {
         lblTotalCursos.setText(lang.get("courses.totalLabel", "Todos los Cursos ({0})").replace("{0}", String.valueOf(count)));
     }
 
-    public record CourseRow(Integer cursoId, String grado, int teacherIdx, String seccion, int alumnos, double rendimiento, String estado) {}
+    public record CourseRow(Integer cursoId, String grado, int teacherIdx, String seccion, int alumnos, int profesores, double rendimiento, String estado) {}
 }

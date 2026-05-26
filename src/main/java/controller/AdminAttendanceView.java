@@ -370,24 +370,17 @@ public class AdminAttendanceView {
 
     private void showSelectorMenu(MouseEvent event, List<String> options, Label target) {
         ContextMenu menu = new ContextMenu();
-        String bg = theme.isDark() ? "#1E293B" : "#ffffff";
-        String border = theme.isDark() ? "#334155" : "#E5E7EB";
         String textC = theme.isDark() ? "#F8FAFC" : "#0f172a";
-        String hoverBg = theme.isDark() ? "#334155" : "#F1F5F9";
-        menu.setStyle("-fx-background-color: " + bg + "; -fx-border-color: " + border + "; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 6; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 10, 0.15, 0, 4);");
+        menu.setStyle("-fx-background-color: " + (theme.isDark() ? "#1E293B" : "#ffffff") + "; -fx-border-color: " + (theme.isDark() ? "#334155" : "#E5E7EB") + "; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 6; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 10, 0.15, 0, 4);");
         for (String opt : options) {
             MenuItem item = new MenuItem(opt);
-            item.setStyle("-fx-text-fill: " + textC + "; -fx-font-weight: 700; -fx-font-size: 12; -fx-padding: 8 16; -fx-background-radius: 6;");
-            if (opt.equals(target.getText())) {
-                item.setDisable(true);
-                item.setStyle("-fx-text-fill: " + (theme.isDark() ? "#475569" : "#94A3B8") + "; -fx-font-weight: 700; -fx-font-size: 12; -fx-padding: 8 16;");
-            }
+            boolean active = opt.equals(target.getText());
+            item.setStyle((active ? "-fx-text-fill: " + (theme.isDark() ? "#475569" : "#94A3B8") : "-fx-text-fill: " + textC) + "; -fx-font-weight: 700; -fx-font-size: 12; -fx-padding: 8 16;");
+            item.setDisable(active);
             item.setOnAction(e -> {
                 target.setText(opt);
                 updateLanguage();
             });
-            item.setOnMouseEntered(e -> item.setStyle("-fx-background-color: " + hoverBg + "; -fx-text-fill: " + textC + "; -fx-font-weight: 700; -fx-font-size: 12; -fx-padding: 8 16; -fx-background-radius: 6;"));
-            item.setOnMouseExited(e -> item.setStyle("-fx-text-fill: " + textC + "; -fx-font-weight: 700; -fx-font-size: 12; -fx-padding: 8 16; -fx-background-radius: 6;"));
             menu.getItems().add(item);
         }
         menu.show((Node) event.getSource(), Side.BOTTOM, 0, 0);

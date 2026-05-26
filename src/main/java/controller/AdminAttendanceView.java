@@ -23,9 +23,11 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import theme.ThemeManager;
 import util.LanguageManager;
 
@@ -38,6 +40,10 @@ import java.util.Locale;
 public class AdminAttendanceView {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final String ICON_SAVE = "M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zM12 19c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zM6 8V5h9v3H6z";
+    private static final String[] AVATAR_COLORS = {
+            "#3B82F6", "#8B5CF6", "#EC4899", "#F59E0B",
+            "#10B981", "#EF4444", "#6366F1", "#14B8A6"
+    };
 
     private final ThemeManager theme;
     private final LanguageManager lang = LanguageManager.getInstance();
@@ -221,21 +227,31 @@ public class AdminAttendanceView {
         return row;
     }
 
+    private final Label tableDateLabel = new Label();
     private void buildTableCard() {
         VBox tableCard = new VBox();
         tableCard.setMinWidth(520);
-        VBox tableHeader = new VBox(4, listTitle, listSubtitle);
-        tableHeader.setPadding(new Insets(22, 24, 18, 24));
+        tableDateLabel.setFont(Font.font("Plus Jakarta Sans", 12));
+        tableDateLabel.setText(LocalDate.now().format(DATE_FORMAT));
+        VBox tableHeader = new VBox(4, listTitle, listSubtitle, tableDateLabel);
+        tableHeader.setPadding(new Insets(22, 24, 14, 24));
         listTitle.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 18));
         listSubtitle.setFont(Font.font("Plus Jakarta Sans", 13));
 
         HBox header = new HBox();
         header.setPadding(new Insets(14, 24, 14, 24));
+        HBox studentHeader = headerCell("attendance.student", 200);
+        HBox.setHgrow(studentHeader, Priority.ALWAYS);
+        Label attendanceLabel = new Label();
+        attendanceLabel.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 11));
+        languageUpdaters.add(() -> attendanceLabel.setText(lang.get("attendance.attendance").toUpperCase(Locale.ROOT)));
+        themeUpdaters.add(() -> attendanceLabel.setTextFill(Color.web(textMuted())));
+        HBox attendanceHeader = new HBox(attendanceLabel);
+        attendanceHeader.setAlignment(Pos.CENTER_RIGHT);
+        HBox.setHgrow(attendanceHeader, Priority.SOMETIMES);
         header.getChildren().addAll(
-            headerCell("attendance.student", 290),
-            headerCell("attendance.enrollment", 150),
-            headerCell("attendance.date", 120),
-            headerCell("attendance.attendance", 260)
+            studentHeader,
+            attendanceHeader
         );
 
         rowsBox.setFillWidth(true);
@@ -243,7 +259,7 @@ public class AdminAttendanceView {
         rowScroll.setFitToWidth(true);
         rowScroll.setMinHeight(220);
         rowScroll.setPrefHeight(390);
-        rowScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        rowScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         rowScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
         HBox tableFooter = new HBox(loadMoreButton);
@@ -269,6 +285,7 @@ public class AdminAttendanceView {
             tableFooter.setStyle("-fx-background-color: " + card() + "; -fx-border-color: " + borderSoft() + " transparent transparent transparent;");
             listTitle.setTextFill(Color.web(text()));
             listSubtitle.setTextFill(Color.web(textMuted()));
+            tableDateLabel.setTextFill(Color.web(textMuted()));
             loadMoreButton.setStyle("-fx-background-color: transparent; -fx-text-fill: " + textSecondary() + "; -fx-font-weight: 600; -fx-cursor: hand;");
             saveButton.setStyle("-fx-background-color: #2563eb; -fx-background-radius: 16; -fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: 700; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.25), 8, 0.2, 0, 2);");
             ((Label) saveContent.getChildren().get(1)).setTextFill(Color.WHITE);
@@ -289,54 +306,51 @@ public class AdminAttendanceView {
     private void refreshRows() {
         rowsBox.getChildren().clear();
         String q = searchField.getText() == null ? "" : searchField.getText().trim().toLowerCase(Locale.ROOT);
+        int idx = 1;
         for (StudentAttendance student : students) {
-            if (!q.isEmpty() && !student.name().toLowerCase(Locale.ROOT).contains(q) && !student.email().toLowerCase(Locale.ROOT).contains(q)) {
+            if (!q.isEmpty() && !student.name().toLowerCase(Locale.ROOT).contains(q)) {
                 continue;
             }
-            rowsBox.getChildren().add(createStudentRow(student));
+            rowsBox.getChildren().add(createStudentRow(student, idx++));
         }
         updateSummary();
         applyTheme();
     }
 
-    private HBox createStudentRow(StudentAttendance student) {
+    private HBox createStudentRow(StudentAttendance student, int number) {
         HBox row = new HBox();
         row.setAlignment(Pos.CENTER_LEFT);
-        row.setPadding(new Insets(12, 24, 12, 24));
-        row.setMinHeight(68);
+        row.setPadding(new Insets(8, 16, 8, 16));
+        row.setMinHeight(48);
 
-        StackPane initials = new StackPane(new Label(student.initials()));
-        initials.setMinSize(36, 36);
-        initials.setMaxSize(36, 36);
-        VBox studentTexts = new VBox(2, new Label(student.name()), new Label(student.email()));
-        HBox studentCell = new HBox(12, initials, studentTexts);
+        StackPane avatarContainer = new StackPane();
+        avatarContainer.setMinSize(28, 28);
+        avatarContainer.setPrefSize(28, 28);
+        Circle avatarCircle = new Circle(14);
+        Text numberText = new Text(String.valueOf(number));
+        numberText.setFont(Font.font("Segoe UI", FontWeight.BOLD, 12));
+        numberText.setFill(Color.WHITE);
+        avatarContainer.getChildren().addAll(avatarCircle, numberText);
+
+        Label nameLabel = new Label(student.name());
+        nameLabel.setFont(Font.font("Segoe UI", FontWeight.MEDIUM, 14));
+        nameLabel.setTextFill(Color.web(text()));
+        HBox studentCell = new HBox(12, avatarContainer, nameLabel);
         studentCell.setAlignment(Pos.CENTER_LEFT);
-        studentCell.setMinWidth(290);
-        studentCell.setPrefWidth(290);
-
-        Label enrollment = new Label(student.enrollment());
-        enrollment.setMinWidth(150);
-        enrollment.setPrefWidth(150);
-        Label date = new Label(LocalDate.now().format(DATE_FORMAT));
-        date.setMinWidth(120);
-        date.setPrefWidth(120);
+        HBox.setHgrow(studentCell, Priority.ALWAYS);
 
         HBox actions = new HBox(8,
             statusButton(student, AttendanceStatus.PRESENT, "attendance.presentButton"),
             statusButton(student, AttendanceStatus.ABSENT, "attendance.absentButton"),
             statusButton(student, AttendanceStatus.EXCUSE, "attendance.excuseButton")
         );
-        actions.setMinWidth(260);
-        row.getChildren().addAll(studentCell, enrollment, date, actions);
+        actions.setMinWidth(210);
+        row.getChildren().addAll(studentCell, actions);
 
         themeUpdaters.add(() -> {
             row.setStyle("-fx-background-color: " + card() + "; -fx-border-color: transparent transparent " + borderSoft() + " transparent;");
-            initials.setStyle("-fx-background-color: " + student.avatarBg(theme.isDark()) + "; -fx-background-radius: 100;");
-            ((Label) initials.getChildren().get(0)).setTextFill(Color.web(student.avatarText(theme.isDark())));
-            ((Label) studentTexts.getChildren().get(0)).setTextFill(Color.web(text()));
-            ((Label) studentTexts.getChildren().get(1)).setTextFill(Color.web(textMuted()));
-            enrollment.setTextFill(Color.web(textSecondary()));
-            date.setTextFill(Color.web(textSecondary()));
+            avatarCircle.setFill(Color.web(AVATAR_COLORS[student.colorIndex % AVATAR_COLORS.length]));
+            nameLabel.setTextFill(Color.web(text()));
         });
         return row;
     }
@@ -391,8 +405,8 @@ public class AdminAttendanceView {
         loadMoreButton.setOnAction(e -> {
             int start = students.size() + 1;
             students.addAll(
-                new StudentAttendance("Herrera, Sebastian " + start, "sebastian.h@student.edu", "STU-2023-20" + start, "SH", 0),
-                new StudentAttendance("Morales, Isabella " + (start + 1), "isabella.m@student.edu", "STU-2023-22" + start, "IM", 1)
+                new StudentAttendance("Herrera Campos, Sebastián " + start, 0),
+                new StudentAttendance("Morales Vega, Isabella " + (start + 1), 1)
             );
             refreshRows();
         });
@@ -490,14 +504,14 @@ public class AdminAttendanceView {
 
     private void loadInitialData() {
         students.addAll(
-            new StudentAttendance("Garcia, Alejandro", "alejandro.g@student.edu", "STU-2023-045", "AG", 0),
-            new StudentAttendance("Martinez, Lucia", "lucia.m@student.edu", "STU-2023-089", "LM", 1),
-            new StudentAttendance("Perez, Carlos", "carlos.p@student.edu", "STU-2023-112", "PC", 2),
-            new StudentAttendance("Lopez, Sofia", "sofia.l@student.edu", "STU-2023-134", "LS", 3),
-            new StudentAttendance("Ramirez, Diego", "diego.r@student.edu", "STU-2023-158", "RD", 0),
-            new StudentAttendance("Torres, Valentina", "valentina.t@student.edu", "STU-2023-177", "VT", 1),
-            new StudentAttendance("Nunez, Camila", "camila.n@student.edu", "STU-2023-188", "CN", 2),
-            new StudentAttendance("Santos, Daniel", "daniel.s@student.edu", "STU-2023-196", "DS", 3)
+            new StudentAttendance("García López, Alejandro Miguel", 0),
+            new StudentAttendance("Martínez Ríos, Lucía Fernanda", 1),
+            new StudentAttendance("Pérez Soto, Carlos Andrés", 2),
+            new StudentAttendance("López Vargas, Sofía Elena", 3),
+            new StudentAttendance("Ramírez Cruz, Diego Antonio", 0),
+            new StudentAttendance("Torres Medina, Valentina Isabel", 1),
+            new StudentAttendance("Núñez Vera, Camila Alejandra", 2),
+            new StudentAttendance("Santos Rojas, Daniel Esteban", 3)
         );
     }
 
@@ -505,35 +519,14 @@ public class AdminAttendanceView {
 
     private static class StudentAttendance {
         private final String name;
-        private final String email;
-        private final String enrollment;
-        private final String initials;
         private final int colorIndex;
         private AttendanceStatus status = AttendanceStatus.PRESENT;
 
-        StudentAttendance(String name, String email, String enrollment, String initials, int colorIndex) {
+        StudentAttendance(String name, int colorIndex) {
             this.name = name;
-            this.email = email;
-            this.enrollment = enrollment;
-            this.initials = initials;
             this.colorIndex = colorIndex;
         }
 
         String name() { return name; }
-        String email() { return email; }
-        String enrollment() { return enrollment; }
-        String initials() { return initials; }
-
-        String avatarBg(boolean dark) {
-            String[] light = {"#e0e7ff", "#dbeafe", "#fce7f3", "#dcfce7"};
-            String[] darkColors = {"#312e81", "#1e3a8a", "#831843", "#14532d"};
-            return dark ? darkColors[colorIndex % darkColors.length] : light[colorIndex % light.length];
-        }
-
-        String avatarText(boolean dark) {
-            String[] light = {"#4338ca", "#1d4ed8", "#be185d", "#15803d"};
-            String[] darkColors = {"#c7d2fe", "#bfdbfe", "#f9a8d4", "#bbf7d0"};
-            return dark ? darkColors[colorIndex % darkColors.length] : light[colorIndex % light.length];
-        }
     }
 }

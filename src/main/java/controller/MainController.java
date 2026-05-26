@@ -4,7 +4,9 @@ import theme.ThemeManager;
 import util.LanguageManager;
 import java.io.File;
 import java.util.prefs.Preferences;
+import javafx.animation.KeyFrame;
 import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -87,7 +89,10 @@ public class MainController {
     private final List<Text> scheduleDetList = new ArrayList<>();
     private final List<Rectangle> perfBarsList = new ArrayList<>();
     private final List<Text> perfBarLabelList = new ArrayList<>();
+    private final int[] perfOriginalHeights = new int[6];
     private int selectedPerfBar = -1;
+    private int defaultHighlightBar = -1;
+    private static final int PERF_BAR_GROW = 15;
     private Circle headerAvatar;
     private SVGPath headerAvatarSvg;
     private Preferences prefs = Preferences.userNodeForPackage(controller.Configuracion.class);
@@ -769,19 +774,24 @@ public class MainController {
 
         String[] labels = {"5to E", "6to A", "4to B", "4to C", "5to A", "6to B"};
         int[] heights = {60, 70, 80, 60, 110, 90};
+        int maxH = 0;
+        for (int h : heights) { if (h > maxH) maxH = h; }
 
         List<Rectangle> bars = new ArrayList<>();
         List<Text> barLabels = new ArrayList<>();
 
-        for (int i = 0; i < labels.length; i++) {
+        for (int i = 0; i < heights.length; i++) {
+            perfOriginalHeights[i] = heights[i];
+            if (heights[i] == maxH) defaultHighlightBar = i;
+
             int idx = i;
             VBox barBox = new VBox(8);
             barBox.setAlignment(Pos.BOTTOM_CENTER);
-            Rectangle bar = new Rectangle(20, heights[i], Color.web(c(L_PRIMARY, D_PRIMARY)));
+            Rectangle bar = new Rectangle(20, heights[i], Color.web(heights[i] == maxH ? c(L_PRIMARY, D_PRIMARY) : c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
             bar.setArcWidth(10); bar.setArcHeight(10);
             Text lbl = new Text(labels[i]);
             lbl.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
-            lbl.setFill(Color.web(c(i == 4 ? L_PRIMARY : L_OUTLINE, D_ON_SURFACE)));
+            lbl.setFill(Color.web(heights[i] == maxH ? c(L_PRIMARY, D_ON_SURFACE) : c(L_OUTLINE, D_OUTLINE)));
 
             bar.setOnMouseEntered(e -> {
                 if (selectedPerfBar == -1 || selectedPerfBar != idx) {
@@ -834,11 +844,19 @@ public class MainController {
             perfSubText.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
             moreDots.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
             fT.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
-            for (int i = 0; i < bars.size(); i++) {
-                bars.get(i).setFill(Color.web(c(i == 4 ? L_PRIMARY : L_PRIMARY_FIXED, D_PRIMARY)));
-                barLabels.get(i).setFill(Color.web(c(i == 4 ? L_PRIMARY : L_OUTLINE, D_ON_SURFACE)));
+            if (selectedPerfBar == -1) {
+                restoreBars();
+            } else {
+                dimOtherBars(selectedPerfBar);
             }
         });
+    }
+
+    private void animateBarHeight(Rectangle bar, int targetHeight) {
+        Timeline tl = new Timeline();
+        double start = bar.getHeight();
+        tl.getKeyFrames().add(new KeyFrame(Duration.millis(150), e -> bar.setHeight(targetHeight)));
+        tl.play();
     }
 
     private void dimOtherBars(int activeIndex) {
@@ -848,9 +866,11 @@ public class MainController {
             if (i == activeIndex) {
                 bar.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
                 if (lbl != null) lbl.setFill(Color.web(c(L_PRIMARY, D_ON_SURFACE)));
+                animateBarHeight(bar, perfOriginalHeights[i] + PERF_BAR_GROW);
             } else {
                 bar.setFill(Color.web(c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
                 if (lbl != null) lbl.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+                animateBarHeight(bar, perfOriginalHeights[i]);
             }
         }
     }
@@ -859,8 +879,10 @@ public class MainController {
         for (int i = 0; i < perfBarsList.size(); i++) {
             Rectangle bar = perfBarsList.get(i);
             Text lbl = i < perfBarLabelList.size() ? perfBarLabelList.get(i) : null;
-            bar.setFill(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY)));
-            if (lbl != null) lbl.setFill(Color.web(c(i == 4 ? L_PRIMARY : L_OUTLINE, D_ON_SURFACE)));
+            boolean isDefault = defaultHighlightBar == i;
+            bar.setFill(Color.web(isDefault ? c(L_PRIMARY, D_PRIMARY) : c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
+            if (lbl != null) lbl.setFill(Color.web(isDefault ? c(L_PRIMARY, D_ON_SURFACE) : c(L_OUTLINE, D_OUTLINE)));
+            animateBarHeight(bar, perfOriginalHeights[i]);
         }
     }
 

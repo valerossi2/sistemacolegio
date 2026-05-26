@@ -78,6 +78,7 @@ public class AdminAttendanceView {
     public AdminAttendanceView(ThemeManager theme) {
         this.theme = theme;
         System.out.println("[AdminAttendanceView] CREADO. isDark=" + theme.isDark() + " text()=" + text() + " textMuted()=" + textMuted());
+        loadInitialData();
         buildView();
         wireEvents();
         updateLanguage();
@@ -415,6 +416,7 @@ public class AdminAttendanceView {
             item.setOnAction(e -> {
                 target.setText(opt);
                 updateLanguage();
+                reloadStudents();
             });
             menu.getItems().add(item);
         }
@@ -513,6 +515,67 @@ public class AdminAttendanceView {
     private String text() { return theme.isDark() ? "#F8FAFC" : "#0f172a"; }
     private String textSecondary() { return theme.isDark() ? "#CBD5E1" : "#1e293b"; }
     private String textMuted() { return theme.isDark() ? "#94A3B8" : "#334155"; }
+
+    private void loadInitialData() {
+        reloadStudents();
+    }
+
+    private void reloadStudents() {
+        students.clear();
+        String g = gradeLabel.getText();
+        String s = sectionLabel.getText();
+        String key = g + " " + s;
+        List<StudentAttendance> data = sampleData.getOrDefault(key, sampleData.get("5to E"));
+        if (data != null) {
+            for (StudentAttendance sa : data) {
+                students.add(new StudentAttendance(sa.name(), sa.colorIndex));
+            }
+        }
+        refreshRows();
+    }
+
+    private static final java.util.Map<String, List<StudentAttendance>> sampleData = new java.util.LinkedHashMap<>();
+    static {
+        sampleData.put("5to E", List.of(
+            new StudentAttendance("García López, Alejandro Miguel", 0),
+            new StudentAttendance("Martínez Ríos, Lucía Fernanda", 1),
+            new StudentAttendance("Pérez Soto, Carlos Andrés", 2),
+            new StudentAttendance("López Vargas, Sofía Elena", 3),
+            new StudentAttendance("Ramírez Cruz, Diego Antonio", 0),
+            new StudentAttendance("Torres Medina, Valentina Isabel", 1)
+        ));
+        sampleData.put("5to D", List.of(
+            new StudentAttendance("Herrera Campos, Sebastián", 2),
+            new StudentAttendance("Morales Vega, Isabella", 3),
+            new StudentAttendance("Castro Rivas, Mateo", 0),
+            new StudentAttendance("Flores Delgado, Camila", 1),
+            new StudentAttendance("Ríos Paredes, Benjamín", 2)
+        ));
+        sampleData.put("4to A", List.of(
+            new StudentAttendance("Díaz Mendoza, Valentina", 3),
+            new StudentAttendance("Ortiz Guzmán, Santiago", 0),
+            new StudentAttendance("Reyes Aguilar, Mariana", 1),
+            new StudentAttendance("Medina Cárdenas, Nicolás", 2),
+            new StudentAttendance("Cruz Peña, Ximena", 3),
+            new StudentAttendance("Vega Roldán, Fernando", 0),
+            new StudentAttendance("Campos Navarro, Jimena", 1)
+        ));
+        sampleData.put("4to B", List.of(
+            new StudentAttendance("Paredes Vega, Emiliano", 2),
+            new StudentAttendance("Figueroa Lara, Renata", 3),
+            new StudentAttendance("Acosta Molina, Mauricio", 0),
+            new StudentAttendance("Navarrete Ríos, Paulina", 1),
+            new StudentAttendance("Salinas Cordero, Alan", 2)
+        ));
+        sampleData.put("3ro C", List.of(
+            new StudentAttendance("Guerrero Luna, Fátima", 3),
+            new StudentAttendance("Maldonado Pacheco, Raúl", 0),
+            new StudentAttendance("Sosa Del Valle, Abril", 1),
+            new StudentAttendance("Castillo Peña, Emilio", 2),
+            new StudentAttendance("Rivas Contreras, Daniela", 3),
+            new StudentAttendance("Peralta Sandoval, Gustavo", 0)
+        ));
+    }
 
     private enum AttendanceStatus { UNMARKED, PRESENT, ABSENT, EXCUSE }
 

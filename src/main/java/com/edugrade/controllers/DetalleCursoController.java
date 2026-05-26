@@ -293,12 +293,10 @@ public class DetalleCursoController {
 
         // ── Gender distribution ──
         int masc = rng.nextInt(studentCount + 1);
-        int fem = rng.nextInt(studentCount - masc + 1);
-        int otro = studentCount - masc - fem;
+        int fem = studentCount - masc;
         genderChart.setData(FXCollections.observableArrayList(
             new PieChart.Data("Masculino", masc),
-            new PieChart.Data("Femenino", fem),
-            new PieChart.Data("Otro", otro)
+            new PieChart.Data("Femenino", fem)
         ));
         initGenderChartInteraction();
 
@@ -308,7 +306,6 @@ public class DetalleCursoController {
         int reprobados = studentCount - aprobados;
         lblPromedioGeneral.setText(String.format("%.1f", avg));
         lblAprobadosReprobados.setText(aprobados + " / " + reprobados);
-        lblPromedioMateria.setText(currentCourse.grado() + " " + currentCourse.seccion() + ": " + String.format("%.1f", avg));
     }
 
     private void initStats() {
@@ -320,8 +317,7 @@ public class DetalleCursoController {
 
         ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
             new PieChart.Data("Masculino", 18),
-            new PieChart.Data("Femenino", 12),
-            new PieChart.Data("Otro", 2)
+            new PieChart.Data("Femenino", 12)
         );
         genderChart.setData(pieData);
         initGenderChartInteraction();

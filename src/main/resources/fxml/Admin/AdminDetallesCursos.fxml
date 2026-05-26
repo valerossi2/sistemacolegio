@@ -81,8 +81,7 @@
 
             <!-- ─── Columna izquierda: Estadísticas y Rendimiento ─── -->
             <VBox fx:id="courseOverviewCard" styleClass="card" spacing="16"
-                  GridPane.columnIndex="0" GridPane.rowIndex="0"
-                  VBox.vgrow="ALWAYS">
+                  GridPane.columnIndex="0" GridPane.rowIndex="0">
                 <padding>
                     <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>
@@ -137,15 +136,14 @@
 
                 <Region styleClass="card-divider"/>
 
-                <VBox spacing="8" VBox.vgrow="ALWAYS">
+                <VBox spacing="8">
                     <Label text="Distribución por Género" styleClass="card__subtitle"/>
                     <PieChart fx:id="genderChart"
                               styleClass="gender-chart"
                               legendVisible="true"
                               labelsVisible="true"
                               prefHeight="200"
-                              animated="false"
-                              VBox.vgrow="ALWAYS"/>
+                              animated="false"/>
                 </VBox>
 
             </VBox>

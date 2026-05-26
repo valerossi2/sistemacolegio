@@ -5,6 +5,7 @@
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.shape.*?>
+<?import javafx.scene.chart.*?>
 
 
 <!--
@@ -33,7 +34,8 @@
                 <HBox spacing="6" alignment="CENTER_LEFT">
                     <Label fx:id="breadcrumbCursos"
                            text="Cursos"
-                           styleClass="breadcrumb__parent btn-link"/>
+                           styleClass="breadcrumb__parent btn-link"
+                           onMouseClicked="#onBreadcrumbCursos"/>
                     <Label text="›" styleClass="breadcrumb__separator"/>
                     <Label fx:id="breadcrumbCursoActual"
                            text="5to E"
@@ -64,6 +66,15 @@
                              scaleX="0.8" scaleY="0.8"/>
                 </graphic>
             </Button>
+            <!-- Botón Calificaciones -->
+            <Button fx:id="btnCalificaciones" styleClass="btn-outlined"
+                    mnemonicParsing="false" onAction="#onCalificaciones">
+                <graphic>
+                    <SVGPath styleClass="btn-svg-icon"
+                             content="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h10v2H4v-2z"
+                             scaleX="0.8" scaleY="0.8"/>
+                </graphic>
+            </Button>
         </HBox>
 
         <!-- ════════════════════════════════════════
@@ -78,33 +89,17 @@
                 <RowConstraints vgrow="ALWAYS"/>
             </rowConstraints>
 
-            <!-- ─── Columna izquierda: Overview Card ──────────── -->
+            <!-- ─── Columna izquierda: Estadísticas y Rendimiento ─── -->
             <VBox fx:id="courseOverviewCard" styleClass="card" spacing="16"
                   GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
 
-                <HBox alignment="CENTER_LEFT">
-                    <Label text="Resumen" styleClass="card__title" HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="badgeNivel" text="SECUNDARIA"
-                           styleClass="badge badge--surface"/>
-                </HBox>
+                <Label fx:id="lblStatsTitle" text="Estadísticas y Rendimiento"
+                       styleClass="card__title"/>
 
-                <!-- Imagen / placeholder del curso -->
-                <StackPane styleClass="course-image-container" prefHeight="192">
-                    <Pane styleClass="course-image-placeholder"/>
-                    <Pane styleClass="course-image-overlay"/>
-                    <VBox styleClass="course-image-caption"
-                          StackPane.alignment="BOTTOM_LEFT">
-                        <Label text="Tutor Principal" styleClass="caption-subtitle"/>
-                        <Label fx:id="lblTutorPrincipal"
-                               text="Prof. Laura Méndez"
-                               styleClass="caption-title"/>
-                    </VBox>
-                </StackPane>
-
-                <!-- Stats -->
                 <VBox spacing="8">
-
-                    <!-- Stat: Total Estudiantes -->
                     <HBox styleClass="stat-row" spacing="12" alignment="CENTER_LEFT">
                         <StackPane styleClass="stat-icon stat-icon--primary">
                             <SVGPath styleClass="stat-svg-icon"
@@ -112,12 +107,11 @@
                                      scaleX="0.7" scaleY="0.7"/>
                         </StackPane>
                         <VBox>
-                            <Label text="Total Estudiantes" styleClass="stat-label"/>
+                            <Label fx:id="lblTotalStudentsLabel" text="Total Estudiantes" styleClass="stat-label"/>
                             <Label fx:id="totalStudents" text="32" styleClass="stat-value"/>
                         </VBox>
                     </HBox>
 
-                    <!-- Stat: Total Profesores -->
                     <HBox styleClass="stat-row" spacing="12" alignment="CENTER_LEFT">
                         <StackPane styleClass="stat-icon stat-icon--secondary">
                             <SVGPath styleClass="stat-svg-icon"
@@ -125,14 +119,43 @@
                                      scaleX="0.7" scaleY="0.7"/>
                         </StackPane>
                         <VBox>
-                            <Label text="Total Profesores" styleClass="stat-label"/>
+                            <Label fx:id="lblTotalTeachersLabel" text="Total Profesores" styleClass="stat-label"/>
                             <Label fx:id="totalTeachers" text="8" styleClass="stat-value"/>
                         </VBox>
                     </HBox>
-
-
-
                 </VBox>
+
+                <Region styleClass="card-divider"/>
+
+                <VBox spacing="10">
+                    <HBox spacing="8">
+                        <VBox styleClass="stat-mini-card" HBox.hgrow="ALWAYS">
+                            <Label fx:id="lblPromedioGeneralLabel" text="Promedio General" styleClass="stat-mini-card__label"/>
+                            <Label fx:id="lblPromedioGeneral" text="0.0" styleClass="stat-mini-card__value"/>
+                        </VBox>
+                        <VBox styleClass="stat-mini-card" HBox.hgrow="ALWAYS">
+                            <Label fx:id="lblAprobadosReprobadosLabel" text="Aprobados / Reprobados" styleClass="stat-mini-card__label"/>
+                            <Label fx:id="lblAprobadosReprobados" text="0 / 0" styleClass="stat-mini-card__value"/>
+                        </VBox>
+                    </HBox>
+                    <VBox styleClass="stat-mini-card">
+                        <Label fx:id="lblPromedioMateriaLabel" text="Promedio por Materia" styleClass="stat-mini-card__label"/>
+                        <Label fx:id="lblPromedioMateria" text="-" styleClass="stat-mini-card__value" wrapText="true"/>
+                    </VBox>
+                </VBox>
+
+                <Region styleClass="card-divider"/>
+
+                <VBox spacing="8">
+                    <Label fx:id="lblDistribucionGeneroLabel" text="Distribución por Género" styleClass="card__subtitle"/>
+                    <PieChart fx:id="genderChart"
+                              styleClass="gender-chart"
+                              legendVisible="true"
+                              labelsVisible="true"
+                              prefHeight="200"
+                              animated="false"/>
+                </VBox>
+
             </VBox>
 
             <!-- ─── Columna derecha ──────────── -->
@@ -143,7 +166,7 @@
                 <!-- Equipo Docente -->
                 <VBox styleClass="card" spacing="0">
                     <HBox styleClass="teacher-card__header" alignment="CENTER_LEFT">
-                        <Label text="Equipo Docente" styleClass="card__title"
+                        <Label fx:id="lblEquipoDocenteCard" text="Equipo Docente" styleClass="card__title"
                                HBox.hgrow="ALWAYS"/>
                         <Button fx:id="btnVerTodosDocentes" text="Ver Todos"
                                 styleClass="btn-link" mnemonicParsing="false"
@@ -168,7 +191,7 @@
                 <!-- Lista de Estudiantes -->
                 <VBox styleClass="card" spacing="0">
                     <HBox styleClass="teacher-card__header" alignment="CENTER_LEFT">
-                        <Label text="Lista de Estudiantes" styleClass="card__title"
+                        <Label fx:id="lblListaEstudiantesCard" text="Lista de Estudiantes" styleClass="card__title"
                                HBox.hgrow="ALWAYS"/>
                         <Button fx:id="btnLoadMore" text="Cargar más estudiantes"
                                 styleClass="btn-link" mnemonicParsing="false"

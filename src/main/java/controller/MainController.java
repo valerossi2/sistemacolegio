@@ -188,10 +188,9 @@ public class MainController {
 
     private void setupNavigation() {
         LanguageManager lang = LanguageManager.getInstance();
-        String[] navKeys = {"sidebar.home", "sidebar.students", "sidebar.teachers", "sidebar.courses", "sidebar.attendance", "sidebar.schedule", "sidebar.settings"};
+        String[] navKeys = {"sidebar.home", "sidebar.teachers", "sidebar.courses", "sidebar.attendance", "sidebar.schedule", "sidebar.settings"};
         String[][] items = {
             {lang.get("sidebar.home"), ICON_HOME},
-            {lang.get("sidebar.students"), ICON_SCHOOL},
             {lang.get("sidebar.teachers"), ICON_GROUP},
             {lang.get("sidebar.courses"), ICON_BOOK},
             {lang.get("sidebar.attendance"), ICON_CHECK_CIRCLE},
@@ -267,14 +266,13 @@ public class MainController {
 
     private void handleNavigation(int index) {
         if (index == 0) {
-            setCenterView(mainCanvas);
+            centerWrapper.getChildren().setAll(mainCanvas);
             loadHeaderProfileImage();
         } else if (index == 1) {
-            loadView("/fxml/Admin/AdminEstudiantes.fxml");
-        } else if (index == 2) {
             loadView("/fxml/Admin/AdminMaestros.fxml");
-        } else if (index == 3) {
+        } else if (index == 2) {
             loadView("/fxml/Admin/AdminCursos.fxml");
+
         } else if (index == 4) {
 
             AdminAttendanceView attendanceView = new AdminAttendanceView(theme);
@@ -283,6 +281,15 @@ public class MainController {
         } else if (index == 6) {
             controller.Configuracion config = new controller.Configuracion();
 
+            loadView("/fxml/Admin/AdminHorario.fxml");
+        } else if (index == 5) {
+            controller.Configuracion config = new controller.Configuracion();
+
+        } else if (index == 3) {
+            AdminAttendanceView attendanceView = new AdminAttendanceView(theme);
+            attendanceView.attachSearchField(searchField);
+            setCenterView(attendanceView.getView());
+        } else if (index == 4) {
             loadView("/fxml/Admin/AdminHorario.fxml");
         } else if (index == 5) {
             controller.Configuracion config = new controller.Configuracion();
@@ -340,7 +347,7 @@ public class MainController {
             }
         });
         
-        setCenterView(mainCanvas);
+        centerWrapper.getChildren().setAll(mainCanvas);
     }
 
     private void setCenterView(Node node) {
@@ -841,12 +848,14 @@ public class MainController {
         ScrollPane sp = new ScrollPane(list);
         sp.setFitToWidth(true);
         sp.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
-        sp.setPrefHeight(220);
+        sp.setPrefHeight(240);
+        sp.setMinHeight(140);
 
         scheduleBox.getChildren().addAll(scheduleTitleText, sp);
-        scheduleBox.setPadding(new Insets(12));
+        scheduleBox.setPadding(new Insets(12, 12, 28, 12));
         scheduleBox.setSpacing(8);
         scheduleBox.setStyle(cardStyle(theme.isDark()));
+        VBox.setVgrow(scheduleBox, Priority.ALWAYS);
 
         themeUpdaters.add(() -> {
             scheduleBox.setStyle(cardStyle(theme.isDark()));
@@ -952,7 +961,7 @@ public class MainController {
             bar.setArcHeight(10 * s);
         }
 
-        scheduleBox.setPadding(new Insets(12 * s));
+        scheduleBox.setPadding(new Insets(12 * s, 12 * s, 28 * s, 12 * s));
         scheduleBox.setSpacing(8 * s);
         coursesBox.setPadding(new Insets(compact ? 8 : 0));
         coursesBox.setSpacing(compact ? 8 : 0);
@@ -1012,7 +1021,7 @@ public class MainController {
         btnAll.setText(lang.get("course.viewAll"));
         searchField.setPromptText(lang.get("search.prompt"));
         // Update sidebar labels
-        String[] navKeys = {"sidebar.home", "sidebar.students", "sidebar.teachers", "sidebar.courses", "sidebar.attendance", "sidebar.schedule", "sidebar.settings"};
+        String[] navKeys = {"sidebar.home", "sidebar.teachers", "sidebar.courses", "sidebar.attendance", "sidebar.schedule", "sidebar.settings"};
         for (int i = 0; i < navLabelList.size() && i < navKeys.length; i++) {
             navLabelList.get(i).setText(lang.get(navKeys[i]));
         }

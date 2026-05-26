@@ -69,7 +69,7 @@ import java.time.LocalDateTime;
         public String getFotoUrl()                { return FotoUrl; }
         public void   setFotoUrl(String u)        { this.FotoUrl = u; }
         public Boolean getActivo()                { return activo; }
-        public void    setActivo(Boolean a)       { this.activo = a; }
+        public void    setActivo(String a)       { this.activo = false; }
         public boolean esAdmin()   { return "ADMIN".equals(rol.getNombre()); }
         public boolean esMaestro() { return "MAESTRO".equals(rol.getNombre()); }
     }

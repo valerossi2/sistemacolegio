@@ -60,5 +60,6 @@ public class Calificacion {
     public Usuario getRegistradoPor()               { return registradoPor; }
     public void setRegistradoPor(Usuario u)         { this.registradoPor = u; }
     public LocalDate getFechaRegistro()             { return FechaRegistro; }
+    public void setFechaRegistro(LocalDate fecha)   { this.FechaRegistro = fecha; }
     public LocalDateTime getCreadoEn()              { return CreadoEn; }
 }

@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.chart.PieChart;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -15,7 +16,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -34,6 +35,8 @@ public class DetalleCursoController {
     private ThemeManager theme;
     private boolean showingAllTeachers = false;
     private boolean showingAllStudents = false;
+    private boolean editMode = false;
+    private List<Node> savedCardChildren;
 
     private final ObservableList<TeacherRow> fullTeacherData = FXCollections.observableArrayList();
     private final ObservableList<TeacherRow> displayedTeacherData = FXCollections.observableArrayList();
@@ -47,9 +50,8 @@ public class DetalleCursoController {
     @FXML private Label pageTitle;
     @FXML private Button btnPrint;
     @FXML private Button btnEditCourse;
+    @FXML private Button btnCalificaciones;
     @FXML private GridPane bentoGrid;
-    @FXML private Label badgeNivel;
-    @FXML private Label lblTutorPrincipal;
     @FXML private Label totalStudents;
     @FXML private Label totalTeachers;
     @FXML private Button btnVerTodosDocentes;
@@ -61,19 +63,35 @@ public class DetalleCursoController {
     @FXML private TableColumn<StudentRow, String> colMatricula;
     @FXML private TableColumn<StudentRow, String> colAsistencia;
     @FXML private Button btnLoadMore;
+    @FXML private Label lblPromedioGeneral;
+    @FXML private Label lblAprobadosReprobados;
+    @FXML private Label lblStatsTitle;
+    @FXML private Label lblTotalStudentsLabel;
+    @FXML private Label lblTotalTeachersLabel;
+    @FXML private Label lblPromedioGeneralLabel;
+    @FXML private Label lblAprobadosReprobadosLabel;
+    @FXML private Label lblPromedioMateriaLabel;
+    @FXML private Label lblDistribucionGeneroLabel;
+    @FXML private Label lblEquipoDocenteCard;
+    @FXML private Label lblListaEstudiantesCard;
+    @FXML private Label lblPromedioMateria;
+    @FXML private PieChart genderChart;
 
     private CursoController.CourseRow currentCourse;
     private List<CursoController.CourseRow> allCourses;
     private Consumer<CursoController.CourseRow> navigateToCourse;
+    private Runnable onBackToList;
 
     public void setCourse(CursoController.CourseRow course, List<CursoController.CourseRow> allCourses,
-                          Consumer<CursoController.CourseRow> navigator) {
+                          Consumer<CursoController.CourseRow> navigator, Runnable onBackToList) {
         this.currentCourse = course;
         this.allCourses = allCourses;
         this.navigateToCourse = navigator;
+        this.onBackToList = onBackToList;
         String label = course.grado() + " " + course.seccion();
         breadcrumbCursoActual.setText(label);
         pageTitle.setText(lang.get("detalle.pageTitle", "Detalles del Curso") + ": " + label);
+        loadRealData();
     }
 
     @FXML
@@ -88,6 +106,7 @@ public class DetalleCursoController {
         initTeacherData();
         initStudentTable();
         initStudentData();
+        initStats();
 
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);
@@ -106,9 +125,27 @@ public class DetalleCursoController {
     private static final int TOTAL_STUDENT_COUNT = 10;
 
     private void initTeacherTable() {
-        colTeacherName.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().nombre()));
+        colTeacherName.setCellValueFactory(d -> d.getValue().nombreProperty());
         colTeacherName.setCellFactory(nombreCell());
-        colTeacherSubject.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().materia()));
+        colTeacherSubject.setCellValueFactory(d -> d.getValue().materiaProperty());
+    }
+
+    private Callback<TableColumn<TeacherRow, String>, TableCell<TeacherRow, String>> defaultSubjectCell() {
+        return col -> new TableCell<>() {
+            private final Label label = new Label();
+            { setGraphic(label); setPadding(new Insets(8, 16, 8, 16)); }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                var tv = getTableView();
+                if (empty || tv == null || getIndex() < 0 || getIndex() >= tv.getItems().size()) {
+                    label.setText(null);
+                } else {
+                    label.setText(tv.getItems().get(getIndex()).getMateria());
+                    label.getStyleClass().add("cell-docente-name");
+                }
+            }
+        };
     }
 
     private Callback<TableColumn<TeacherRow, String>, TableCell<TeacherRow, String>> nombreCell() {
@@ -136,8 +173,8 @@ public class DetalleCursoController {
                     initials.setText(null);
                 } else {
                     TeacherRow row = tv.getItems().get(getIndex());
-                    nameLabel.setText(row.nombre());
-                    String initial = row.nombre().substring(0, 1).toUpperCase();
+                    nameLabel.setText(row.getNombre());
+                    String initial = row.getNombre().substring(0, 1).toUpperCase();
                     initials.setText(initial);
                     avatarCircle.setFill(Color.web(AVATAR_COLORS[row.avatarIdx() % AVATAR_COLORS.length]));
                 }
@@ -170,9 +207,9 @@ public class DetalleCursoController {
         colMatricula.setCellValueFactory(new PropertyValueFactory<>("matricula"));
         colAsistencia.setCellValueFactory(new PropertyValueFactory<>("status"));
         colAsistencia.setCellFactory(col -> new TableCell<StudentRow, String>() {
-            private final Button btn = new Button();
+            private final Label lbl = new Label();
             {
-                btn.getStyleClass().add("attendance-btn");
+                lbl.getStyleClass().add("attendance-btn");
             }
 
             @Override
@@ -182,24 +219,24 @@ public class DetalleCursoController {
                     setGraphic(null);
                     setText(null);
                 } else {
-                    btn.getStyleClass().removeAll(
+                    lbl.getStyleClass().removeAll(
                         "attendance-btn--presente", "attendance-btn--ausente", "attendance-btn--excusa"
                     );
                     switch (status) {
                         case "presente" -> {
-                            btn.setText("Presente");
-                            btn.getStyleClass().add("attendance-btn--presente");
+                            lbl.setText("Presente");
+                            lbl.getStyleClass().add("attendance-btn--presente");
                         }
                         case "ausente" -> {
-                            btn.setText("Ausente");
-                            btn.getStyleClass().add("attendance-btn--ausente");
+                            lbl.setText("Ausente");
+                            lbl.getStyleClass().add("attendance-btn--ausente");
                         }
                         case "excusa" -> {
-                            btn.setText("Excusa");
-                            btn.getStyleClass().add("attendance-btn--excusa");
+                            lbl.setText("Excusa");
+                            lbl.getStyleClass().add("attendance-btn--excusa");
                         }
                     }
-                    setGraphic(btn);
+                    setGraphic(lbl);
                 }
             }
         });
@@ -226,6 +263,131 @@ public class DetalleCursoController {
         displayedStudentData.addAll(fullStudentData.subList(0, INITIAL_STUDENT_COUNT));
         studentsTable.setItems(displayedStudentData);
         updateStudentTableHeight(INITIAL_STUDENT_COUNT);
+    }
+
+    private void loadRealData() {
+        if (currentCourse == null) return;
+        var rng = ThreadLocalRandom.current();
+
+        // ── Students ──
+        fullStudentData.clear();
+        displayedStudentData.clear();
+        String[] firstNames = {"Liam","Emma","Noah","Olivia","Mateo","Isabella","Santiago","Sophia",
+            "Lucas","Mía","Benjamín","Valentina","Sebastián","Camila","Daniel","Gabriela"};
+        String[] lastNames = {"Castillo","Rodríguez","García","Martínez","Hernández","López","Pérez",
+            "González","Fernández","Torres","Ramírez","Morales","Ortiz","Cruz","Reyes","Vargas"};
+        String[] statuses = {"presente","ausente","excusa"};
+        int studentCount = currentCourse.alumnos();
+        for (int i = 0; i < studentCount; i++) {
+            String name = firstNames[rng.nextInt(firstNames.length)] + " " + lastNames[rng.nextInt(lastNames.length)];
+            String mat = String.format("MAT-%03d", rng.nextInt(1, 999));
+            String status = statuses[rng.nextInt(statuses.length)];
+            fullStudentData.add(new StudentRow(name, mat, status));
+        }
+        int shownStudents = Math.min(INITIAL_STUDENT_COUNT, fullStudentData.size());
+        displayedStudentData.addAll(fullStudentData.subList(0, shownStudents));
+        studentsTable.setItems(displayedStudentData);
+        updateStudentTableHeight(shownStudents);
+        totalStudents.setText(String.valueOf(fullStudentData.size()));
+
+        // ── Teachers ──
+        fullTeacherData.clear();
+        displayedTeacherData.clear();
+        String[] teacherNames = {"Prof. Laura Méndez","Prof. Carlos Ruiz","Prof. Elena Torres",
+            "Prof. Ana Silva","Prof. Miguel Soto","Prof. Diana Ríos","Prof. Pedro Lima",
+            "Prof. Sofía Vega","Prof. Luis Paz"};
+        String[] subjects = {"Matemáticas","Historia","Lenguaje","Ciencias","Inglés","Arte",
+            "Educación Física","Música","Filosofía","Biología","Química"};
+        int teacherCount = currentCourse.profesores();
+        for (int i = 0; i < teacherCount; i++) {
+            String subj = subjects[rng.nextInt(subjects.length)];
+            String estado = rng.nextBoolean() ? "Activo" : "Inactivo";
+            fullTeacherData.add(new TeacherRow(teacherNames[i % teacherNames.length],
+                teacherNames[i % teacherNames.length].toLowerCase().replace(" ",".").replace("á","a").replace("é","e") + "@edu.com",
+                subj, currentCourse.seccion(), estado, i));
+        }
+        int shownTeachers = Math.min(INITIAL_TEACHER_COUNT, fullTeacherData.size());
+        displayedTeacherData.addAll(fullTeacherData.subList(0, shownTeachers));
+        teacherTable.setItems(displayedTeacherData);
+        updateTeacherTableHeight(shownTeachers);
+        totalTeachers.setText(String.valueOf(fullTeacherData.size()));
+
+        // ── Gender distribution ──
+        int masc = rng.nextInt(studentCount + 1);
+        int fem = studentCount - masc;
+        genderChart.setData(FXCollections.observableArrayList(
+            new PieChart.Data("Masculino", masc),
+            new PieChart.Data("Femenino", fem)
+        ));
+        initGenderChartInteraction();
+
+        // ── Stats ──
+        double avg = currentCourse.rendimiento();
+        int aprobados = (int)(studentCount * (avg / 10.0 * 0.8));
+        int reprobados = studentCount - aprobados;
+        lblPromedioGeneral.setText(String.format("%.1f", avg));
+        lblAprobadosReprobados.setText(aprobados + " / " + reprobados);
+    }
+
+    private void initStats() {
+        lblPromedioGeneral.setText("85.4");
+
+        lblAprobadosReprobados.setText("28 / 4");
+
+        lblPromedioMateria.setText("Matemáticas: 72.3 (La más baja)");
+
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
+            new PieChart.Data("Masculino", 18),
+            new PieChart.Data("Femenino", 12)
+        );
+        genderChart.setData(pieData);
+        initGenderChartInteraction();
+    }
+
+    private static final String GRAY_PIE = "#CBD5E1";
+
+    private void initGenderChartInteraction() {
+        genderChart.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                genderChart.applyCss();
+                genderChart.layout();
+                Platform.runLater(this::attachPieHandlers);
+            }
+        });
+    }
+
+    private void attachPieHandlers() {
+        for (PieChart.Data data : genderChart.getData()) {
+            Node node = data.getNode();
+            if (node != null) {
+                String label = switch (data.getName()) {
+                    case "Masculino" -> "varones";
+                    case "Femenino"  -> "mujeres";
+                    default          -> "otros";
+                };
+                int count = (int) data.getPieValue();
+                Tooltip tip = new Tooltip(count + " " + label);
+                tip.getStyleClass().add("pie-tooltip");
+                Tooltip.install(node, tip);
+
+                node.setOnMouseEntered(e -> {
+                    for (PieChart.Data other : genderChart.getData()) {
+                        Node otherNode = other.getNode();
+                        if (other != data && otherNode != null) {
+                            otherNode.setStyle("-fx-pie-color: " + GRAY_PIE + ";");
+                        }
+                    }
+                });
+                node.setOnMouseExited(e -> {
+                    for (PieChart.Data other : genderChart.getData()) {
+                        Node otherNode = other.getNode();
+                        if (otherNode != null) {
+                            otherNode.setStyle("");
+                        }
+                    }
+                });
+            }
+        }
     }
 
     private void loadStylesheets() {
@@ -258,8 +420,7 @@ public class DetalleCursoController {
         breadcrumbCursos.setText(lang.get("detalle.breadcrumbCursos", "Cursos"));
         btnPrint.setText(lang.get("detalle.btnPrint", "Imprimir Reporte"));
         btnEditCourse.setText(lang.get("detalle.btnEdit", "Editar Curso"));
-        badgeNivel.setText(lang.get("detalle.badgeNivel", "SECUNDARIA"));
-        lblTutorPrincipal.setText(lang.get("detalle.tutorPrincipal", "Prof. Laura Méndez"));
+        if (btnCalificaciones != null) btnCalificaciones.setText(lang.get("detalle.btnCalificaciones", "Calificaciones"));
         btnVerTodosDocentes.setText(lang.get(
             showingAllTeachers ? "detalle.verMenos" : "detalle.verTodos"
         ));
@@ -271,12 +432,21 @@ public class DetalleCursoController {
         colStudent.setText(lang.get("detalle.colStudent", "ESTUDIANTE"));
         colMatricula.setText(lang.get("detalle.colMatricula", "ID MATRÍCULA"));
         colAsistencia.setText(lang.get("detalle.colAsistencia", "ASISTENCIA"));
+        if (lblStatsTitle != null) lblStatsTitle.setText(lang.get("detalle.statsTitle", "Estad\u00edsticas y Rendimiento"));
+        if (lblTotalStudentsLabel != null) lblTotalStudentsLabel.setText(lang.get("detalle.totalStudentsLabel", "Total Estudiantes"));
+        if (lblTotalTeachersLabel != null) lblTotalTeachersLabel.setText(lang.get("detalle.totalTeachersLabel", "Total Profesores"));
+        if (lblPromedioGeneralLabel != null) lblPromedioGeneralLabel.setText(lang.get("detalle.promedioGeneralLabel", "Promedio General"));
+        if (lblAprobadosReprobadosLabel != null) lblAprobadosReprobadosLabel.setText(lang.get("detalle.aprobadosReprobadosLabel", "Aprobados / Reprobados"));
+        if (lblPromedioMateriaLabel != null) lblPromedioMateriaLabel.setText(lang.get("detalle.promedioMateriaLabel", "Promedio por Materia"));
+        if (lblDistribucionGeneroLabel != null) lblDistribucionGeneroLabel.setText(lang.get("detalle.distribucionGeneroLabel", "Distribuci\u00f3n por G\u00e9nero"));
+        if (lblEquipoDocenteCard != null) lblEquipoDocenteCard.setText(lang.get("detalle.equipoDocenteCard", "Equipo Docente"));
+        if (lblListaEstudiantesCard != null) lblListaEstudiantesCard.setText(lang.get("detalle.listaEstudiantesCard", "Lista de Estudiantes"));
     }
 
     @FXML
     private void onBreadcrumbCursos(MouseEvent event) {
-        if (allCourses != null && !allCourses.isEmpty())
-            showCourseMenu(event);
+        if (onBackToList != null)
+            onBackToList.run();
     }
 
     @FXML
@@ -312,10 +482,112 @@ public class DetalleCursoController {
 
     @FXML
     private void onEditarCurso(ActionEvent event) {
+        if (!editMode) {
+            enterEditMode();
+        } else {
+            saveEditMode();
+        }
+    }
+
+    private void enterEditMode() {
+        editMode = true;
+        savedCardChildren = new java.util.ArrayList<>(courseOverviewCard.getChildren());
+
+        btnEditCourse.setText(lang.get("detalle.btnGuardar", "Guardar"));
+        btnPrint.setText(lang.get("detalle.btnCancelar", "Cancelar"));
+        btnPrint.setOnAction(e -> exitEditMode());
+
+        // Replace left card with editable form
+        VBox editForm = new VBox(12);
+        editForm.setPadding(new Insets(20));
+        editForm.setSpacing(12);
+
+        Label title = new Label(lang.get("detalle.editarTitle", "Editar Curso"));
+        title.getStyleClass().add("card__title");
+
+        TextField tfStudents = new TextField(totalStudents.getText());
+        tfStudents.getStyleClass().add("input-field");
+        VBox studentsRow = new VBox(4);
+        studentsRow.getChildren().addAll(new Label("Total Estudiantes"), tfStudents);
+
+        TextField tfTeachers = new TextField(totalTeachers.getText());
+        tfTeachers.getStyleClass().add("input-field");
+        VBox teachersRow = new VBox(4);
+        teachersRow.getChildren().addAll(new Label("Total Profesores"), tfTeachers);
+
+        TextField tfAvg = new TextField(lblPromedioGeneral.getText());
+        tfAvg.getStyleClass().add("input-field");
+        VBox avgRow = new VBox(4);
+        avgRow.getChildren().addAll(new Label("Promedio General"), tfAvg);
+
+        editForm.getChildren().addAll(title, studentsRow, teachersRow, avgRow);
+
+        // Store refs for save
+        tfStudents.setUserData("tfStudents");
+        tfTeachers.setUserData("tfTeachers");
+        tfAvg.setUserData("tfAvg");
+
+        courseOverviewCard.getChildren().setAll(editForm);
+
+        // Make teacher table editable
+        teacherTable.setEditable(true);
+        colTeacherName.setCellFactory(TextFieldTableCell.forTableColumn());
+        colTeacherName.setOnEditCommit(e -> {
+            TeacherRow row = e.getRowValue();
+            row.setNombre(e.getNewValue());
+        });
+        colTeacherSubject.setCellFactory(TextFieldTableCell.forTableColumn());
+        colTeacherSubject.setOnEditCommit(e -> {
+            TeacherRow row = e.getRowValue();
+            row.setMateria(e.getNewValue());
+        });
+    }
+
+    private void saveEditMode() {
+        VBox editForm = (VBox) courseOverviewCard.getChildren().get(0);
+        // Read values from TextFields
+        for (Node child : editForm.getChildren()) {
+            if (child instanceof VBox row) {
+                for (Node field : row.getChildren()) {
+                    if (field instanceof TextField tf) {
+                        String ud = (String) tf.getUserData();
+                        if ("tfStudents".equals(ud)) {
+                            totalStudents.setText(tf.getText());
+                        } else if ("tfTeachers".equals(ud)) {
+                            totalTeachers.setText(tf.getText());
+                        } else if ("tfAvg".equals(ud)) {
+                            lblPromedioGeneral.setText(tf.getText());
+                        }
+                    }
+                }
+            }
+        }
+        exitEditMode();
+    }
+
+    private void exitEditMode() {
+        editMode = false;
+        if (savedCardChildren != null) {
+            courseOverviewCard.getChildren().setAll(savedCardChildren);
+            savedCardChildren = null;
+        }
+        btnEditCourse.setText(lang.get("detalle.btnEdit", "Editar Curso"));
+        btnPrint.setText(lang.get("detalle.btnPrint", "Imprimir Reporte"));
+        btnPrint.setOnAction(this::onImprimirReporte);
+
+        teacherTable.setEditable(false);
+        colTeacherName.setCellFactory(nombreCell());
+        colTeacherSubject.setCellFactory(defaultSubjectCell());
+        teacherTable.refresh();
+        studentsTable.refresh();
+    }
+
+    @FXML
+    private void onCalificaciones(ActionEvent event) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(lang.get("detalle.editarTitle", "Editar curso"));
+        alert.setTitle(lang.get("detalle.calificacionesTitle", "Calificaciones"));
         alert.setHeaderText(null);
-        alert.setContentText(lang.get("detalle.editarMsg", "Edición de curso no implementada."));
+        alert.setContentText(lang.get("detalle.calificacionesMsg", "Gestión de calificaciones no implementada."));
         alert.showAndWait();
     }
 
@@ -330,9 +602,10 @@ public class DetalleCursoController {
     @FXML
     private void onVerTodosDocentes(ActionEvent event) {
         showingAllTeachers = !showingAllTeachers;
-        int count = showingAllTeachers ? TOTAL_TEACHER_COUNT : INITIAL_TEACHER_COUNT;
+        int total = fullTeacherData.size();
+        int count = showingAllTeachers ? total : Math.min(INITIAL_TEACHER_COUNT, total);
         displayedTeacherData.setAll(
-            showingAllTeachers ? fullTeacherData : fullTeacherData.subList(0, INITIAL_TEACHER_COUNT)
+            showingAllTeachers ? fullTeacherData : fullTeacherData.subList(0, count)
         );
         updateTeacherTableHeight(count);
         btnVerTodosDocentes.setText(lang.get(
@@ -343,9 +616,10 @@ public class DetalleCursoController {
     @FXML
     private void onCargarMas(ActionEvent event) {
         showingAllStudents = !showingAllStudents;
-        int count = showingAllStudents ? TOTAL_STUDENT_COUNT : INITIAL_STUDENT_COUNT;
+        int total = fullStudentData.size();
+        int count = showingAllStudents ? total : Math.min(INITIAL_STUDENT_COUNT, total);
         displayedStudentData.setAll(
-            showingAllStudents ? fullStudentData : fullStudentData.subList(0, INITIAL_STUDENT_COUNT)
+            showingAllStudents ? fullStudentData : fullStudentData.subList(0, count)
         );
         updateStudentTableHeight(count);
         btnLoadMore.setText(lang.get(
@@ -377,5 +651,43 @@ public class DetalleCursoController {
         public StringProperty statusProperty() { return status; }
     }
 
-    public record TeacherRow(String nombre, String email, String materia, String seccion, String estado, int avatarIdx) {}
+    public static class TeacherRow {
+        private final StringProperty nombre;
+        private final StringProperty email;
+        private final StringProperty materia;
+        private final StringProperty seccion;
+        private final StringProperty estado;
+        private final int avatarIdx;
+
+        public TeacherRow(String nombre, String email, String materia, String seccion, String estado, int avatarIdx) {
+            this.nombre = new SimpleStringProperty(nombre);
+            this.email = new SimpleStringProperty(email);
+            this.materia = new SimpleStringProperty(materia);
+            this.seccion = new SimpleStringProperty(seccion);
+            this.estado = new SimpleStringProperty(estado);
+            this.avatarIdx = avatarIdx;
+        }
+
+        public String getNombre() { return nombre.get(); }
+        public void setNombre(String n) { nombre.set(n); }
+        public StringProperty nombreProperty() { return nombre; }
+
+        public String getEmail() { return email.get(); }
+        public void setEmail(String e) { email.set(e); }
+        public StringProperty emailProperty() { return email; }
+
+        public String getMateria() { return materia.get(); }
+        public void setMateria(String m) { materia.set(m); }
+        public StringProperty materiaProperty() { return materia; }
+
+        public String getSeccion() { return seccion.get(); }
+        public void setSeccion(String s) { seccion.set(s); }
+        public StringProperty seccionProperty() { return seccion; }
+
+        public String getEstado() { return estado.get(); }
+        public void setEstado(String e) { estado.set(e); }
+        public StringProperty estadoProperty() { return estado; }
+
+        public int avatarIdx() { return avatarIdx; }
+    }
 }

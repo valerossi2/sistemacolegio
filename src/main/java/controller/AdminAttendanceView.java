@@ -362,23 +362,57 @@ public class AdminAttendanceView {
         Button button = new Button();
         button.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 12));
         button.setPadding(new Insets(6, 14, 6, 14));
+        button.setText(lang.get(key));
+        updateButtonState(button, student, status);
         button.setOnAction(e -> {
-            student.status = status;
+            if (student.status == status) {
+                student.status = AttendanceStatus.UNMARKED;
+            } else {
+                student.status = status;
+            }
             refreshRows();
         });
         languageUpdaters.add(() -> button.setText(lang.get(key)));
-        themeUpdaters.add(() -> button.setStyle(statusButtonStyle(student.status == status, status)));
+        themeUpdaters.add(() -> button.setStyle(statusButtonStyle(student, status)));
         return button;
     }
 
-    private String statusButtonStyle(boolean active, AttendanceStatus status) {
-        if (status == AttendanceStatus.PRESENT) {
-            return active ? buttonStyle("#16a34a", "#ffffff", "#15803d") : buttonStyle("#16a34a", "#ffffff", "transparent");
+    private void updateButtonState(Button button, StudentAttendance student, AttendanceStatus btnStatus) {
+        boolean isUnmarked = student.status == AttendanceStatus.UNMARKED;
+        boolean isActive = student.status == btnStatus;
+        if (isUnmarked || isActive) {
+            button.setPadding(new Insets(6, 14, 6, 14));
+            button.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 12));
+        } else {
+            button.setPadding(new Insets(2, 6, 2, 6));
+            button.setFont(Font.font("Plus Jakarta Sans", FontWeight.NORMAL, 10));
         }
-        if (status == AttendanceStatus.ABSENT) {
-            return active ? buttonStyle("#ef4444", "#ffffff", "#dc2626") : buttonStyle(theme.isDark() ? "#451a1a" : "#fee2e2", theme.isDark() ? "#fecaca" : "#b91c1c", "transparent");
+        button.setStyle(statusButtonStyle(student, btnStatus));
+    }
+
+    private String statusButtonStyle(StudentAttendance student, AttendanceStatus buttonStatus) {
+        boolean active = student.status == buttonStatus;
+        boolean anyChosen = student.status != AttendanceStatus.UNMARKED;
+
+        if (!anyChosen) {
+            if (buttonStatus == AttendanceStatus.PRESENT)
+                return buttonStyle("#16a34a", "#ffffff", "transparent");
+            if (buttonStatus == AttendanceStatus.ABSENT)
+                return buttonStyle("#ef4444", "#ffffff", "transparent");
+            return buttonStyle("#f59e0b", "#ffffff", "transparent");
         }
-        return active ? buttonStyle("#f59e0b", "#ffffff", "#d97706") : buttonStyle(theme.isDark() ? "#422006" : "#fef9c3", theme.isDark() ? "#fde68a" : "#92400e", "transparent");
+
+        if (active) {
+            if (buttonStatus == AttendanceStatus.PRESENT)
+                return buttonStyle("#16a34a", "#ffffff", "#15803d");
+            if (buttonStatus == AttendanceStatus.ABSENT)
+                return buttonStyle("#ef4444", "#ffffff", "#dc2626");
+            return buttonStyle("#f59e0b", "#ffffff", "#d97706");
+        }
+
+        String grayBg = theme.isDark() ? "#374151" : "#d1d5db";
+        String grayText = theme.isDark() ? "#6b7280" : "#9ca3af";
+        return buttonStyle(grayBg, grayText, "transparent");
     }
 
     private String buttonStyle(String bg, String text, String border) {
@@ -523,7 +557,7 @@ public class AdminAttendanceView {
     private static class StudentAttendance {
         private final String name;
         private final int colorIndex;
-        private AttendanceStatus status = AttendanceStatus.PRESENT;
+        private AttendanceStatus status = AttendanceStatus.UNMARKED;
 
         StudentAttendance(String name, int colorIndex) {
             this.name = name;

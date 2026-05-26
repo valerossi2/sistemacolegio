@@ -249,34 +249,47 @@ public class DetalleCursoController {
     }
 
     private static final String GRAY_PIE = "#CBD5E1";
-    private PieChart.Data selectedSlice;
 
     private void initGenderChartInteraction() {
-        for (PieChart.Data data : genderChart.getData()) {
-            data.nodeProperty().addListener((obs, oldNode, newNode) -> {
-                if (newNode != null) {
-                    newNode.setOnMouseClicked(e -> {
-                        if (selectedSlice == data) {
-                            restoreAll();
-                        } else {
-                            selectedSlice = data;
-                            for (PieChart.Data other : genderChart.getData()) {
-                                if (other != data && other.getNode() != null) {
-                                    other.getNode().setStyle("-fx-pie-color: " + GRAY_PIE + ";");
-                                }
-                            }
-                        }
-                    });
-                }
-            });
-        }
+        genderChart.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                genderChart.applyCss();
+                genderChart.layout();
+                Platform.runLater(this::attachPieHandlers);
+            }
+        });
     }
 
-    private void restoreAll() {
-        selectedSlice = null;
-        for (PieChart.Data d : genderChart.getData()) {
-            if (d.getNode() != null) {
-                d.getNode().setStyle("");
+    private void attachPieHandlers() {
+        for (PieChart.Data data : genderChart.getData()) {
+            Node node = data.getNode();
+            if (node != null) {
+                String label = switch (data.getName()) {
+                    case "Masculino" -> "varones";
+                    case "Femenino"  -> "mujeres";
+                    default          -> "otros";
+                };
+                int count = (int) data.getPieValue();
+                Tooltip tip = new Tooltip(count + " " + label);
+                tip.getStyleClass().add("pie-tooltip");
+                Tooltip.install(node, tip);
+
+                node.setOnMouseEntered(e -> {
+                    for (PieChart.Data other : genderChart.getData()) {
+                        Node otherNode = other.getNode();
+                        if (other != data && otherNode != null) {
+                            otherNode.setStyle("-fx-pie-color: " + GRAY_PIE + ";");
+                        }
+                    }
+                });
+                node.setOnMouseExited(e -> {
+                    for (PieChart.Data other : genderChart.getData()) {
+                        Node otherNode = other.getNode();
+                        if (otherNode != null) {
+                            otherNode.setStyle("");
+                        }
+                    }
+                });
             }
         }
     }

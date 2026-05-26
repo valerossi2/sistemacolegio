@@ -291,6 +291,16 @@
 .gender-chart .default-color1.chart-pie { -fx-pie-color: #EC4899; }
 .gender-chart .default-color2.chart-pie { -fx-pie-color: #F59E0B; }
 
+/* ── PIE TOOLTIP ──────────────────────────────────────────── */
+.pie-tooltip {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-background-color: #1F2937;
+    -fx-text-fill: #F8FAFC;
+    -fx-background-radius: 6px;
+    -fx-padding: 6 12;
+}
+
 /* ── DARK MODE ────────────────────────────────────────────── */
 .root-dark .page-header .page-title { -fx-text-fill: #F8FAFC; }
 .root-dark .breadcrumb__current { -fx-text-fill: #94A3B8; }

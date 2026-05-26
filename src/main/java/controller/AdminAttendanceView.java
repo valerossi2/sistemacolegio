@@ -4,16 +4,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.application.Platform;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -21,7 +23,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -61,11 +62,11 @@ public class AdminAttendanceView {
     private final Label listSubtitle = new Label();
     private final Button loadMoreButton = new Button();
     private final Button saveButton = new Button();
-    private final ComboBox<String> gradeSelector = new ComboBox<>();
-    private final ComboBox<String> sectionSelector = new ComboBox<>();
+    private final Label gradeLabel = new Label("5to");
+    private final Label sectionLabel = new Label("E");
     private final TextField searchField = new TextField();
     private final VBox titleBox = new VBox(8);
-    private final HBox selectorBox = new HBox(12);
+    private final HBox selectorBox = new HBox(8);
     private final HBox pageHeader = new HBox(24);
     private boolean compact;
 
@@ -110,15 +111,13 @@ public class AdminAttendanceView {
         pageHeader.setSpacing(16);
         titleBox.getChildren().setAll(breadcrumb, title);
         selectorBox.setSpacing(8);
-        selectorBox.getChildren().setAll(createSelectorCard("attendance.grade", gradeSelector), createSelectorCard("attendance.section", sectionSelector));
+        selectorBox.getChildren().setAll(createLabelSelector("attendance.grade", gradeLabel), createLabelSelector("attendance.section", sectionLabel));
         Region headerSpacer = new Region();
         HBox.setHgrow(headerSpacer, Priority.ALWAYS);
         pageHeader.getChildren().setAll(titleBox, headerSpacer, selectorBox);
 
-        gradeSelector.setItems(FXCollections.observableArrayList("5to", "4to"));
-        sectionSelector.setItems(FXCollections.observableArrayList("E", "A"));
-        gradeSelector.getSelectionModel().selectFirst();
-        sectionSelector.getSelectionModel().selectFirst();
+        gradeLabel.setOnMouseClicked(e -> showSelectorMenu(e, List.of("5to", "4to", "3ro", "2do", "1ro"), gradeLabel));
+        sectionLabel.setOnMouseClicked(e -> showSelectorMenu(e, List.of("A", "B", "C", "D", "E"), sectionLabel));
 
         buildSummaryCard();
         buildTableCard();
@@ -134,65 +133,23 @@ public class AdminAttendanceView {
         setCompact(false);
     }
 
-    private HBox createSelectorCard(String labelKey, ComboBox<String> selector) {
+    private HBox createLabelSelector(String labelKey, Label valueLabel) {
         Label label = new Label();
         label.setFont(Font.font("Plus Jakarta Sans", 11));
         languageUpdaters.add(() -> label.setText(lang.get(labelKey)));
-        selector.setPrefWidth(55);
-        selector.setMinHeight(24);
-        selector.setVisibleRowCount(5);
-        selector.setCellFactory(list -> new ListCell<String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item);
-                    setTextFill(Color.web(text()));
-                    setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12));
-                }
-            }
-        });
-        selector.setButtonCell(new ListCell<String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item);
-                    setTextFill(Color.web(text()));
-                    setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12));
-                    setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-                }
-            }
-        });
-        HBox box = new HBox(4, label, selector);
+
+        valueLabel.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13));
+        valueLabel.setCursor(javafx.scene.Cursor.HAND);
+        valueLabel.setPadding(new Insets(0, 2, 0, 0));
+
+        HBox box = new HBox(4, label, valueLabel);
         box.setAlignment(Pos.CENTER_LEFT);
-        box.setPadding(new Insets(4, 10, 4, 10));
-        Runnable updateSelector = () -> {
+        box.setPadding(new Insets(2, 8, 2, 8));
+        themeUpdaters.add(() -> {
             label.setTextFill(Color.web(textMuted()));
-            selector.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-font-weight: 700; -fx-font-size: 12; -fx-text-fill: " + text() + "; -fx-mark-color: " + textMuted() + ";");
+            valueLabel.setTextFill(Color.web(text()));
             box.setStyle(cardStyle(8, borderSoft()));
-            selector.setCellFactory(list -> new ListCell<String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) { setText(null); }
-                    else { setText(item); setTextFill(Color.web(text())); setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12)); }
-                }
-            });
-            selector.setButtonCell(new ListCell<String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) { setText(null); }
-                    else { setText(item); setTextFill(Color.web(text())); setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12)); setStyle("-fx-background-color: transparent; -fx-padding: 0;"); }
-                }
-            });
-        };
-        themeUpdaters.add(updateSelector);
+        });
         return box;
     }
 
@@ -408,10 +365,22 @@ public class AdminAttendanceView {
         return "-fx-background-color: " + bg + "; -fx-text-fill: " + text + "; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: " + border + "; -fx-border-width: " + ("transparent".equals(border) ? "0" : "2") + "; -fx-cursor: hand;";
     }
 
+    private void showSelectorMenu(MouseEvent event, List<String> options, Label target) {
+        ContextMenu menu = new ContextMenu();
+        for (String opt : options) {
+            MenuItem item = new MenuItem(opt);
+            if (opt.equals(target.getText())) item.setDisable(true);
+            item.setOnAction(e -> {
+                target.setText(opt);
+                updateLanguage();
+            });
+            menu.getItems().add(item);
+        }
+        menu.show((Node) event.getSource(), Side.BOTTOM, 0, 0);
+    }
+
     private void wireEvents() {
         searchField.textProperty().addListener((obs, oldValue, newValue) -> refreshRows());
-        gradeSelector.setOnAction(e -> updateLanguage());
-        sectionSelector.setOnAction(e -> updateLanguage());
         loadMoreButton.setOnAction(e -> {
             int start = students.size() + 1;
             students.addAll(
@@ -459,8 +428,8 @@ public class AdminAttendanceView {
     }
 
     private void updateLanguage() {
-        String grade = gradeSelector.getValue() == null ? "5to" : gradeSelector.getValue();
-        String section = sectionSelector.getValue() == null ? "E" : sectionSelector.getValue();
+        String grade = gradeLabel.getText();
+        String section = sectionLabel.getText();
         breadcrumb.setText(lang.get("attendance.breadcrumb").replace("{0}", grade).replace("{1}", section));
         title.setText(lang.get("attendance.title"));
         summaryTitle.setText(lang.get("attendance.summary"));

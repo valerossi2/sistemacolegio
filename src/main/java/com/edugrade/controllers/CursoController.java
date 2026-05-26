@@ -225,7 +225,7 @@ public class CursoController {
         colAlumnos.setCellValueFactory(d -> new SimpleStringProperty(String.valueOf(d.getValue().alumnos())));
         colAlumnos.setCellFactory(alumnosCell());
 
-        colRendimiento.setCellValueFactory(d -> new SimpleStringProperty(String.valueOf(d.getValue().rendimiento())));
+        colRendimiento.setCellValueFactory(d -> new SimpleStringProperty(String.format("%.2f", d.getValue().rendimiento())));
         colRendimiento.setCellFactory(rendimientoCell());
 
         colEstado.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().estado()));

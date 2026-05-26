@@ -15,35 +15,34 @@
       maxHeight="Infinity"
       stylesheets="@../../css/base.css,@../../css/Cursos.css,@../../css/Calificaciones.css">
 
-    <VBox fx:id="gradesCard" styleClass="cursos-card" VBox.vgrow="ALWAYS" spacing="0">
-        <VBox spacing="6">
-            <padding><Insets top="32" right="40" bottom="0" left="40"/></padding>
-            <Text fx:id="pageTitle" text="Gestión de Calificaciones" styleClass="cursos-page-title" />
-            <Text fx:id="pageSubtitle" text="Ingresa y gestiona las calificaciones de los estudiantes." styleClass="cursos-page-subtitle" />
-        </VBox>
+    <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
 
-        <HBox spacing="16" alignment="CENTER_LEFT">
-            <padding><Insets top="24" right="40" bottom="16" left="40"/></padding>
+    <HBox fx:id="topBar" styleClass="grades-topbar" spacing="16" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="Buscar estudiante..." styleClass="grades-search" HBox.hgrow="ALWAYS" />
+        <Button fx:id="btnGuardarTop" text="Guardar Cambios" styleClass="grades-btn" />
+    </HBox>
+
+    <VBox fx:id="gradesCard" styleClass="grades-card" VBox.vgrow="ALWAYS" spacing="0">
+        <Text fx:id="pageTitle" text="Gestión de Calificaciones - 5to E" styleClass="grades-title" />
+
+        <HBox fx:id="filterBox" spacing="16" alignment="CENTER_LEFT">
             <VBox spacing="6" HBox.hgrow="ALWAYS">
-                <Label fx:id="lblPeriodo" text="Periodo" styleClass="input-label" />
-                <ComboBox fx:id="comboPeriodo" maxWidth="Infinity" prefHeight="42" styleClass="input-field" />
+                <Label fx:id="lblPeriodo" text="Periodo" styleClass="grades-label" />
+                <ComboBox fx:id="comboPeriodo" styleClass="grades-combo" maxWidth="Infinity" prefHeight="42" />
             </VBox>
             <VBox spacing="6" HBox.hgrow="ALWAYS">
-                <Label fx:id="lblTipoEval" text="Tipo de Evaluación" styleClass="input-label" />
-                <ComboBox fx:id="comboTipoEval" maxWidth="Infinity" prefHeight="42" styleClass="input-field" />
-            </VBox>
-            <VBox spacing="6" alignment="BOTTOM_RIGHT">
-                <Button fx:id="btnGuardarTop" text="Guardar Cambios" styleClass="btn-primary" />
+                <Label fx:id="lblTipoEval" text="Tipo de Evaluación" styleClass="grades-label" />
+                <ComboBox fx:id="comboTipoEval" styleClass="grades-combo" maxWidth="Infinity" prefHeight="42" />
             </VBox>
         </HBox>
 
         <TableView fx:id="gradesTable"
-                   styleClass="cursos-table"
+                   styleClass="grades-table"
                    VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn fx:id="colEstudiante"   text="ESTUDIANTE"     />
-                <TableColumn fx:id="colMatricula"    text="ID MATRÍCULA"   />
-                <TableColumn fx:id="colCalifActual"  text="CALIFICACIÓN"   />
+                <TableColumn fx:id="colMatricula"    text="MATRÍCULA"      />
+                <TableColumn fx:id="colCalifActual"  text="NOTA ACTUAL"    />
                 <TableColumn fx:id="colNuevaCalif"   text="NUEVA NOTA"     />
             </columns>
             <columnResizePolicy>
@@ -55,11 +54,8 @@
         </TableView>
 
         <HBox alignment="CENTER_RIGHT" spacing="12">
-            <padding>
-                <Insets top="16" right="40" bottom="32" left="40"/>
-            </padding>
-            <Button fx:id="btnCancelar" text="Cancelar" styleClass="btn-secondary" />
-            <Button fx:id="btnGuardarBottom" text="Guardar Cambios" styleClass="btn-primary" />
+            <Button fx:id="btnCancelar" text="Cancelar" styleClass="grades-btn-secondary" />
+            <Button fx:id="btnGuardarBottom" text="Guardar Cambios" styleClass="grades-btn" />
         </HBox>
     </VBox>
 </VBox>

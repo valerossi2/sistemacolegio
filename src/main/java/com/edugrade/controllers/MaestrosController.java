@@ -22,6 +22,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
+import model.Curso;
+import model.Usuario;
+import repository.AsignacionRepository;
+import repository.UsuarioRepositry;
+import java.util.List;
 import theme.ThemeManager;
 import util.DataStore;
 import util.LanguageManager;
@@ -31,6 +36,9 @@ public class MaestrosController {
     private static final String[] AVATAR_COLORS = {
         "#3B82F6", "#8B5CF6", "#EC4899", "#F59E0B", "#10B981", "#EF4444", "#6366F1", "#14B8A6"
     };
+
+    private final UsuarioRepositry usuarioRepo = new UsuarioRepositry();
+    private final AsignacionRepository asigRepo = new AsignacionRepository();
 
     private LanguageManager lang;
     private ThemeManager theme;
@@ -111,6 +119,39 @@ public class MaestrosController {
         setupResponsive();
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);
+
+        loadTeachersFromDB();
+    }
+
+    private void loadTeachersFromDB() {
+        new Thread(() -> {
+            try {
+                List<Usuario> maestros = usuarioRepo.findAllMaestros();
+                Platform.runLater(() -> {
+                    allTeachers.clear();
+                    for (Usuario u : maestros) {
+                        String materia = "";
+                        String seccion = "";
+                        List<Curso> cursos = asigRepo.findCursosByMaestro(u.getId());
+                        if (!cursos.isEmpty()) {
+                            Curso c = cursos.get(0);
+                            materia = c.getMateria().getNombre();
+                            seccion = c.getSeccion().getGrado().getNombre() + " " + c.getSeccion().getNombre();
+                        }
+                        String estado = Boolean.TRUE.equals(u.getActivo()) ? "Activo" : "Inactivo";
+                        int avatarIdx = u.getId() % AVATAR_COLORS.length;
+                        allTeachers.add(new TeacherRow(u.getNombreCompleto(), u.getEmail(), materia, seccion, estado, avatarIdx));
+                    }
+                    updateCount(allTeachers.size());
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    allTeachers.clear();
+                    allTeachers.add(new TeacherRow("Error al cargar: " + e.getMessage(), "", "", "", "", 0));
+                    updateCount(0);
+                });
+            }
+        }).start();
     }
 
     private void setupResponsive() {

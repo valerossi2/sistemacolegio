@@ -66,6 +66,15 @@
                              scaleX="0.8" scaleY="0.8"/>
                 </graphic>
             </Button>
+            <!-- Botón Calificaciones -->
+            <Button fx:id="btnCalificaciones" styleClass="btn-outlined"
+                    mnemonicParsing="false" onAction="#onCalificaciones">
+                <graphic>
+                    <SVGPath styleClass="btn-svg-icon"
+                             content="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h10v2H4v-2z"
+                             scaleX="0.8" scaleY="0.8"/>
+                </graphic>
+            </Button>
         </HBox>
 
         <!-- ════════════════════════════════════════

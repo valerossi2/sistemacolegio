@@ -48,6 +48,7 @@ public class DetalleCursoController {
     @FXML private Label pageTitle;
     @FXML private Button btnPrint;
     @FXML private Button btnEditCourse;
+    @FXML private Button btnCalificaciones;
     @FXML private GridPane bentoGrid;
     @FXML private Label totalStudents;
     @FXML private Label totalTeachers;
@@ -399,6 +400,7 @@ public class DetalleCursoController {
         breadcrumbCursos.setText(lang.get("detalle.breadcrumbCursos", "Cursos"));
         btnPrint.setText(lang.get("detalle.btnPrint", "Imprimir Reporte"));
         btnEditCourse.setText(lang.get("detalle.btnEdit", "Editar Curso"));
+        if (btnCalificaciones != null) btnCalificaciones.setText(lang.get("detalle.btnCalificaciones", "Calificaciones"));
         btnVerTodosDocentes.setText(lang.get(
             showingAllTeachers ? "detalle.verMenos" : "detalle.verTodos"
         ));
@@ -464,6 +466,15 @@ public class DetalleCursoController {
         alert.setTitle(lang.get("detalle.editarTitle", "Editar curso"));
         alert.setHeaderText(null);
         alert.setContentText(lang.get("detalle.editarMsg", "Edición de curso no implementada."));
+        alert.showAndWait();
+    }
+
+    @FXML
+    private void onCalificaciones(ActionEvent event) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(lang.get("detalle.calificacionesTitle", "Calificaciones"));
+        alert.setHeaderText(null);
+        alert.setContentText(lang.get("detalle.calificacionesMsg", "Gestión de calificaciones no implementada."));
         alert.showAndWait();
     }
 

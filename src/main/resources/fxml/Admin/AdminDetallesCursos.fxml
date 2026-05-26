@@ -5,6 +5,7 @@
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.shape.*?>
+<?import javafx.scene.chart.*?>
 
 
 <!--
@@ -78,33 +79,18 @@
                 <RowConstraints vgrow="ALWAYS"/>
             </rowConstraints>
 
-            <!-- ─── Columna izquierda: Overview Card ──────────── -->
+            <!-- ─── Columna izquierda: Estadísticas y Rendimiento ─── -->
             <VBox fx:id="courseOverviewCard" styleClass="card" spacing="16"
-                  GridPane.columnIndex="0" GridPane.rowIndex="0">
+                  GridPane.columnIndex="0" GridPane.rowIndex="0"
+                  VBox.vgrow="ALWAYS">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
 
-                <HBox alignment="CENTER_LEFT">
-                    <Label text="Resumen" styleClass="card__title" HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="badgeNivel" text="SECUNDARIA"
-                           styleClass="badge badge--surface"/>
-                </HBox>
+                <Label text="Estadísticas y Rendimiento"
+                       styleClass="card__title"/>
 
-                <!-- Imagen / placeholder del curso -->
-                <StackPane styleClass="course-image-container" prefHeight="192">
-                    <Pane styleClass="course-image-placeholder"/>
-                    <Pane styleClass="course-image-overlay"/>
-                    <VBox styleClass="course-image-caption"
-                          StackPane.alignment="BOTTOM_LEFT">
-                        <Label text="Tutor Principal" styleClass="caption-subtitle"/>
-                        <Label fx:id="lblTutorPrincipal"
-                               text="Prof. Laura Méndez"
-                               styleClass="caption-title"/>
-                    </VBox>
-                </StackPane>
-
-                <!-- Stats -->
                 <VBox spacing="8">
-
-                    <!-- Stat: Total Estudiantes -->
                     <HBox styleClass="stat-row" spacing="12" alignment="CENTER_LEFT">
                         <StackPane styleClass="stat-icon stat-icon--primary">
                             <SVGPath styleClass="stat-svg-icon"
@@ -117,7 +103,6 @@
                         </VBox>
                     </HBox>
 
-                    <!-- Stat: Total Profesores -->
                     <HBox styleClass="stat-row" spacing="12" alignment="CENTER_LEFT">
                         <StackPane styleClass="stat-icon stat-icon--secondary">
                             <SVGPath styleClass="stat-svg-icon"
@@ -129,10 +114,40 @@
                             <Label fx:id="totalTeachers" text="8" styleClass="stat-value"/>
                         </VBox>
                     </HBox>
-
-
-
                 </VBox>
+
+                <Region styleClass="card-divider"/>
+
+                <VBox spacing="10">
+                    <HBox spacing="8">
+                        <VBox styleClass="stat-mini-card" HBox.hgrow="ALWAYS">
+                            <Label text="Promedio General" styleClass="stat-mini-card__label"/>
+                            <Label fx:id="lblPromedioGeneral" text="0.0" styleClass="stat-mini-card__value"/>
+                        </VBox>
+                        <VBox styleClass="stat-mini-card" HBox.hgrow="ALWAYS">
+                            <Label text="Aprobados / Reprobados" styleClass="stat-mini-card__label"/>
+                            <Label fx:id="lblAprobadosReprobados" text="0 / 0" styleClass="stat-mini-card__value"/>
+                        </VBox>
+                    </HBox>
+                    <VBox styleClass="stat-mini-card">
+                        <Label text="Promedio por Materia" styleClass="stat-mini-card__label"/>
+                        <Label fx:id="lblPromedioMateria" text="-" styleClass="stat-mini-card__value" wrapText="true"/>
+                    </VBox>
+                </VBox>
+
+                <Region styleClass="card-divider"/>
+
+                <VBox spacing="8" VBox.vgrow="ALWAYS">
+                    <Label text="Distribución por Género" styleClass="card__subtitle"/>
+                    <PieChart fx:id="genderChart"
+                              styleClass="gender-chart"
+                              legendVisible="true"
+                              labelsVisible="true"
+                              prefHeight="200"
+                              animated="false"
+                              VBox.vgrow="ALWAYS"/>
+                </VBox>
+
             </VBox>
 
             <!-- ─── Columna derecha ──────────── -->

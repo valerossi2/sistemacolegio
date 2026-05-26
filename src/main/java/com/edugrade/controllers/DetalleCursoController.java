@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.chart.PieChart;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -48,8 +49,6 @@ public class DetalleCursoController {
     @FXML private Button btnPrint;
     @FXML private Button btnEditCourse;
     @FXML private GridPane bentoGrid;
-    @FXML private Label badgeNivel;
-    @FXML private Label lblTutorPrincipal;
     @FXML private Label totalStudents;
     @FXML private Label totalTeachers;
     @FXML private Button btnVerTodosDocentes;
@@ -61,6 +60,10 @@ public class DetalleCursoController {
     @FXML private TableColumn<StudentRow, String> colMatricula;
     @FXML private TableColumn<StudentRow, String> colAsistencia;
     @FXML private Button btnLoadMore;
+    @FXML private Label lblPromedioGeneral;
+    @FXML private Label lblAprobadosReprobados;
+    @FXML private Label lblPromedioMateria;
+    @FXML private PieChart genderChart;
 
     private CursoController.CourseRow currentCourse;
     private List<CursoController.CourseRow> allCourses;
@@ -88,6 +91,7 @@ public class DetalleCursoController {
         initTeacherData();
         initStudentTable();
         initStudentData();
+        initStats();
 
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);
@@ -228,6 +232,55 @@ public class DetalleCursoController {
         updateStudentTableHeight(INITIAL_STUDENT_COUNT);
     }
 
+    private void initStats() {
+        lblPromedioGeneral.setText("85.4");
+
+        lblAprobadosReprobados.setText("28 / 4");
+
+        lblPromedioMateria.setText("Matemáticas: 72.3 (La más baja)");
+
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
+            new PieChart.Data("Masculino", 18),
+            new PieChart.Data("Femenino", 12),
+            new PieChart.Data("Otro", 2)
+        );
+        genderChart.setData(pieData);
+        initGenderChartInteraction();
+    }
+
+    private static final String GRAY_PIE = "#CBD5E1";
+    private PieChart.Data selectedSlice;
+
+    private void initGenderChartInteraction() {
+        for (PieChart.Data data : genderChart.getData()) {
+            data.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                if (newNode != null) {
+                    newNode.setOnMouseClicked(e -> {
+                        if (selectedSlice == data) {
+                            restoreAll();
+                        } else {
+                            selectedSlice = data;
+                            for (PieChart.Data other : genderChart.getData()) {
+                                if (other != data && other.getNode() != null) {
+                                    other.getNode().setStyle("-fx-pie-color: " + GRAY_PIE + ";");
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    private void restoreAll() {
+        selectedSlice = null;
+        for (PieChart.Data d : genderChart.getData()) {
+            if (d.getNode() != null) {
+                d.getNode().setStyle("");
+            }
+        }
+    }
+
     private void loadStylesheets() {
         var baseUrl = getClass().getResource("/css/base.css");
         var detalleUrl = getClass().getResource("/css/DetallesCurso.css");
@@ -258,8 +311,6 @@ public class DetalleCursoController {
         breadcrumbCursos.setText(lang.get("detalle.breadcrumbCursos", "Cursos"));
         btnPrint.setText(lang.get("detalle.btnPrint", "Imprimir Reporte"));
         btnEditCourse.setText(lang.get("detalle.btnEdit", "Editar Curso"));
-        badgeNivel.setText(lang.get("detalle.badgeNivel", "SECUNDARIA"));
-        lblTutorPrincipal.setText(lang.get("detalle.tutorPrincipal", "Prof. Laura Méndez"));
         btnVerTodosDocentes.setText(lang.get(
             showingAllTeachers ? "detalle.verMenos" : "detalle.verTodos"
         ));

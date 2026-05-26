@@ -9,26 +9,6 @@
     -fx-border-color: transparent;
     -fx-padding: 0;
 }
-.scroll-bar:vertical {
-    -fx-background-color: transparent;
-    -fx-pref-width: 6px;
-}
-.scroll-bar:vertical .thumb {
-    -fx-background-color: #CBD5E1;
-    -fx-background-radius: 3px;
-}
-.scroll-bar:vertical .thumb:hover {
-    -fx-background-color: #94A3B8;
-}
-.scroll-bar:vertical .increment-button,
-.scroll-bar:vertical .decrement-button {
-    -fx-background-color: transparent;
-    -fx-pref-height: 0;
-}
-.scroll-bar:horizontal {
-    -fx-pref-height: 0;
-    -fx-opacity: 0;
-}
 
 /* ── PAGE HEADER ─────────────────────────────────────────── */
 .page-header {
@@ -264,6 +244,53 @@
     -fx-text-fill: #9CA3AF;
 }
 
+/* ── CARD DIVIDER ──────────────────────────────────────────── */
+.card-divider {
+    -fx-min-height: 1px;
+    -fx-max-height: 1px;
+    -fx-background-color: #E5E7EB;
+}
+
+/* ── CARD SUBTITLE ─────────────────────────────────────────── */
+.card__subtitle {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #6B7280;
+}
+
+/* ── STAT MINI CARD (inside overview) ──────────────────────── */
+.stat-mini-card {
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 10px;
+    -fx-padding: 12 14;
+    -fx-spacing: 4;
+}
+.stat-mini-card__label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6B7280;
+    -fx-font-weight: 500;
+}
+.stat-mini-card__value {
+    -fx-font-size: 20px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #1F2937;
+}
+
+/* ── GENDER PIE CHART ──────────────────────────────────────── */
+.gender-chart {
+    -fx-pie-label-visible: true;
+}
+.gender-chart .chart-pie-label {
+    -fx-font-size: 11px;
+    -fx-fill: #374151;
+}
+.gender-chart .chart-legend {
+    -fx-font-size: 11px;
+}
+.gender-chart .default-color0.chart-pie { -fx-pie-color: #3B82F6; }
+.gender-chart .default-color1.chart-pie { -fx-pie-color: #EC4899; }
+.gender-chart .default-color2.chart-pie { -fx-pie-color: #F59E0B; }
+
 /* ── DARK MODE ────────────────────────────────────────────── */
 .root-dark .page-header .page-title { -fx-text-fill: #F8FAFC; }
 .root-dark .breadcrumb__current { -fx-text-fill: #94A3B8; }
@@ -289,7 +316,13 @@
 .root-dark .course-image-placeholder { -fx-background-color: #1E293B; }
 .root-dark .btn-outlined { -fx-border-color: #475569; -fx-text-fill: #CBD5E1; }
 .root-dark .btn-outlined:hover { -fx-background-color: #1E293B; }
+.root-dark .card-divider { -fx-background-color: #334155; }
+.root-dark .card__subtitle { -fx-text-fill: #94A3B8; }
+.root-dark .stat-mini-card { -fx-background-color: #1E293B; }
+.root-dark .stat-mini-card__label { -fx-text-fill: #94A3B8; }
+.root-dark .stat-mini-card__value { -fx-text-fill: #F8FAFC; }
+.root-dark .gender-chart .chart-pie-label { -fx-fill: #CBD5E1; }
+.root-dark .gender-chart .chart-legend { -fx-text-fill: #CBD5E1; }
 .root-dark .btn-svg-icon { -fx-fill: #94A3B8; }
-.root-dark .scroll-bar:vertical .thumb { -fx-background-color: #475569; }
-.root-dark .scroll-bar:vertical .thumb:hover { -fx-background-color: #64748B; }
+
 

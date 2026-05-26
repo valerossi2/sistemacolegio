@@ -4,7 +4,9 @@ import theme.ThemeManager;
 import util.LanguageManager;
 import java.io.File;
 import java.util.prefs.Preferences;
+import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
 import javafx.geometry.*;
@@ -92,7 +94,7 @@ public class MainController {
     private final int[] perfOriginalHeights = new int[6];
     private int selectedPerfBar = -1;
     private int defaultHighlightBar = -1;
-    private static final int PERF_BAR_GROW = 15;
+    private static final int PERF_BAR_GROW = 6;
     private Circle headerAvatar;
     private SVGPath headerAvatarSvg;
     private Preferences prefs = Preferences.userNodeForPackage(controller.Configuracion.class);
@@ -852,10 +854,12 @@ public class MainController {
         });
     }
 
-    private void animateBarHeight(Rectangle bar, int targetHeight) {
+    private void animateBarHeight(Rectangle bar, double targetHeight) {
         Timeline tl = new Timeline();
         double start = bar.getHeight();
-        tl.getKeyFrames().add(new KeyFrame(Duration.millis(150), e -> bar.setHeight(targetHeight)));
+        if (Math.abs(start - targetHeight) < 0.5) return;
+        tl.getKeyFrames().add(new KeyFrame(Duration.ZERO, new KeyValue(bar.heightProperty(), start, Interpolator.EASE_BOTH)));
+        tl.getKeyFrames().add(new KeyFrame(Duration.millis(500), new KeyValue(bar.heightProperty(), targetHeight, Interpolator.EASE_BOTH)));
         tl.play();
     }
 

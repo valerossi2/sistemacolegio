@@ -18,11 +18,11 @@
         <padding>
             <Insets bottom="32"/>
         </padding>
-        <Text text="Gestión de Estudiantes" styleClass="cursos-page-title" />
-        <Text text="Administra los estudiantes del instituto." styleClass="cursos-page-subtitle" />
+        <Text text="Horario Académico" styleClass="cursos-page-title" />
+        <Text text="Gestiona los horarios y asignaciones del instituto." styleClass="cursos-page-subtitle" />
     </VBox>
 
     <VBox styleClass="cursos-card" VBox.vgrow="ALWAYS" alignment="CENTER">
-        <Label text="Módulo de Estudiantes - Próximamente" style="-fx-font-size: 18px; -fx-text-fill: #9CA3AF;" />
+        <Label text="Módulo de Horario - Próximamente" style="-fx-font-size: 18px; -fx-text-fill: #9CA3AF;" />
     </VBox>
 </VBox>

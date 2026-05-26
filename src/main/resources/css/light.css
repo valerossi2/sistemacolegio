@@ -1,76 +1,80 @@
 .root {
-    -fx-background-color: #f9f9ff;
+    -fx-background-color: #F8F9FA;
 }
 
 .sidebar {
-    -fx-background-color: #ffffff;
-    -fx-border-color: transparent #dee8ff transparent transparent;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent #E5E7EB transparent transparent;
+    -fx-background-radius: 0 24 24 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0, 2, 0);
 }
 
 .nav-item { 
     -fx-background-color: transparent; 
     -fx-cursor: hand; 
-    -fx-text-fill: #434655; 
+    -fx-text-fill: #6B7280; 
+    -fx-background-radius: 12; 
 } 
 
 .nav-item:hover { 
-    -fx-background-color: #f0f3ff; 
+    -fx-background-color: #F1F5F9; 
     -fx-cursor: hand; 
     -fx-background-radius: 12; 
-    -fx-text-fill: #004ac6; 
+    -fx-text-fill: #2B54A8; 
 } 
 
 .sidebar-active { 
-    -fx-background-color: #2563eb; 
+    -fx-background-color: #2B54A8; 
     -fx-cursor: hand; 
     -fx-background-radius: 12; 
 } 
 
 .sidebar-active:hover { 
-    -fx-background-color: #2563eb; 
+    -fx-background-color: #1E40AF; 
     -fx-background-radius: 12; 
 } 
 
 .search-container { 
-    -fx-background-color: #f0f3ff; 
+    -fx-background-color: #F1F5F9; 
     -fx-background-radius: 32; 
-    -fx-border-color: #e7eeff; 
+    -fx-border-color: #E5E7EB; 
     -fx-border-radius: 32; 
 } 
 
 .search-input { 
     -fx-background-color: transparent; 
     -fx-border-color: transparent; 
-    -fx-font-family: 'Plus Jakarta Sans'; 
-    -fx-text-fill: #111c2d; 
-    -fx-prompt-text-fill: #737686; 
+    -fx-font-family: 'Segoe UI', 'Inter', Arial, sans-serif; 
+    -fx-text-fill: #1F2937; 
+    -fx-prompt-text-fill: #9CA3AF; 
 } 
 
 .glass-card { 
-    -fx-background-color: #ffffff; 
-    -fx-background-radius: 16; 
-    -fx-border-color: #e7eeff; 
-    -fx-border-radius: 16; 
+    -fx-background-color: #FFFFFF; 
+    -fx-background-radius: 24; 
+    -fx-border-color: #E5E7EB; 
+    -fx-border-radius: 24; 
+    -fx-border-width: 1;
 } 
 
 .course-row { 
-    -fx-border-color: transparent transparent #e7eeff transparent; 
+    -fx-border-color: transparent transparent #E5E7EB transparent; 
 } 
 
 .course-row:hover { 
-    -fx-background-color: #f0f3ff; 
+    -fx-background-color: #F9FAFB; 
 } 
 
 .schedule-row { 
-    -fx-border-color: transparent transparent #e7eeff transparent; 
+    -fx-border-color: transparent transparent #E5E7EB transparent; 
 } 
 
 .schedule-row:hover { 
-    -fx-background-color: #f0f3ff; 
+    -fx-background-color: #F9FAFB; 
 } 
 
 .text-button { 
-    -fx-text-fill: #004ac6; 
+    -fx-text-fill: #2B54A8; 
     -fx-background-color: transparent; 
     -fx-underline: false; 
     -fx-cursor: hand; 
@@ -87,15 +91,15 @@
 } 
 
 .growth-badge { 
-    -fx-background-color: #dbe1ff; 
-    -fx-text-fill: #004ac6; 
+    -fx-background-color: #DBEAFE; 
+    -fx-text-fill: #2B54A8; 
     -fx-font-weight: bold; 
     -fx-padding: 4 12 4 12; 
     -fx-background-radius: 16; 
 } 
 
 .fab-button { 
-    -fx-background-color: #004ac6; 
+    -fx-background-color: #2B54A8; 
     -fx-background-radius: 32; 
     -fx-cursor: hand; 
 } 
@@ -116,7 +120,7 @@
 }
 
 .title-bar-text {
-    -fx-fill: #434655;
+    -fx-fill: #6B7280;
 }
 
 .window-btn {
@@ -125,7 +129,7 @@
 }
 
 .window-btn:hover {
-    -fx-background-color: #f0f3ff;
+    -fx-background-color: #F1F5F9;
 }
 
 .window-btn-close {
@@ -177,4 +181,20 @@
 .modal-scroll .scroll-bar:horizontal {
     -fx-pref-height: 0;
     -fx-opacity: 0;
+}
+
+.logo-title {
+    -fx-font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+}
+.logo-subtitle {
+    -fx-font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 10px;
+}
+.header-role {
+    -fx-font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 10px;
 }

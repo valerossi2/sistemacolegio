@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class LuminaAcademyFX extends Application {
 
-    private ThemeManager theme = new ThemeManager();
+    private ThemeManager theme = ThemeManager.getInstance();
 
     @Override
     public void start(Stage primaryStage) {
@@ -23,7 +23,6 @@ public class LuminaAcademyFX extends Application {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_view.fxml"));
             Parent rootNode = loader.load();
             MainController controller = loader.getController();
-            controller.setThemeManager(theme);
             controller.setStage(primaryStage);
             controller.setupEverything();
 

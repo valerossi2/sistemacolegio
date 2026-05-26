@@ -23,7 +23,6 @@
       xmlns:fx="http://javafx.com/fxml/1"
       styleClass="root-bg"
       fx:controller="controller.LoginController"
-      styleClass=""
 
       minWidth="820"
       minHeight="560">
@@ -47,7 +46,7 @@
                    preserveRatio="true"
                    StackPane.alignment="BOTTOM_LEFT">
             <image>
-                <Image url="@../../../../../img/logoCEPVAremove.png"/>
+                <Image url="@../../img/logoCEPVAremove.png"/>
             </image>
             <StackPane.margin><Insets bottom="20" left="20"/></StackPane.margin>
         </ImageView>

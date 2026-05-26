@@ -18,11 +18,12 @@
             fx:controller="com.edugrade.controllers.DetalleCursoController"
             fx:id="vistaDetalleCurso"
             styleClass="main-scroll-pane"
+            stylesheets="@../../css/base.css,@../../css/DetallesCurso.css"
             fitToWidth="true"
             hbarPolicy="NEVER"
             vbarPolicy="AS_NEEDED">
 
-    <VBox styleClass="content-area" spacing="32">
+    <VBox fx:id="root" styleClass="content-area" spacing="32">
 
         <!-- ════════════════════════════════════════
              Page Header — Breadcrumb + Acciones
@@ -32,12 +33,12 @@
                 <HBox spacing="6" alignment="CENTER_LEFT">
                     <Label fx:id="breadcrumbCursos"
                            text="Cursos"
-                           styleClass="breadcrumb__parent breadcrumb__link"
-                           onMouseClicked="#onBreadcrumbCursos"/>
+                           styleClass="breadcrumb__parent btn-link"/>
                     <Label text="›" styleClass="breadcrumb__separator"/>
                     <Label fx:id="breadcrumbCursoActual"
                            text="5to E"
-                           styleClass="breadcrumb__current"/>
+                           styleClass="breadcrumb__current breadcrumb__link"
+                           onMouseClicked="#onBreadcrumbCursoActual"/>
                 </HBox>
                 <Label fx:id="pageTitle"
                        text="Detalles del Curso: 5to E"
@@ -48,12 +49,9 @@
             <Button fx:id="btnPrint" styleClass="btn-outlined"
                     mnemonicParsing="false" onAction="#onImprimirReporte">
                 <graphic>
-                    <HBox spacing="8" alignment="CENTER">
-                        <SVGPath styleClass="btn-svg-icon"
-                                 content="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"
-                                 scaleX="0.8" scaleY="0.8"/>
-                        <Label text="Imprimir Reporte"/>
-                    </HBox>
+                    <SVGPath styleClass="btn-svg-icon"
+                             content="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"
+                             scaleX="0.8" scaleY="0.8"/>
                 </graphic>
             </Button>
 
@@ -61,12 +59,9 @@
             <Button fx:id="btnEditCourse" styleClass="btn-primary"
                     mnemonicParsing="false" onAction="#onEditarCurso">
                 <graphic>
-                    <HBox spacing="8" alignment="CENTER">
-                        <SVGPath styleClass="btn-svg-icon btn-svg-icon--white"
-                                 content="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                                 scaleX="0.8" scaleY="0.8"/>
-                        <Label text="Editar Curso" styleClass="btn-primary__label"/>
-                    </HBox>
+                    <SVGPath styleClass="btn-svg-icon btn-svg-icon--white"
+                             content="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                             scaleX="0.8" scaleY="0.8"/>
                 </graphic>
             </Button>
         </HBox>
@@ -135,20 +130,7 @@
                         </VBox>
                     </HBox>
 
-                    <!-- Stat: Aula Asignada -->
-                    <HBox styleClass="stat-row" spacing="12" alignment="CENTER_LEFT">
-                        <StackPane styleClass="stat-icon stat-icon--neutral">
-                            <SVGPath styleClass="stat-svg-icon stat-svg-icon--dark"
-                                     content="M12 3L4 9v12h16V9l-8-6zm0 2.35L18 9.86V19h-3v-4H9v4H6V9.86L12 5.35z"
-                                     scaleX="0.7" scaleY="0.7"/>
-                        </StackPane>
-                        <VBox>
-                            <Label text="Aula Asignada" styleClass="stat-label"/>
-                            <Label fx:id="assignedRoom"
-                                   text="Pabellón B - Aula 204"
-                                   styleClass="stat-value"/>
-                        </VBox>
-                    </HBox>
+
 
                 </VBox>
             </VBox>
@@ -159,90 +141,42 @@
                   VBox.vgrow="ALWAYS">
 
                 <!-- Equipo Docente -->
-                <VBox styleClass="card" spacing="16">
-                    <HBox alignment="CENTER_LEFT">
+                <VBox styleClass="card" spacing="0">
+                    <HBox styleClass="teacher-card__header" alignment="CENTER_LEFT">
                         <Label text="Equipo Docente" styleClass="card__title"
                                HBox.hgrow="ALWAYS"/>
                         <Button fx:id="btnVerTodosDocentes" text="Ver Todos"
                                 styleClass="btn-link" mnemonicParsing="false"
                                 onAction="#onVerTodosDocentes"/>
                     </HBox>
-                    <GridPane hgap="16" vgap="12">
-                        <columnConstraints>
-                            <ColumnConstraints percentWidth="50"/>
-                            <ColumnConstraints percentWidth="50"/>
-                        </columnConstraints>
-
-                        <HBox styleClass="teacher-card" spacing="12" alignment="CENTER_LEFT"
-                              GridPane.columnIndex="0" GridPane.rowIndex="0">
-                            <StackPane styleClass="avatar avatar--md avatar--blue">
-                                <Label text="CR" styleClass="avatar__initials"/>
-                            </StackPane>
-                            <VBox spacing="2">
-                                <Label text="Carlos Ruiz"             styleClass="teacher-name"/>
-                                <Label text="Matemáticas Avanzadas"   styleClass="teacher-subject"/>
-                            </VBox>
-                        </HBox>
-
-                        <HBox styleClass="teacher-card" spacing="12" alignment="CENTER_LEFT"
-                              GridPane.columnIndex="1" GridPane.rowIndex="0">
-                            <StackPane styleClass="avatar avatar--md avatar--green">
-                                <Label text="ET" styleClass="avatar__initials"/>
-                            </StackPane>
-                            <VBox spacing="2">
-                                <Label text="Elena Torres"    styleClass="teacher-name"/>
-                                <Label text="Física y Química" styleClass="teacher-subject"/>
-                            </VBox>
-                        </HBox>
-
-                        <HBox styleClass="teacher-card" spacing="12" alignment="CENTER_LEFT"
-                              GridPane.columnIndex="0" GridPane.rowIndex="1">
-                            <StackPane styleClass="avatar avatar--md avatar--amber">
-                                <Label text="MS" styleClass="avatar__initials"/>
-                            </StackPane>
-                            <VBox spacing="2">
-                                <Label text="Miguel Ángel Soto"       styleClass="teacher-name"/>
-                                <Label text="Literatura Hispanoam."    styleClass="teacher-subject"/>
-                            </VBox>
-                        </HBox>
-
-                        <HBox styleClass="teacher-card" spacing="12" alignment="CENTER_LEFT"
-                              GridPane.columnIndex="1" GridPane.rowIndex="1">
-                            <StackPane styleClass="avatar avatar--md avatar--teal">
-                                <Label text="AS" styleClass="avatar__initials"/>
-                            </StackPane>
-                            <VBox spacing="2">
-                                <Label text="Ana Silva"         styleClass="teacher-name"/>
-                                <Label text="Historia Universal" styleClass="teacher-subject"/>
-                            </VBox>
-                        </HBox>
-
-                    </GridPane>
+                    <TableView fx:id="teacherTable"
+                               styleClass="teacher-table"
+                               VBox.vgrow="NEVER">
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                        </columnResizePolicy>
+                        <columns>
+                            <TableColumn fx:id="colTeacherName" text="DOCENTE" prefWidth="220"/>
+                            <TableColumn fx:id="colTeacherSubject" text="MATERIA" prefWidth="220"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No hay docentes asignados." styleClass="table-placeholder-label"/>
+                        </placeholder>
+                    </TableView>
                 </VBox>
 
                 <!-- Lista de Estudiantes -->
-                <VBox styleClass="card students-card" spacing="0" VBox.vgrow="ALWAYS">
-                    <HBox styleClass="students-card__header"
-                          alignment="CENTER_LEFT" spacing="16">
-                        <VBox spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="Lista de Estudiantes" styleClass="card__title"/>
-                            <Label fx:id="studentsSubtitle"
-                                   text="32 alumnos inscritos en el ciclo actual"
-                                   styleClass="card__subtitle"/>
-                        </VBox>
-                        <HBox styleClass="view-toggle" spacing="0">
-                            <ToggleButton fx:id="btnViewTable" text="Tabla"
-                                          styleClass="view-toggle__btn view-toggle__btn--active"
-                                          selected="true" mnemonicParsing="false"/>
-                            <ToggleButton fx:id="btnViewGrid" text="Cuadrícula"
-                                          styleClass="view-toggle__btn"
-                                          mnemonicParsing="false"/>
-                        </HBox>
+                <VBox styleClass="card" spacing="0">
+                    <HBox styleClass="teacher-card__header" alignment="CENTER_LEFT">
+                        <Label text="Lista de Estudiantes" styleClass="card__title"
+                               HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnLoadMore" text="Cargar más estudiantes"
+                                styleClass="btn-link" mnemonicParsing="false"
+                                onAction="#onCargarMas"/>
                     </HBox>
-
                     <TableView fx:id="studentsTable"
-                               styleClass="students-table"
-                               VBox.vgrow="ALWAYS">
+                               styleClass="teacher-table"
+                               VBox.vgrow="NEVER">
                         <columnResizePolicy>
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                         </columnResizePolicy>
@@ -250,21 +184,12 @@
                             <TableColumn fx:id="colStudent"    text="ESTUDIANTE"   prefWidth="240"/>
                             <TableColumn fx:id="colMatricula"  text="ID MATRÍCULA" prefWidth="140"/>
                             <TableColumn fx:id="colAsistencia" text="ASISTENCIA"   prefWidth="160"/>
-                            <TableColumn fx:id="colAcciones"   text="ACCIONES"     prefWidth="80"/>
                         </columns>
                         <placeholder>
                             <Label text="No hay estudiantes registrados."
                                    styleClass="table-placeholder-label"/>
                         </placeholder>
                     </TableView>
-
-                    <HBox styleClass="students-card__footer" alignment="CENTER">
-                        <Button fx:id="btnLoadMore"
-                                text="Cargar más estudiantes"
-                                styleClass="btn-link-primary"
-                                mnemonicParsing="false"
-                                onAction="#onCargarMas"/>
-                    </HBox>
                 </VBox>
 
             </VBox>

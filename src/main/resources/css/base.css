@@ -1,0 +1,286 @@
+/* ════════════════════════════════════════════════════════════
+   BASE.CSS  —  Shared design system for all pages
+   Hardcoded hex colors (no looked-up variables) so styles
+   resolve on child-loaded FXML stylesheets.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── TYPOGRAPHY ──────────────────────────────────────────── */
+.page-title {
+    -fx-font-size: 30px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #1F2937;
+}
+.page-subtitle {
+    -fx-font-size: 18px;
+    -fx-text-fill: #6B7280;
+}
+.section-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #1F2937;
+}
+
+/* ── CARDS ────────────────────────────────────────────────── */
+.card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 24px;
+    -fx-border-color: #E5E7EB;
+    -fx-border-radius: 24px;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);
+}
+.card__title {
+    -fx-font-size: 20px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #1F2937;
+}
+.card__header {
+    -fx-padding: 24 32 16 32;
+}
+.card__body {
+    -fx-padding: 0 32 24 32;
+}
+
+/* ── MODERN TABLE ─────────────────────────────────────────── */
+.modern-table {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-table-cell-border-color: transparent;
+    -fx-padding: 0;
+}
+.modern-table .column-header-background {
+    -fx-background-color: rgba(238,242,255,0.5);
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1px 0;
+}
+.modern-table .column-header {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+.modern-table .column-header .label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #6B7280;
+    -fx-padding: 12 16;
+}
+.modern-table .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 0 0 1 0;
+    -fx-pref-height: 57px;
+    -fx-cell-size: 57px;
+}
+.modern-table .table-row-cell:hover {
+    -fx-background-color: rgba(249,250,251,0.5);
+}
+.modern-table .table-row-cell:selected {
+    -fx-background-color: #EFF6FF;
+}
+.modern-table .table-cell {
+    -fx-border-width: 0;
+    -fx-alignment: CENTER_LEFT;
+    -fx-font-size: 14px;
+    -fx-text-fill: #374151;
+    -fx-padding: 8 16;
+}
+
+/* ── BUTTONS ──────────────────────────────────────────────── */
+.btn-primary {
+    -fx-background-color: #2B54A8;
+    -fx-background-radius: 8px;
+    -fx-border-width: 0;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-padding: 8 16;
+    -fx-cursor: hand;
+}
+.btn-primary:hover {
+    -fx-background-color: #1E40AF;
+}
+.btn-secondary {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 8px;
+    -fx-border-color: #D1D5DB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-text-fill: #374151;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-padding: 8 16;
+    -fx-cursor: hand;
+}
+.btn-secondary:hover {
+    -fx-background-color: #F9FAFB;
+}
+.btn-danger {
+    -fx-background-color: #DC2626;
+    -fx-background-radius: 8px;
+    -fx-border-width: 0;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-padding: 8 16;
+    -fx-cursor: hand;
+}
+.btn-danger:hover {
+    -fx-background-color: #B91C1C;
+}
+.btn-link {
+    -fx-background-color: transparent;
+    -fx-text-fill: #2B54A8;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-cursor: hand;
+    -fx-padding: 4 8;
+    -fx-border-width: 0;
+}
+.btn-link:hover {
+    -fx-text-fill: #1E40AF;
+    -fx-underline: true;
+}
+
+/* ── STATUS PILLS ─────────────────────────────────────────── */
+.status-pill {
+    -fx-background-radius: 16px;
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+    -fx-padding: 2 10;
+    -fx-min-width: 80px;
+    -fx-min-height: 24px;
+    -fx-alignment: CENTER;
+}
+.status-pill--active {
+    -fx-background-color: #D1FAE5;
+    -fx-text-fill: #065F46;
+}
+.status-pill--inactive {
+    -fx-background-color: #FEE2E2;
+    -fx-text-fill: #991B1B;
+}
+.status-pill--pending {
+    -fx-background-color: #FEF3C7;
+    -fx-text-fill: #92400E;
+}
+
+/* ── AVATARS ──────────────────────────────────────────────── */
+.avatar-circle {
+    -fx-min-width: 32px; -fx-max-width: 32px;
+    -fx-min-height: 32px; -fx-max-height: 32px;
+    -fx-background-radius: 16px;
+}
+.avatar-initials {
+    -fx-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+.avatar-sm {
+    -fx-min-width: 24px; -fx-max-width: 24px;
+    -fx-min-height: 24px; -fx-max-height: 24px;
+    -fx-background-radius: 12px;
+}
+
+/* ── FORM INPUTS ──────────────────────────────────────────── */
+.input-field {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 12 16;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1F2937;
+    -fx-prompt-text-fill: #9CA3AF;
+}
+.input-field:focused {
+    -fx-border-color: #2B54A8;
+    -fx-border-width: 2px;
+}
+.input-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #6B7280;
+}
+
+/* ── BADGES ───────────────────────────────────────────────── */
+.badge {
+    -fx-background-radius: 8px;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-padding: 2 10;
+    -fx-text-fill: #374151;
+}
+.badge--primary {
+    -fx-background-color: #DBEAFE;
+    -fx-text-fill: #1E40AF;
+}
+.badge--green {
+    -fx-background-color: #D1FAE5;
+    -fx-text-fill: #065F46;
+}
+.badge--amber {
+    -fx-background-color: #FEF3C7;
+    -fx-text-fill: #92400E;
+}
+
+/* ── SCROLLBAR ────────────────────────────────────────────── */
+.content-area .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 6px;
+}
+.content-area .scroll-bar:vertical .thumb {
+    -fx-background-color: #CBD5E1;
+    -fx-background-radius: 3px;
+}
+.content-area .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #94A3B8;
+}
+.content-area .scroll-bar:vertical .increment-button,
+.content-area .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-pref-height: 0;
+}
+
+/* ── PLACEHOLDER ──────────────────────────────────────────── */
+.table-placeholder {
+    -fx-font-size: 14px;
+    -fx-text-fill: #9CA3AF;
+}
+
+/* ── DARK OVERRIDES ───────────────────────────────────────── */
+.root-dark .page-title { -fx-text-fill: #F8FAFC; }
+.root-dark .page-subtitle { -fx-text-fill: #94A3B8; }
+.root-dark .section-title { -fx-text-fill: #F8FAFC; }
+.root-dark .card__title { -fx-text-fill: #F8FAFC; }
+.root-dark .card {
+    -fx-background-color: #1E293B;
+    -fx-border-color: #334155;
+}
+.root-dark .modern-table .column-header-background {
+    -fx-background-color: rgba(30,41,59,0.8);
+    -fx-border-color: #334155;
+}
+.root-dark .modern-table .column-header .label {
+    -fx-text-fill: #94A3B8;
+}
+.root-dark .modern-table .table-row-cell {
+    -fx-background-color: #1E293B;
+    -fx-border-color: #334155;
+}
+.root-dark .modern-table .table-row-cell:hover {
+    -fx-background-color: rgba(51,65,85,0.5);
+}
+.root-dark .modern-table .table-row-cell:selected {
+    -fx-background-color: #1E3A5F;
+}
+.root-dark .modern-table .table-cell {
+    -fx-text-fill: #F8FAFC;
+}
+.root-dark .input-field {
+    -fx-background-color: #0F172A;
+    -fx-border-color: #334155;
+    -fx-text-fill: #F8FAFC;
+    -fx-prompt-text-fill: #64748B;
+}
+.root-dark .input-label {
+    -fx-text-fill: #94A3B8;
+}

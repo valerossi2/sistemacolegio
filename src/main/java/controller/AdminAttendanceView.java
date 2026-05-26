@@ -241,14 +241,17 @@ public class AdminAttendanceView {
         HBox header = new HBox();
         header.setPadding(new Insets(14, 24, 14, 24));
         HBox studentHeader = headerCell("attendance.student", 200);
+        studentHeader.setAlignment(Pos.CENTER_LEFT);
+        studentHeader.setPadding(new Insets(0, 0, 0, 40));
         HBox.setHgrow(studentHeader, Priority.ALWAYS);
         Label attendanceLabel = new Label();
         attendanceLabel.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 11));
         languageUpdaters.add(() -> attendanceLabel.setText(lang.get("attendance.attendance").toUpperCase(Locale.ROOT)));
         themeUpdaters.add(() -> attendanceLabel.setTextFill(Color.web(textMuted())));
         HBox attendanceHeader = new HBox(attendanceLabel);
-        attendanceHeader.setAlignment(Pos.CENTER_RIGHT);
-        HBox.setHgrow(attendanceHeader, Priority.SOMETIMES);
+        attendanceHeader.setAlignment(Pos.CENTER);
+        attendanceHeader.setMinWidth(260);
+        attendanceHeader.setPrefWidth(260);
         header.getChildren().addAll(
             studentHeader,
             attendanceHeader

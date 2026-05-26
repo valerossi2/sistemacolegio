@@ -132,15 +132,15 @@ public class AdminAttendanceView {
 
     private HBox createLabelSelector(String labelKey, Label valueLabel) {
         Label label = new Label();
-        label.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12));
+        label.setFont(Font.font("Plus Jakarta Sans", 10));
         languageUpdaters.add(() -> label.setText(lang.get(labelKey)));
 
-        valueLabel.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12));
+        valueLabel.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 11));
         valueLabel.setPadding(new Insets(0, 2, 0, 0));
 
         HBox box = new HBox(3, label, valueLabel);
         box.setAlignment(Pos.CENTER_LEFT);
-        box.setPadding(new Insets(6, 14, 6, 14));
+        box.setPadding(new Insets(1, 6, 1, 6));
         box.setCursor(javafx.scene.Cursor.HAND);
         box.setOnMouseClicked(e -> {
             if (valueLabel == gradeLabel)
@@ -149,10 +149,9 @@ public class AdminAttendanceView {
                 showSelectorMenu(e, List.of("A", "B", "C", "D", "E"), sectionLabel);
         });
         themeUpdaters.add(() -> {
-            String txtColor = "#FFFFFF";
-            label.setTextFill(Color.web(txtColor));
-            valueLabel.setTextFill(Color.web(txtColor));
-            box.setStyle("-fx-background-color: #2B54A8; -fx-background-radius: 8; -fx-border-width: 0; -fx-padding: 6 14;");
+            label.setTextFill(Color.web(textMuted()));
+            valueLabel.setTextFill(Color.web(text()));
+            box.setStyle(cardStyle(6, borderSoft()));
         });
         return box;
     }

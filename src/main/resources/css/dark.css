@@ -3,8 +3,8 @@
 }
 
 .sidebar {
-    -fx-background-color: #1E293B;
-    -fx-border-color: transparent #334155 transparent transparent;
+    -fx-background-color: #0F172A;
+    -fx-border-color: transparent #1E293B transparent transparent;
     -fx-background-radius: 0 24 24 0;
 }
 
@@ -145,11 +145,11 @@
     -fx-pref-width: 6px;
 }
 .scroll-bar:vertical .thumb {
-    -fx-background-color: #475569;
+    -fx-background-color: #334155;
     -fx-background-radius: 3px;
 }
 .scroll-bar:vertical .thumb:hover {
-    -fx-background-color: #64748B;
+    -fx-background-color: #475569;
 }
 .scroll-bar:vertical .increment-button,
 .scroll-bar:vertical .decrement-button {
@@ -166,11 +166,11 @@
     -fx-pref-width: 6px;
 }
 .modal-scroll .scroll-bar:vertical .thumb {
-    -fx-background-color: #475569;
+    -fx-background-color: #334155;
     -fx-background-radius: 3px;
 }
 .modal-scroll .scroll-bar:vertical .thumb:hover {
-    -fx-background-color: #64748B;
+    -fx-background-color: #475569;
 }
 .modal-scroll .scroll-bar:vertical .increment-button,
 .modal-scroll .scroll-bar:vertical .decrement-button {

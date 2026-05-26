@@ -16,7 +16,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -50,6 +51,7 @@ public class DetalleCursoController {
     @FXML private Label pageTitle;
     @FXML private Button btnPrint;
     @FXML private Button btnEditCourse;
+    @FXML private Button btnCancelEdit;
     @FXML private Button btnCalificaciones;
     @FXML private GridPane bentoGrid;
     @FXML private Label totalStudents;
@@ -494,40 +496,23 @@ public class DetalleCursoController {
         savedCardChildren = new java.util.ArrayList<>(courseOverviewCard.getChildren());
 
         btnEditCourse.setText(lang.get("detalle.btnGuardar", "Guardar"));
-        btnPrint.setText(lang.get("detalle.btnCancelar", "Cancelar"));
-        btnPrint.setOnAction(e -> exitEditMode());
+        btnCancelEdit.setVisible(true);
+        btnCancelEdit.setManaged(true);
 
-        // Replace left card with editable form
-        VBox editForm = new VBox(12);
-        editForm.setPadding(new Insets(20));
-        editForm.setSpacing(12);
-
-        Label title = new Label(lang.get("detalle.editarTitle", "Editar Curso"));
-        title.getStyleClass().add("card__title");
-
-        TextField tfStudents = new TextField(totalStudents.getText());
-        tfStudents.getStyleClass().add("input-field");
-        VBox studentsRow = new VBox(4);
-        studentsRow.getChildren().addAll(new Label("Total Estudiantes"), tfStudents);
-
-        TextField tfTeachers = new TextField(totalTeachers.getText());
-        tfTeachers.getStyleClass().add("input-field");
-        VBox teachersRow = new VBox(4);
-        teachersRow.getChildren().addAll(new Label("Total Profesores"), tfTeachers);
-
-        TextField tfAvg = new TextField(lblPromedioGeneral.getText());
-        tfAvg.getStyleClass().add("input-field");
-        VBox avgRow = new VBox(4);
-        avgRow.getChildren().addAll(new Label("Promedio General"), tfAvg);
-
-        editForm.getChildren().addAll(title, studentsRow, teachersRow, avgRow);
-
-        // Store refs for save
-        tfStudents.setUserData("tfStudents");
-        tfTeachers.setUserData("tfTeachers");
-        tfAvg.setUserData("tfAvg");
-
-        courseOverviewCard.getChildren().setAll(editForm);
+        // Make student table editable (name + matrícula)
+        studentsTable.setEditable(true);
+        colStudent.setCellFactory(TextFieldTableCell.forTableColumn());
+        colStudent.setOnEditCommit(e -> {
+            StudentRow row = e.getRowValue();
+            row.setName(e.getNewValue());
+            studentsTable.refresh();
+        });
+        colMatricula.setCellFactory(TextFieldTableCell.forTableColumn());
+        colMatricula.setOnEditCommit(e -> {
+            StudentRow row = e.getRowValue();
+            row.setMatricula(e.getNewValue());
+            studentsTable.refresh();
+        });
 
         // Make teacher table editable
         teacherTable.setEditable(true);
@@ -544,24 +529,11 @@ public class DetalleCursoController {
     }
 
     private void saveEditMode() {
-        VBox editForm = (VBox) courseOverviewCard.getChildren().get(0);
-        // Read values from TextFields
-        for (Node child : editForm.getChildren()) {
-            if (child instanceof VBox row) {
-                for (Node field : row.getChildren()) {
-                    if (field instanceof TextField tf) {
-                        String ud = (String) tf.getUserData();
-                        if ("tfStudents".equals(ud)) {
-                            totalStudents.setText(tf.getText());
-                        } else if ("tfTeachers".equals(ud)) {
-                            totalTeachers.setText(tf.getText());
-                        } else if ("tfAvg".equals(ud)) {
-                            lblPromedioGeneral.setText(tf.getText());
-                        }
-                    }
-                }
-            }
-        }
+        exitEditMode();
+    }
+
+    @FXML
+    private void onCancelarEdicion(ActionEvent event) {
         exitEditMode();
     }
 
@@ -572,8 +544,27 @@ public class DetalleCursoController {
             savedCardChildren = null;
         }
         btnEditCourse.setText(lang.get("detalle.btnEdit", "Editar Curso"));
-        btnPrint.setText(lang.get("detalle.btnPrint", "Imprimir Reporte"));
-        btnPrint.setOnAction(this::onImprimirReporte);
+        btnCancelEdit.setVisible(false);
+        btnCancelEdit.setManaged(false);
+
+        studentsTable.setEditable(false);
+        colStudent.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colStudent.setCellFactory(col -> new TableCell<>() {
+            private final Label lbl = new Label();
+            { setGraphic(lbl); setPadding(new Insets(8, 16, 8, 16)); }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                var tv = getTableView();
+                if (empty || tv == null || getIndex() < 0 || getIndex() >= tv.getItems().size()) {
+                    lbl.setText(null);
+                } else {
+                    lbl.setText(tv.getItems().get(getIndex()).getName());
+                    lbl.getStyleClass().add("cell-docente-name");
+                }
+            }
+        });
+        colMatricula.setCellValueFactory(new PropertyValueFactory<>("matricula"));
 
         teacherTable.setEditable(false);
         colTeacherName.setCellFactory(nombreCell());

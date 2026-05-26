@@ -223,21 +223,25 @@
 }
 
 /* ── SCROLLBAR ────────────────────────────────────────────── */
-.content-area .scroll-bar:vertical {
+.scroll-bar:vertical {
     -fx-background-color: transparent;
     -fx-pref-width: 6px;
 }
-.content-area .scroll-bar:vertical .thumb {
+.scroll-bar:vertical .thumb {
     -fx-background-color: #CBD5E1;
     -fx-background-radius: 3px;
 }
-.content-area .scroll-bar:vertical .thumb:hover {
+.scroll-bar:vertical .thumb:hover {
     -fx-background-color: #94A3B8;
 }
-.content-area .scroll-bar:vertical .increment-button,
-.content-area .scroll-bar:vertical .decrement-button {
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button {
     -fx-background-color: transparent;
     -fx-pref-height: 0;
+}
+.scroll-bar:horizontal {
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
 }
 
 /* ── PLACEHOLDER ──────────────────────────────────────────── */
@@ -284,3 +288,5 @@
 .root-dark .input-label {
     -fx-text-fill: #94A3B8;
 }
+.root-dark .scroll-bar:vertical .thumb { -fx-background-color: #334155; }
+.root-dark .scroll-bar:vertical .thumb:hover { -fx-background-color: #475569; }

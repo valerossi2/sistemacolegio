@@ -1,5 +1,6 @@
 package ui;
 
+import config.Hibernate_config;
 import controller.MainController;
 import theme.ThemeManager;
 import javafx.application.Application;
@@ -18,6 +19,8 @@ public class LuminaAcademyFX extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        try { Hibernate_config.init(); } catch (Exception e) { System.err.println("Hibernate init falló: " + e.getMessage()); }
+
         primaryStage.initStyle(StageStyle.UNDECORATED);
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_view.fxml"));

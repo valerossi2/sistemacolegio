@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
+import config.Hibernate_config;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -26,6 +27,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
+import model.*;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 import theme.ThemeManager;
 import util.LanguageManager;
 
@@ -77,6 +81,7 @@ public class DetalleCursoController {
         String label = course.grado() + " " + course.seccion();
         breadcrumbCursoActual.setText(label);
         pageTitle.setText(lang.get("detalle.pageTitle", "Detalles del Curso") + ": " + label);
+        loadRealData();
     }
 
     @FXML
@@ -230,6 +235,85 @@ public class DetalleCursoController {
         displayedStudentData.addAll(fullStudentData.subList(0, INITIAL_STUDENT_COUNT));
         studentsTable.setItems(displayedStudentData);
         updateStudentTableHeight(INITIAL_STUDENT_COUNT);
+    }
+
+    private void loadRealData() {
+        if (currentCourse == null || currentCourse.cursoId() == null) return;
+        try (Session s = Hibernate_config.getSessionFactory().openSession()) {
+            Curso curso = s.get(Curso.class, currentCourse.cursoId());
+            if (curso == null) return;
+
+            // ── Students ──
+            fullStudentData.clear();
+            displayedStudentData.clear();
+            Query<Matricula> mq = s.createQuery(
+                "FROM Matricula m JOIN FETCH m.estudiante WHERE m.seccion.id = :secId AND m.periodo.id = :perId AND m.estado = 'ACTIVO'",
+                Matricula.class);
+            mq.setParameter("secId", curso.getSeccion().getId());
+            mq.setParameter("perId", curso.getPeriodo().getId());
+            List<Matricula> matriculas = mq.list();
+            for (Matricula m : matriculas) {
+                Estudiante e = m.getEstudiante();
+                fullStudentData.add(new StudentRow(e.getNombre() + " " + e.getApellido(), e.getCodigo(), "presente"));
+            }
+            displayedStudentData.addAll(fullStudentData.subList(0, Math.min(INITIAL_STUDENT_COUNT, fullStudentData.size())));
+            studentsTable.setItems(displayedStudentData);
+            updateStudentTableHeight(Math.min(INITIAL_STUDENT_COUNT, fullStudentData.size()));
+            totalStudents.setText(String.valueOf(fullStudentData.size()));
+
+            // ── Teachers ──
+            fullTeacherData.clear();
+            displayedTeacherData.clear();
+            Query<AsignacionMaestro> aq = s.createQuery(
+                "FROM AsignacionMaestro a JOIN FETCH a.maestro WHERE a.curso.id = :curId",
+                AsignacionMaestro.class);
+            aq.setParameter("curId", curso.getId());
+            List<AsignacionMaestro> asignaciones = aq.list();
+            for (AsignacionMaestro a : asignaciones) {
+                Usuario u = a.getMaestro();
+                fullTeacherData.add(new TeacherRow(u.getNombre() + " " + u.getApellido(), u.getEmail(),
+                    curso.getMateria().getNombre(), curso.getSeccion().getNombre(), "Activo", 0));
+            }
+            displayedTeacherData.addAll(fullTeacherData.subList(0, Math.min(INITIAL_TEACHER_COUNT, fullTeacherData.size())));
+            teacherTable.setItems(displayedTeacherData);
+            updateTeacherTableHeight(Math.min(INITIAL_TEACHER_COUNT, fullTeacherData.size()));
+            totalTeachers.setText(String.valueOf(fullTeacherData.size()));
+
+            // ── Gender distribution ──
+            Query<Estudiante.Genero> gq = s.createQuery(
+                "SELECT e.genero FROM Matricula m JOIN m.estudiante e WHERE m.seccion.id = :secId AND m.periodo.id = :perId AND m.estado = 'ACTIVO'",
+                Estudiante.Genero.class);
+            gq.setParameter("secId", curso.getSeccion().getId());
+            gq.setParameter("perId", curso.getPeriodo().getId());
+            List<Estudiante.Genero> generos = gq.list();
+            long masc = generos.stream().filter(g -> g == Estudiante.Genero.M).count();
+            long fem = generos.stream().filter(g -> g == Estudiante.Genero.F).count();
+            long otro = generos.stream().filter(g -> g == Estudiante.Genero.OTRO).count();
+            genderChart.setData(FXCollections.observableArrayList(
+                new PieChart.Data("Masculino", masc),
+                new PieChart.Data("Femenino", fem),
+                new PieChart.Data("Otro", otro)
+            ));
+            initGenderChartInteraction();
+
+            // ── Stats ──
+            Query<Calificacion> cq = s.createQuery(
+                "FROM Calificacion c WHERE c.curso.id = :curId", Calificacion.class);
+            cq.setParameter("curId", curso.getId());
+            List<Calificacion> calificaciones = cq.list();
+            double avg = calificaciones.stream().mapToDouble(c -> c.getNota().doubleValue()).average().orElse(0);
+            long aprobados = calificaciones.stream().filter(c -> c.getNota().doubleValue() >= 60).count();
+            long reprobados = calificaciones.size() - aprobados;
+            lblPromedioGeneral.setText(String.format("%.1f", avg));
+            lblAprobadosReprobados.setText(aprobados + " / " + reprobados);
+
+            // Materia promedio
+            lblPromedioMateria.setText(curso.getMateria().getNombre() + ": " + String.format("%.1f", avg));
+
+        } catch (Exception e) {
+            System.err.println("Error cargando datos reales: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void initStats() {
@@ -394,9 +478,10 @@ public class DetalleCursoController {
     @FXML
     private void onVerTodosDocentes(ActionEvent event) {
         showingAllTeachers = !showingAllTeachers;
-        int count = showingAllTeachers ? TOTAL_TEACHER_COUNT : INITIAL_TEACHER_COUNT;
+        int total = fullTeacherData.size();
+        int count = showingAllTeachers ? total : Math.min(INITIAL_TEACHER_COUNT, total);
         displayedTeacherData.setAll(
-            showingAllTeachers ? fullTeacherData : fullTeacherData.subList(0, INITIAL_TEACHER_COUNT)
+            showingAllTeachers ? fullTeacherData : fullTeacherData.subList(0, count)
         );
         updateTeacherTableHeight(count);
         btnVerTodosDocentes.setText(lang.get(
@@ -407,9 +492,10 @@ public class DetalleCursoController {
     @FXML
     private void onCargarMas(ActionEvent event) {
         showingAllStudents = !showingAllStudents;
-        int count = showingAllStudents ? TOTAL_STUDENT_COUNT : INITIAL_STUDENT_COUNT;
+        int total = fullStudentData.size();
+        int count = showingAllStudents ? total : Math.min(INITIAL_STUDENT_COUNT, total);
         displayedStudentData.setAll(
-            showingAllStudents ? fullStudentData : fullStudentData.subList(0, INITIAL_STUDENT_COUNT)
+            showingAllStudents ? fullStudentData : fullStudentData.subList(0, count)
         );
         updateStudentTableHeight(count);
         btnLoadMore.setText(lang.get(

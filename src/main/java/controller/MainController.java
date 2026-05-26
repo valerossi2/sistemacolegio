@@ -796,15 +796,15 @@ public class MainController {
             lbl.setFill(Color.web(heights[i] == maxH ? c(L_PRIMARY, D_ON_SURFACE) : c(L_OUTLINE, D_OUTLINE)));
 
             bar.setOnMouseEntered(e -> {
-                if (selectedPerfBar == -1 || selectedPerfBar != idx) {
-                    dimOtherBars(idx);
+                if (selectedPerfBar == -1) {
+                    growBar(idx);
                 }
             });
             bar.setOnMouseExited(e -> {
                 if (selectedPerfBar == -1) {
                     restoreBars();
                 } else {
-                    dimOtherBars(selectedPerfBar);
+                    growBar(selectedPerfBar);
                 }
             });
             bar.setOnMouseClicked(e -> {
@@ -813,7 +813,7 @@ public class MainController {
                     restoreBars();
                 } else {
                     selectedPerfBar = idx;
-                    dimOtherBars(idx);
+                    growBar(idx);
                 }
             });
 
@@ -846,11 +846,13 @@ public class MainController {
             perfSubText.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
             moreDots.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
             fT.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
-            if (selectedPerfBar == -1) {
-                restoreBars();
-            } else {
-                dimOtherBars(selectedPerfBar);
+            for (int i = 0; i < perfBarsList.size(); i++) {
+                boolean isDefault = defaultHighlightBar == i;
+                perfBarsList.get(i).setFill(Color.web(isDefault ? c(L_PRIMARY, D_PRIMARY) : c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
+                if (i < perfBarLabelList.size())
+                    perfBarLabelList.get(i).setFill(Color.web(isDefault ? c(L_PRIMARY, D_ON_SURFACE) : c(L_OUTLINE, D_OUTLINE)));
             }
+            if (selectedPerfBar == -1) restoreBars(); else growBar(selectedPerfBar);
         });
     }
 
@@ -863,30 +865,15 @@ public class MainController {
         tl.play();
     }
 
-    private void dimOtherBars(int activeIndex) {
+    private void growBar(int index) {
         for (int i = 0; i < perfBarsList.size(); i++) {
-            Rectangle bar = perfBarsList.get(i);
-            Text lbl = i < perfBarLabelList.size() ? perfBarLabelList.get(i) : null;
-            if (i == activeIndex) {
-                bar.setFill(Color.web(c(L_PRIMARY, D_PRIMARY)));
-                if (lbl != null) lbl.setFill(Color.web(c(L_PRIMARY, D_ON_SURFACE)));
-                animateBarHeight(bar, perfOriginalHeights[i] + PERF_BAR_GROW);
-            } else {
-                bar.setFill(Color.web(c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
-                if (lbl != null) lbl.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
-                animateBarHeight(bar, perfOriginalHeights[i]);
-            }
+            animateBarHeight(perfBarsList.get(i), i == index ? perfOriginalHeights[i] + PERF_BAR_GROW : perfOriginalHeights[i]);
         }
     }
 
     private void restoreBars() {
         for (int i = 0; i < perfBarsList.size(); i++) {
-            Rectangle bar = perfBarsList.get(i);
-            Text lbl = i < perfBarLabelList.size() ? perfBarLabelList.get(i) : null;
-            boolean isDefault = defaultHighlightBar == i;
-            bar.setFill(Color.web(isDefault ? c(L_PRIMARY, D_PRIMARY) : c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
-            if (lbl != null) lbl.setFill(Color.web(isDefault ? c(L_PRIMARY, D_ON_SURFACE) : c(L_OUTLINE, D_OUTLINE)));
-            animateBarHeight(bar, perfOriginalHeights[i]);
+            animateBarHeight(perfBarsList.get(i), perfOriginalHeights[i]);
         }
     }
 

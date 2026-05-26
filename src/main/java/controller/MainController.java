@@ -266,7 +266,7 @@ public class MainController {
 
     private void handleNavigation(int index) {
         if (index == 0) {
-            setCenterView(mainCanvas);
+            centerWrapper.getChildren().setAll(mainCanvas);
             loadHeaderProfileImage();
         } else if (index == 1) {
             loadView("/fxml/Admin/AdminMaestros.fxml");
@@ -333,7 +333,7 @@ public class MainController {
             }
         });
         
-        setCenterView(mainCanvas);
+        centerWrapper.getChildren().setAll(mainCanvas);
     }
 
     private void setCenterView(Node node) {
@@ -834,12 +834,14 @@ public class MainController {
         ScrollPane sp = new ScrollPane(list);
         sp.setFitToWidth(true);
         sp.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
-        sp.setPrefHeight(220);
+        sp.setPrefHeight(240);
+        sp.setMinHeight(140);
 
         scheduleBox.getChildren().addAll(scheduleTitleText, sp);
-        scheduleBox.setPadding(new Insets(12));
+        scheduleBox.setPadding(new Insets(12, 12, 28, 12));
         scheduleBox.setSpacing(8);
         scheduleBox.setStyle(cardStyle(theme.isDark()));
+        VBox.setVgrow(scheduleBox, Priority.ALWAYS);
 
         themeUpdaters.add(() -> {
             scheduleBox.setStyle(cardStyle(theme.isDark()));
@@ -945,7 +947,7 @@ public class MainController {
             bar.setArcHeight(10 * s);
         }
 
-        scheduleBox.setPadding(new Insets(12 * s));
+        scheduleBox.setPadding(new Insets(12 * s, 12 * s, 28 * s, 12 * s));
         scheduleBox.setSpacing(8 * s);
         coursesBox.setPadding(new Insets(compact ? 8 : 0));
         coursesBox.setSpacing(compact ? 8 : 0);

@@ -116,9 +116,6 @@ public class AdminAttendanceView {
         HBox.setHgrow(headerSpacer, Priority.ALWAYS);
         pageHeader.getChildren().setAll(titleBox, headerSpacer, selectorBox);
 
-        gradeLabel.setOnMouseClicked(e -> showSelectorMenu(e, List.of("5to", "4to", "3ro", "2do", "1ro"), gradeLabel));
-        sectionLabel.setOnMouseClicked(e -> showSelectorMenu(e, List.of("A", "B", "C", "D", "E"), sectionLabel));
-
         buildSummaryCard();
         buildTableCard();
 
@@ -135,20 +132,26 @@ public class AdminAttendanceView {
 
     private HBox createLabelSelector(String labelKey, Label valueLabel) {
         Label label = new Label();
-        label.setFont(Font.font("Plus Jakarta Sans", 11));
+        label.setFont(Font.font("Plus Jakarta Sans", 10));
         languageUpdaters.add(() -> label.setText(lang.get(labelKey)));
 
-        valueLabel.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13));
-        valueLabel.setCursor(javafx.scene.Cursor.HAND);
+        valueLabel.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 11));
         valueLabel.setPadding(new Insets(0, 2, 0, 0));
 
-        HBox box = new HBox(4, label, valueLabel);
+        HBox box = new HBox(3, label, valueLabel);
         box.setAlignment(Pos.CENTER_LEFT);
-        box.setPadding(new Insets(2, 8, 2, 8));
+        box.setPadding(new Insets(1, 6, 1, 6));
+        box.setCursor(javafx.scene.Cursor.HAND);
+        box.setOnMouseClicked(e -> {
+            if (valueLabel == gradeLabel)
+                showSelectorMenu(e, List.of("5to", "4to", "3ro", "2do", "1ro"), gradeLabel);
+            else
+                showSelectorMenu(e, List.of("A", "B", "C", "D", "E"), sectionLabel);
+        });
         themeUpdaters.add(() -> {
             label.setTextFill(Color.web(textMuted()));
             valueLabel.setTextFill(Color.web(text()));
-            box.setStyle(cardStyle(8, borderSoft()));
+            box.setStyle(cardStyle(6, borderSoft()));
         });
         return box;
     }
@@ -367,13 +370,24 @@ public class AdminAttendanceView {
 
     private void showSelectorMenu(MouseEvent event, List<String> options, Label target) {
         ContextMenu menu = new ContextMenu();
+        String bg = theme.isDark() ? "#1E293B" : "#ffffff";
+        String border = theme.isDark() ? "#334155" : "#E5E7EB";
+        String textC = theme.isDark() ? "#F8FAFC" : "#0f172a";
+        String hoverBg = theme.isDark() ? "#334155" : "#F1F5F9";
+        menu.setStyle("-fx-background-color: " + bg + "; -fx-border-color: " + border + "; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 6; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 10, 0.15, 0, 4);");
         for (String opt : options) {
             MenuItem item = new MenuItem(opt);
-            if (opt.equals(target.getText())) item.setDisable(true);
+            item.setStyle("-fx-text-fill: " + textC + "; -fx-font-weight: 700; -fx-font-size: 12; -fx-padding: 8 16; -fx-background-radius: 6;");
+            if (opt.equals(target.getText())) {
+                item.setDisable(true);
+                item.setStyle("-fx-text-fill: " + (theme.isDark() ? "#475569" : "#94A3B8") + "; -fx-font-weight: 700; -fx-font-size: 12; -fx-padding: 8 16;");
+            }
             item.setOnAction(e -> {
                 target.setText(opt);
                 updateLanguage();
             });
+            item.setOnMouseEntered(e -> item.setStyle("-fx-background-color: " + hoverBg + "; -fx-text-fill: " + textC + "; -fx-font-weight: 700; -fx-font-size: 12; -fx-padding: 8 16; -fx-background-radius: 6;"));
+            item.setOnMouseExited(e -> item.setStyle("-fx-text-fill: " + textC + "; -fx-font-weight: 700; -fx-font-size: 12; -fx-padding: 8 16; -fx-background-radius: 6;"));
             menu.getItems().add(item);
         }
         menu.show((Node) event.getSource(), Side.BOTTOM, 0, 0);

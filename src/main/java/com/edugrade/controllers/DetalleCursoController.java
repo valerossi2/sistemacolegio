@@ -303,8 +303,8 @@ public class DetalleCursoController {
         initGenderChartInteraction();
 
         // ── Stats ──
-        double avg = 5.0 + rng.nextDouble() * 5.0;
-        int aprobados = (int)(studentCount * (0.6 + rng.nextDouble() * 0.3));
+        double avg = currentCourse.rendimiento();
+        int aprobados = (int)(studentCount * (avg / 10.0 * 0.8));
         int reprobados = studentCount - aprobados;
         lblPromedioGeneral.setText(String.format("%.1f", avg));
         lblAprobadosReprobados.setText(aprobados + " / " + reprobados);

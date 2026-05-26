@@ -179,9 +179,9 @@ public class DetalleCursoController {
         colMatricula.setCellValueFactory(new PropertyValueFactory<>("matricula"));
         colAsistencia.setCellValueFactory(new PropertyValueFactory<>("status"));
         colAsistencia.setCellFactory(col -> new TableCell<StudentRow, String>() {
-            private final Button btn = new Button();
+            private final Label lbl = new Label();
             {
-                btn.getStyleClass().add("attendance-btn");
+                lbl.getStyleClass().add("attendance-btn");
             }
 
             @Override
@@ -191,24 +191,24 @@ public class DetalleCursoController {
                     setGraphic(null);
                     setText(null);
                 } else {
-                    btn.getStyleClass().removeAll(
+                    lbl.getStyleClass().removeAll(
                         "attendance-btn--presente", "attendance-btn--ausente", "attendance-btn--excusa"
                     );
                     switch (status) {
                         case "presente" -> {
-                            btn.setText("Presente");
-                            btn.getStyleClass().add("attendance-btn--presente");
+                            lbl.setText("Presente");
+                            lbl.getStyleClass().add("attendance-btn--presente");
                         }
                         case "ausente" -> {
-                            btn.setText("Ausente");
-                            btn.getStyleClass().add("attendance-btn--ausente");
+                            lbl.setText("Ausente");
+                            lbl.getStyleClass().add("attendance-btn--ausente");
                         }
                         case "excusa" -> {
-                            btn.setText("Excusa");
-                            btn.getStyleClass().add("attendance-btn--excusa");
+                            lbl.setText("Excusa");
+                            lbl.getStyleClass().add("attendance-btn--excusa");
                         }
                     }
-                    setGraphic(btn);
+                    setGraphic(lbl);
                 }
             }
         });

@@ -70,6 +70,7 @@ public class AdminAttendanceView {
     private final HBox selectorBox = new HBox(12);
     private final HBox pageHeader = new HBox(24);
     private boolean compact;
+    private boolean adjustingSelector;
 
     public AdminAttendanceView(ThemeManager theme) {
         this.theme = theme;
@@ -117,6 +118,7 @@ public class AdminAttendanceView {
         HBox.setHgrow(headerSpacer, Priority.ALWAYS);
         pageHeader.getChildren().addAll(titleBox, headerSpacer, selectorBox);
 
+        adjustingSelector = true;
         gradeSelector.setItems(FXCollections.observableArrayList(
             DataStore.getCourses().stream().map(c -> c.grado()).distinct().sorted().toList()
         ));
@@ -125,6 +127,7 @@ public class AdminAttendanceView {
         ));
         gradeSelector.getSelectionModel().selectFirst();
         sectionSelector.getSelectionModel().selectFirst();
+        adjustingSelector = false;
 
         buildSummaryCard();
         buildTableCard();
@@ -425,8 +428,28 @@ public class AdminAttendanceView {
 
     private void wireEvents() {
         searchField.textProperty().addListener((obs, oldValue, newValue) -> refreshRows());
-        gradeSelector.setOnAction(e -> reloadForCourse());
-        sectionSelector.setOnAction(e -> reloadForCourse());
+        gradeSelector.setOnAction(e -> {
+            if (adjustingSelector) return;
+            adjustingSelector = true;
+            var filtered = DataStore.getCourses().stream()
+                .filter(c -> c.grado().equals(gradeSelector.getValue()))
+                .map(c -> c.seccion()).distinct().sorted().toList();
+            sectionSelector.setItems(FXCollections.observableArrayList(filtered));
+            sectionSelector.getSelectionModel().selectFirst();
+            adjustingSelector = false;
+            reloadForCourse();
+        });
+        sectionSelector.setOnAction(e -> {
+            if (adjustingSelector) return;
+            adjustingSelector = true;
+            var filtered = DataStore.getCourses().stream()
+                .filter(c -> c.seccion().equals(sectionSelector.getValue()))
+                .map(c -> c.grado()).distinct().sorted().toList();
+            gradeSelector.setItems(FXCollections.observableArrayList(filtered));
+            gradeSelector.getSelectionModel().selectFirst();
+            adjustingSelector = false;
+            reloadForCourse();
+        });
         saveButton.setOnAction(e -> {
             long pending = students.stream().filter(s -> s.status == AttendanceStatus.UNMARKED).count();
             if (pending > 0) {

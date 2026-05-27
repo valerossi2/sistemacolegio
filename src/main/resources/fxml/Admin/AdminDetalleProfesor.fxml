@@ -56,11 +56,11 @@
                                    maxWidth="96" maxHeight="96"
                                    minWidth="96" minHeight="96">
                         </StackPane>
-                        <VBox spacing="6">
+                        <StackPane alignment="CENTER_LEFT" maxHeight="96">
                             <Label fx:id="professorName"
                                    text=""
                                    styleClass="professor-name"/>
-                        </VBox>
+                        </StackPane>
                     </HBox>
 
                     <Region styleClass="card-divider"/>

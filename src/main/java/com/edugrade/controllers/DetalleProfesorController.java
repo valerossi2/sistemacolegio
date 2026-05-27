@@ -12,8 +12,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.event.Event;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -76,6 +78,7 @@ public class DetalleProfesorController implements Initializable {
         updateTexts();
         applyTheme();
         setupAttendanceTable();
+        attendanceTable.addEventFilter(ScrollEvent.SCROLL, Event::consume);
 
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);
@@ -172,13 +175,13 @@ public class DetalleProfesorController implements Initializable {
             {"14:45", "16:15", "Arte"}
         };
 
-        String trackColor = c("#E2E8F0", "#334155");
-        String fillColor = c("#2563EB", "#3B82F6");
+        String trackColor = c("#E5E7EB", "#334155");
+        String fillColor = c("#2B54A8", "#3B82F6");
         String currentColor = "#F59E0B";
-        String inactiveColor = c("#CBD5E1", "#475569");
-        String labelColor = c("#0F172A", "#F8FAFC");
-        String labelMuted = c("#475569", "#94A3B8");
-        String labelDim = c("#94A3B8", "#64748B");
+        String inactiveColor = c("#D1D5DB", "#475569");
+        String labelColor = c("#1F2937", "#F8FAFC");
+        String labelMuted = c("#6B7280", "#94A3B8");
+        String labelDim = c("#9CA3AF", "#64748B");
 
         // find last active end for fill height
         String lastActiveEnd = "07:00";
@@ -302,7 +305,7 @@ public class DetalleProfesorController implements Initializable {
         if (dark) root.getStyleClass().add("root-dark");
 
         String cardBg = dark ? "#1E293B" : "#FFFFFF";
-        String cardBorder = dark ? "#334155" : "#E2E8F0";
+        String cardBorder = dark ? "#334155" : "#E5E7EB";
         scheduleCard.setStyle("-fx-background-color: " + cardBg + "; -fx-background-radius: 24; -fx-border-color: " + cardBorder + "; -fx-border-radius: 24; -fx-border-width: 1;");
     }
 

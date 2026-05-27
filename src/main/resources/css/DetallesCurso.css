@@ -17,7 +17,7 @@
 .page-header .page-title {
     -fx-font-size: 30px;
     -fx-font-weight: 700;
-    -fx-text-fill: #0F172A;
+    -fx-text-fill: #1F2937;
     -fx-padding: 0;
 }
 
@@ -25,12 +25,12 @@
 .breadcrumb__parent,
 .breadcrumb__link {
     -fx-font-size: 14px;
-    -fx-text-fill: #2563EB;
+    -fx-text-fill: #2B54A8;
     -fx-cursor: hand;
 }
 .breadcrumb__parent:hover,
 .breadcrumb__link:hover {
-    -fx-text-fill: #1D4ED8;
+    -fx-text-fill: #1E40AF;
     -fx-underline: true;
 }
 .breadcrumb__separator {
@@ -40,7 +40,7 @@
 .breadcrumb__current {
     -fx-font-size: 14px;
     -fx-font-weight: 600;
-    -fx-text-fill: #0F172A;
+    -fx-text-fill: #1F2937;
 }
 
 /* ── BENTO GRID ──────────────────────────────────────────── */
@@ -62,7 +62,7 @@
     -fx-cursor: hand;
 }
 .btn-outlined:hover {
-    -fx-background-color: #F1F5F9;
+    -fx-background-color: #F9FAFB;
 }
 
 /* ── BADGE SURFACE ────────────────────────────────────────── */
@@ -76,7 +76,7 @@
     -fx-background-color: #F1F5F9;
     -fx-background-radius: 16px;
     -fx-border-radius: 16px;
-    -fx-border-color: #E2E8F0;
+    -fx-border-color: #E5E7EB;
     -fx-border-width: 1px;
 }
 .course-image-placeholder {
@@ -114,28 +114,28 @@
     -fx-background-radius: 10px;
 }
 .stat-icon--primary {
-    -fx-background-color: #EFF6FF;
+    -fx-background-color: #DBEAFE;
 }
 .stat-icon--secondary {
     -fx-background-color: #D1FAE5;
 }
 .stat-svg-icon {
-    -fx-fill: #2563EB;
+    -fx-fill: #2B54A8;
 }
 .stat-label {
     -fx-font-size: 12px;
-    -fx-text-fill: #475569;
+    -fx-text-fill: #6B7280;
 }
 .stat-value {
     -fx-font-size: 16px;
     -fx-font-weight: 700;
-    -fx-text-fill: #0F172A;
+    -fx-text-fill: #1F2937;
 }
 
 /* ── TEACHER TABLE ────────────────────────────────────────── */
 .teacher-card__header {
     -fx-padding: 16 20 12 20;
-    -fx-border-color: #E2E8F0;
+    -fx-border-color: #E5E7EB;
     -fx-border-width: 0 0 1 0;
 }
 .teacher-table {
@@ -156,13 +156,13 @@
 .teacher-table .column-header .label {
     -fx-font-size: 12px;
     -fx-font-weight: 600;
-    -fx-text-fill: #475569;
+    -fx-text-fill: #6B7280;
     -fx-padding: 10 16;
     -fx-alignment: CENTER_LEFT;
 }
 .teacher-table .table-row-cell {
     -fx-background-color: #FFFFFF;
-    -fx-border-color: #E2E8F0;
+    -fx-border-color: #E5E7EB;
     -fx-border-width: 0 0 1 0;
     -fx-pref-height: 48px;
     -fx-cell-size: 48px;
@@ -206,14 +206,14 @@
 .cell-docente-name {
     -fx-font-size: 14px;
     -fx-font-weight: 500;
-    -fx-text-fill: #0F172A;
+    -fx-text-fill: #1F2937;
 }
 
 /* ── CONTEXT MENU ──────────────────────────────────────────── */
 .context-menu {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 8px;
-    -fx-border-color: #E2E8F0;
+    -fx-border-color: #E5E7EB;
     -fx-border-radius: 8px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 4);
     -fx-padding: 4;
@@ -243,19 +243,19 @@
 .card-divider {
     -fx-min-height: 1px;
     -fx-max-height: 1px;
-    -fx-background-color: #E2E8F0;
+    -fx-background-color: #E5E7EB;
 }
 
 /* ── CARD SUBTITLE ─────────────────────────────────────────── */
 .card__title {
     -fx-font-size: 18px;
     -fx-font-weight: 700;
-    -fx-text-fill: #0F172A;
+    -fx-text-fill: #1F2937;
 }
 .root-dark .card__title { -fx-text-fill: #F8FAFC; }
     -fx-font-size: 13px;
     -fx-font-weight: 600;
-    -fx-text-fill: #475569;
+    -fx-text-fill: #6B7280;
 }
 
 /* ── STAT MINI CARD (inside overview) ──────────────────────── */
@@ -267,13 +267,13 @@
 }
 .stat-mini-card__label {
     -fx-font-size: 11px;
-    -fx-text-fill: #475569;
+    -fx-text-fill: #6B7280;
     -fx-font-weight: 500;
 }
 .stat-mini-card__value {
     -fx-font-size: 20px;
     -fx-font-weight: 700;
-    -fx-text-fill: #0F172A;
+    -fx-text-fill: #1F2937;
 }
 
 /* ── GENDER PIE CHART ──────────────────────────────────────── */
@@ -295,7 +295,7 @@
 .pie-tooltip {
     -fx-font-size: 13px;
     -fx-font-weight: 600;
-    -fx-background-color: #0F172A;
+    -fx-background-color: #1F2937;
     -fx-text-fill: #F8FAFC;
     -fx-background-radius: 6px;
     -fx-padding: 6 12;
@@ -346,7 +346,7 @@
 .search-suggestion-item {
     -fx-padding: 8 16;
     -fx-font-size: 13px;
-    -fx-text-fill: #0F172A;
+    -fx-text-fill: #1F2937;
 }
 .search-suggestion-item:hover {
     -fx-background-color: #F1F5F9;

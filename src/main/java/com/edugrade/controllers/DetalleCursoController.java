@@ -2,6 +2,7 @@ package com.edugrade.controllers;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
@@ -15,7 +16,9 @@ import com.edugrade.controller.GradesController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -23,11 +26,16 @@ import javafx.scene.control.cell.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.Popup;
 import javafx.util.Callback;
 import theme.ThemeManager;
 import util.LanguageManager;
@@ -40,6 +48,14 @@ public class DetalleCursoController {
     private boolean showingAllStudents = false;
     private boolean editMode = false;
     private List<Node> savedCardChildren;
+    private HBox teacherAddBar;
+    private HBox studentAddBar;
+    private TextField teacherAddField;
+    private TextField studentAddField;
+    private Popup teacherAutoPopup;
+    private Popup studentAutoPopup;
+    private final List<TeacherRow> availableTeacherPool = new java.util.ArrayList<>();
+    private final List<StudentRow> availableStudentPool = new java.util.ArrayList<>();
 
     private final ObservableList<TeacherRow> fullTeacherData = FXCollections.observableArrayList();
     private final ObservableList<TeacherRow> displayedTeacherData = FXCollections.observableArrayList();
@@ -200,6 +216,8 @@ public class DetalleCursoController {
             new TeacherRow("Prof. Andrés Cruz", "andres.cruz@edu.com", "Química", "4to C", "Activo", 2),
             new TeacherRow("Prof. Valeria Solís", "valeria.solis@edu.com", "Historia del Arte", "6to B", "Activo", 3)
         );
+        availableTeacherPool.clear();
+        availableTeacherPool.addAll(fullTeacherData);
         displayedTeacherData.addAll(fullTeacherData.subList(0, INITIAL_TEACHER_COUNT));
         teacherTable.setItems(displayedTeacherData);
         updateTeacherTableHeight(INITIAL_TEACHER_COUNT);
@@ -263,6 +281,8 @@ public class DetalleCursoController {
             String s = statuses[ThreadLocalRandom.current().nextInt(statuses.length)];
             fullStudentData.add(new StudentRow(r[0], r[1], s));
         }
+        availableStudentPool.clear();
+        availableStudentPool.addAll(fullStudentData);
         displayedStudentData.addAll(fullStudentData.subList(0, INITIAL_STUDENT_COUNT));
         studentsTable.setItems(displayedStudentData);
         updateStudentTableHeight(INITIAL_STUDENT_COUNT);
@@ -497,10 +517,7 @@ public class DetalleCursoController {
         savedCardChildren = new java.util.ArrayList<>(courseOverviewCard.getChildren());
 
         btnEditCourse.setText(lang.get("detalle.btnGuardar", "Guardar"));
-        btnPrint.setText(lang.get("detalle.btnCancelar", "Cancelar"));
-        btnPrint.setOnAction(e -> exitEditMode());
 
-        // Replace left card with editable form
         VBox editForm = new VBox(12);
         editForm.setPadding(new Insets(20));
         editForm.setSpacing(12);
@@ -508,31 +525,18 @@ public class DetalleCursoController {
         Label title = new Label(lang.get("detalle.editarTitle", "Editar Curso"));
         title.getStyleClass().add("card__title");
 
-        TextField tfStudents = new TextField(totalStudents.getText());
-        tfStudents.getStyleClass().add("input-field");
-        VBox studentsRow = new VBox(4);
-        studentsRow.getChildren().addAll(new Label("Total Estudiantes"), tfStudents);
+        Button btnGuardar = new Button(lang.get("detalle.btnGuardar", "Guardar"));
+        btnGuardar.getStyleClass().add("btn-primary");
+        Button btnCancelar = new Button(lang.get("detalle.btnCancelar", "Cancelar"));
+        btnCancelar.getStyleClass().add("btn-outlined");
+        HBox btnRow = new HBox(8, btnGuardar, btnCancelar);
 
-        TextField tfTeachers = new TextField(totalTeachers.getText());
-        tfTeachers.getStyleClass().add("input-field");
-        VBox teachersRow = new VBox(4);
-        teachersRow.getChildren().addAll(new Label("Total Profesores"), tfTeachers);
-
-        TextField tfAvg = new TextField(lblPromedioGeneral.getText());
-        tfAvg.getStyleClass().add("input-field");
-        VBox avgRow = new VBox(4);
-        avgRow.getChildren().addAll(new Label("Promedio General"), tfAvg);
-
-        editForm.getChildren().addAll(title, studentsRow, teachersRow, avgRow);
-
-        // Store refs for save
-        tfStudents.setUserData("tfStudents");
-        tfTeachers.setUserData("tfTeachers");
-        tfAvg.setUserData("tfAvg");
-
+        editForm.getChildren().addAll(title, btnRow);
         courseOverviewCard.getChildren().setAll(editForm);
 
-        // Make teacher table editable
+        btnGuardar.setOnAction(e -> exitEditMode());
+        btnCancelar.setOnAction(e -> exitEditMode());
+
         teacherTable.setEditable(true);
         colTeacherName.setCellFactory(TextFieldTableCell.forTableColumn());
         colTeacherName.setOnEditCommit(e -> {
@@ -544,27 +548,11 @@ public class DetalleCursoController {
             TeacherRow row = e.getRowValue();
             row.setMateria(e.getNewValue());
         });
+
+        setupEditModeAddBars();
     }
 
     private void saveEditMode() {
-        VBox editForm = (VBox) courseOverviewCard.getChildren().get(0);
-        // Read values from TextFields
-        for (Node child : editForm.getChildren()) {
-            if (child instanceof VBox row) {
-                for (Node field : row.getChildren()) {
-                    if (field instanceof TextField tf) {
-                        String ud = (String) tf.getUserData();
-                        if ("tfStudents".equals(ud)) {
-                            totalStudents.setText(tf.getText());
-                        } else if ("tfTeachers".equals(ud)) {
-                            totalTeachers.setText(tf.getText());
-                        } else if ("tfAvg".equals(ud)) {
-                            lblPromedioGeneral.setText(tf.getText());
-                        }
-                    }
-                }
-            }
-        }
         exitEditMode();
     }
 
@@ -575,14 +563,255 @@ public class DetalleCursoController {
             savedCardChildren = null;
         }
         btnEditCourse.setText(lang.get("detalle.btnEdit", "Editar Curso"));
-        btnPrint.setText(lang.get("detalle.btnPrint", "Imprimir Reporte"));
-        btnPrint.setOnAction(this::onImprimirReporte);
 
         teacherTable.setEditable(false);
         colTeacherName.setCellFactory(nombreCell());
         colTeacherSubject.setCellFactory(defaultSubjectCell());
         teacherTable.refresh();
         studentsTable.refresh();
+
+        removeEditModeAddBars();
+    }
+
+    private void removeEditModeAddBars() {
+        if (teacherAddBar != null && teacherAddBar.getParent() instanceof VBox tc) {
+            tc.getChildren().remove(teacherAddBar);
+            teacherAddBar = null;
+        }
+        if (studentAddBar != null && studentAddBar.getParent() instanceof VBox sc) {
+            sc.getChildren().remove(studentAddBar);
+            studentAddBar = null;
+        }
+        if (teacherAutoPopup != null) teacherAutoPopup.hide();
+        if (studentAutoPopup != null) studentAutoPopup.hide();
+    }
+
+    private void setupEditModeAddBars() {
+        VBox teacherCard = (VBox) teacherTable.getParent();
+        VBox studentCard = (VBox) studentsTable.getParent();
+
+        teacherAddField = new TextField();
+        teacherAddField.setPromptText("Buscar profesor...");
+        teacherAddField.getStyleClass().add("input-field");
+        Button btnAddTeacher = new Button("Agregar");
+        btnAddTeacher.getStyleClass().add("btn-primary");
+        teacherAddBar = new HBox(8, teacherAddField, btnAddTeacher);
+        teacherAddBar.setPadding(new Insets(8, 16, 8, 16));
+
+        int teacherTableIdx = teacherCard.getChildren().indexOf(teacherTable);
+        teacherCard.getChildren().add(teacherTableIdx, teacherAddBar);
+
+        teacherAutoPopup = new Popup();
+        teacherAutoPopup.setAutoHide(true);
+        teacherAutoPopup.setHideOnEscape(true);
+        teacherAddField.textProperty().addListener((obs, ov, nv) -> {
+            if (nv == null || nv.isBlank()) { teacherAutoPopup.hide(); return; }
+            showTeacherAutoComplete(nv);
+        });
+        teacherAddField.focusedProperty().addListener((obs, ov, nv) -> {
+            if (!nv) teacherAutoPopup.hide();
+        });
+        btnAddTeacher.setOnAction(e -> {
+            String name = teacherAddField.getText().trim();
+            if (name.isEmpty()) return;
+            for (TeacherRow t : availableTeacherPool) {
+                if (t.getNombre().equalsIgnoreCase(name)) {
+                    addTeacherToCourse(t);
+                    teacherAddField.clear();
+                    return;
+                }
+            }
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText(null);
+            alert.setContentText("Selecciona un profesor de la lista de sugerencias.");
+            alert.showAndWait();
+        });
+
+        studentAddField = new TextField();
+        studentAddField.setPromptText("Buscar o agregar estudiante...");
+        studentAddField.getStyleClass().add("input-field");
+        Button btnAddStudent = new Button("Agregar");
+        btnAddStudent.getStyleClass().add("btn-primary");
+        studentAddBar = new HBox(8, studentAddField, btnAddStudent);
+        studentAddBar.setPadding(new Insets(8, 16, 8, 16));
+
+        int studentTableIdx = studentCard.getChildren().indexOf(studentsTable);
+        studentCard.getChildren().add(studentTableIdx, studentAddBar);
+
+        studentAutoPopup = new Popup();
+        studentAutoPopup.setAutoHide(true);
+        studentAutoPopup.setHideOnEscape(true);
+        studentAddField.textProperty().addListener((obs, ov, nv) -> {
+            if (nv == null || nv.isBlank()) { studentAutoPopup.hide(); return; }
+            showStudentAutoComplete(nv);
+        });
+        studentAddField.focusedProperty().addListener((obs, ov, nv) -> {
+            if (!nv) studentAutoPopup.hide();
+        });
+        btnAddStudent.setOnAction(e -> {
+            String name = studentAddField.getText().trim();
+            if (name.isEmpty()) return;
+            for (StudentRow s : availableStudentPool) {
+                if (s.getName().equalsIgnoreCase(name)) {
+                    addStudentToCourse(s);
+                    studentAddField.clear();
+                    return;
+                }
+            }
+            addNewStudent(name);
+            studentAddField.clear();
+        });
+    }
+
+    private void showTeacherAutoComplete(String query) {
+        String q = query.toLowerCase(Locale.ROOT);
+        List<TeacherRow> matches = new java.util.ArrayList<>();
+        for (TeacherRow t : availableTeacherPool) {
+            boolean alreadyAssigned = false;
+            for (TeacherRow dt : fullTeacherData) {
+                if (dt.getNombre().equals(t.getNombre())) {
+                    alreadyAssigned = true;
+                    break;
+                }
+            }
+            if (!alreadyAssigned && t.getNombre().toLowerCase(Locale.ROOT).contains(q)) {
+                matches.add(t);
+                if (matches.size() >= 5) break;
+            }
+        }
+        if (matches.isEmpty()) { teacherAutoPopup.hide(); return; }
+
+        VBox container = new VBox();
+        container.setStyle("-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #E5E7EB; -fx-border-radius: 8; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);");
+        container.setPrefWidth(250);
+
+        for (TeacherRow t : matches) {
+            HBox row = new HBox(8);
+            row.setPadding(new Insets(8, 12, 8, 12));
+            row.setAlignment(Pos.CENTER_LEFT);
+            Label name = new Label(t.getNombre());
+            name.setFont(Font.font("Plus Jakarta Sans", FontWeight.MEDIUM, 13));
+            Label subject = new Label(t.getMateria());
+            subject.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 11px;");
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+            row.getChildren().addAll(name, spacer, subject);
+            row.setOnMouseClicked(e -> {
+                addTeacherToCourse(t);
+                teacherAutoPopup.hide();
+                teacherAddField.clear();
+            });
+            row.setOnMouseEntered(e -> row.setStyle("-fx-background-color: #F3F4F6;"));
+            row.setOnMouseExited(e -> row.setStyle("-fx-background-color: transparent;"));
+            container.getChildren().add(row);
+        }
+
+        teacherAutoPopup.getContent().setAll(container);
+        Bounds b = teacherAddField.localToScreen(teacherAddField.getBoundsInLocal());
+        if (b != null) teacherAutoPopup.show(teacherAddField, b.getMinX(), b.getMaxY());
+    }
+
+    private void showStudentAutoComplete(String query) {
+        String q = query.toLowerCase(Locale.ROOT);
+        List<StudentRow> matches = new java.util.ArrayList<>();
+        for (StudentRow s : availableStudentPool) {
+            boolean alreadyAssigned = false;
+            for (StudentRow ds : fullStudentData) {
+                if (ds.getName().equals(s.getName())) {
+                    alreadyAssigned = true;
+                    break;
+                }
+            }
+            if (!alreadyAssigned && s.getName().toLowerCase(Locale.ROOT).contains(q)) {
+                matches.add(s);
+                if (matches.size() >= 5) break;
+            }
+        }
+
+        VBox container = new VBox();
+        container.setStyle("-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #E5E7EB; -fx-border-radius: 8; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);");
+        container.setPrefWidth(250);
+
+        for (StudentRow s : matches) {
+            HBox row = new HBox(8);
+            row.setPadding(new Insets(8, 12, 8, 12));
+            row.setAlignment(Pos.CENTER_LEFT);
+            Label name = new Label(s.getName());
+            name.setFont(Font.font("Plus Jakarta Sans", FontWeight.MEDIUM, 13));
+            Label mat = new Label(s.getMatricula());
+            mat.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 11px;");
+            row.getChildren().addAll(name, mat);
+            row.setOnMouseClicked(e -> {
+                addStudentToCourse(s);
+                studentAutoPopup.hide();
+                studentAddField.clear();
+            });
+            row.setOnMouseEntered(e -> row.setStyle("-fx-background-color: #F3F4F6;"));
+            row.setOnMouseExited(e -> row.setStyle("-fx-background-color: transparent;"));
+            container.getChildren().add(row);
+        }
+
+        boolean showAddNew = !query.isBlank();
+        if (showAddNew) {
+            if (!matches.isEmpty()) {
+                Region sep = new Region();
+                sep.setStyle("-fx-border-color: transparent transparent #E5E7EB transparent; -fx-border-width: 1;");
+                sep.setMinHeight(1);
+                container.getChildren().add(sep);
+            }
+            HBox addRow = new HBox(8);
+            addRow.setPadding(new Insets(8, 12, 8, 12));
+            addRow.setAlignment(Pos.CENTER_LEFT);
+            Label addLabel = new Label("+ Agregar \"" + query + "\"");
+            addLabel.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13));
+            addLabel.setTextFill(Color.web("#2563EB"));
+            addRow.getChildren().add(addLabel);
+            addRow.setOnMouseClicked(e -> {
+                addNewStudent(query);
+                studentAutoPopup.hide();
+                studentAddField.clear();
+            });
+            addRow.setOnMouseEntered(e -> addRow.setStyle("-fx-background-color: #EFF6FF;"));
+            addRow.setOnMouseExited(e -> addRow.setStyle("-fx-background-color: transparent;"));
+            container.getChildren().add(addRow);
+        }
+
+        if (!matches.isEmpty() || showAddNew) {
+            studentAutoPopup.getContent().setAll(container);
+            Bounds b = studentAddField.localToScreen(studentAddField.getBoundsInLocal());
+            if (b != null) studentAutoPopup.show(studentAddField, b.getMinX(), b.getMaxY());
+        } else {
+            studentAutoPopup.hide();
+        }
+    }
+
+    private void addTeacherToCourse(TeacherRow teacher) {
+        fullTeacherData.add(teacher);
+        displayedTeacherData.add(teacher);
+        updateTeacherTableHeight(displayedTeacherData.size());
+        totalTeachers.setText(String.valueOf(fullTeacherData.size()));
+        if (!showingAllTeachers) {
+            showingAllTeachers = true;
+            btnVerTodosDocentes.setText(lang.get("detalle.verMenos", "Ver menos"));
+        }
+    }
+
+    private void addStudentToCourse(StudentRow student) {
+        fullStudentData.add(student);
+        displayedStudentData.add(student);
+        updateStudentTableHeight(displayedStudentData.size());
+        totalStudents.setText(String.valueOf(fullStudentData.size()));
+        if (!showingAllStudents) {
+            showingAllStudents = true;
+            btnLoadMore.setText(lang.get("detalle.verMenos", "Ver menos"));
+        }
+    }
+
+    private void addNewStudent(String name) {
+        String mat = String.format("MAT-%03d", ThreadLocalRandom.current().nextInt(1, 999));
+        StudentRow s = new StudentRow(name, mat, "presente");
+        addStudentToCourse(s);
+        availableStudentPool.add(s);
     }
 
     @FXML
@@ -592,7 +821,10 @@ public class DetalleCursoController {
             Node gradesView = loader.load();
             GradesController ctrl = loader.getController();
 
-            VBox cursosCard = (VBox) root.getParent().getParent().getParent();
+            Node p = root;
+            while (p != null && !"cursosCard".equals(p.getId())) p = p.getParent();
+            if (p == null) return;
+            VBox cursosCard = (VBox) p;
             List<Node> savedChildren = new java.util.ArrayList<>(cursosCard.getChildrenUnmodifiable());
 
             ctrl.setOnBack(() -> cursosCard.getChildren().setAll(savedChildren));

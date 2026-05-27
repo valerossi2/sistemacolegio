@@ -27,9 +27,7 @@ import java.util.ResourceBundle;
 public class GradesController implements Initializable {
 
     @FXML private VBox root;
-    @FXML private HBox topBar;
     @FXML private VBox gradesCard;
-    @FXML private TextField searchField;
     @FXML private Text pageTitle;
     @FXML private HBox filterBox;
     @FXML private Label lblPeriodo;
@@ -41,13 +39,21 @@ public class GradesController implements Initializable {
     @FXML private TableColumn<Student, String>  colNuevaCalif;
     @FXML private ComboBox<String> comboPeriodo;
     @FXML private ComboBox<String> comboTipoEval;
-    @FXML private Button btnGuardarTop;
-    @FXML private Button btnGuardarBottom;
-    @FXML private Button btnCancelar;
+    @FXML private Button btnVolver;
+    @FXML private Button btnGuardar;
 
     private LanguageManager lang;
     private ThemeManager theme;
     private Runnable onBack;
+
+    private double currentMaxGrade = 100.0;
+
+    private static final java.util.Map<String, Double> EVAL_MAX = java.util.Map.of(
+        "Examen Parcial", 25.0,
+        "Examen Final", 35.0,
+        "Tareas", 25.0,
+        "Participación", 15.0
+    );
 
     private final ObservableList<Student> masterData =
         FXCollections.observableArrayList(
@@ -79,19 +85,9 @@ public class GradesController implements Initializable {
                 root.minHeightProperty().bind(sp.viewportBoundsProperty().map(b -> b.getHeight()));
         }));
 
-        btnGuardarTop.setOnAction(e    -> handleSave());
-        btnGuardarBottom.setOnAction(e -> handleSave());
-        btnCancelar.setOnAction(e      -> { handleCancel(); if (onBack != null) onBack.run(); });
+        btnVolver.setOnAction(e -> { if (onBack != null) onBack.run(); });
 
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
-            String q = newVal == null ? "" : newVal.toLowerCase().trim();
-            filteredData.setPredicate(s -> {
-                if (q.isEmpty()) return true;
-                return s.getName().toLowerCase().contains(q)
-                    || s.getStudentId().toLowerCase().contains(q)
-                    || s.getEmail().toLowerCase().contains(q);
-            });
-        });
+        btnGuardar.setOnAction(e -> handleSave());
 
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);
@@ -100,6 +96,17 @@ public class GradesController implements Initializable {
         comboTipoEval.getItems().addAll("Examen Parcial", "Examen Final", "Tareas", "Participación");
         comboPeriodo.getSelectionModel().selectFirst();
         comboTipoEval.getSelectionModel().selectFirst();
+
+        comboTipoEval.valueProperty().addListener((obs, ov, nv) -> {
+            currentMaxGrade = EVAL_MAX.getOrDefault(nv, 100.0);
+            colNuevaCalif.setCellFactory(col -> {
+                GradeInputCell cell = new GradeInputCell();
+                cell.setMaxGrade(currentMaxGrade);
+                return cell;
+            });
+            gradesTable.refresh();
+        });
+        currentMaxGrade = EVAL_MAX.getOrDefault(comboTipoEval.getValue(), 100.0);
 
         setupResponsive();
     }
@@ -146,11 +153,9 @@ public class GradesController implements Initializable {
         colEstudiante.setText(lang.get("grades.colEstudiante", "ESTUDIANTE"));
         colMatricula.setText(lang.get("grades.colMatricula", "MATRÍCULA"));
         colCalifActual.setText(lang.get("grades.colCalifActual", "NOTA ACTUAL"));
-        colNuevaCalif.setText(lang.get("grades.colNuevaCalif", "NUEVA NOTA"));
-        btnGuardarTop.setText(lang.get("grades.guardar", "Guardar Cambios"));
-        btnGuardarBottom.setText(lang.get("grades.guardar", "Guardar Cambios"));
-        btnCancelar.setText(lang.get("grades.cancelar", "Cancelar"));
-        searchField.setPromptText(lang.get("attendance.search", "Buscar estudiantes..."));
+        colNuevaCalif.setText(lang.get("grades.colFinal", "CALIF. FINAL"));
+        btnVolver.setText(lang.get("grades.cancelar", "Volver"));
+        btnGuardar.setText(lang.get("grades.guardar", "Guardar Cambios"));
     }
 
     private void configureColumns() {
@@ -190,7 +195,11 @@ public class GradesController implements Initializable {
         });
 
         colNuevaCalif.setCellValueFactory(new PropertyValueFactory<>("newGrade"));
-        colNuevaCalif.setCellFactory(col -> new GradeInputCell());
+        colNuevaCalif.setCellFactory(col -> {
+            GradeInputCell cell = new GradeInputCell();
+            cell.setMaxGrade(currentMaxGrade);
+            return cell;
+        });
         colNuevaCalif.setOnEditCommit(event -> {
             Student s = event.getRowValue();
             s.newGradeProperty().set(event.getNewValue());
@@ -203,13 +212,19 @@ public class GradesController implements Initializable {
         for (Student s : masterData) {
             String ng = s.getNewGrade();
             if (ng != null && !ng.isBlank()) {
-                System.out.printf("Guardando → %s  |  Nueva calificación: %s%n",
-                    s.getName(), ng);
+                double increment = Double.parseDouble(ng);
+                double current = s.getCurrentGrade();
+                String tipo = comboTipoEval.getValue();
+                double max = EVAL_MAX.getOrDefault(tipo, 100.0);
+                if (increment > max) {
+                    System.out.printf("\u26a0 %s: +%.1f supera el m\u00e1ximo de %.0f para %s%n",
+                        s.getName(), increment, max, tipo);
+                    continue;
+                }
+                double finalGrade = current + increment;
+                System.out.printf("\u2713 %s: %.1f + %.1f = %.1f / %.0f (%s)%n",
+                    s.getName(), current, increment, finalGrade, max, tipo);
             }
         }
-    }
-
-    private void handleCancel() {
-        masterData.forEach(s -> s.newGradeProperty().set(""));
     }
 }

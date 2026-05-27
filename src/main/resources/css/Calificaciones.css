@@ -26,19 +26,24 @@
     -fx-border-width: 2px;
 }
 
-.grades-btn {
-    -fx-background-color: #0F489F;
-    -fx-background-radius: 12px;
+.grades-btn-primary {
+    -fx-background-color: #2563EB;
+    -fx-background-radius: 8px;
     -fx-border-width: 0;
     -fx-text-fill: #FFFFFF;
     -fx-font-size: 14px;
-    -fx-font-weight: 700;
-    -fx-font-family: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+    -fx-font-weight: 500;
     -fx-padding: 12px 20px;
     -fx-cursor: hand;
 }
-.grades-btn:hover {
-    -fx-background-color: #0B3D8A;
+.grades-btn-primary:hover {
+    -fx-background-color: #1D4ED8;
+}
+.root-dark .grades-btn-primary {
+    -fx-background-color: #3B82F6;
+}
+.root-dark .grades-btn-primary:hover {
+    -fx-background-color: #2563EB;
 }
 
 .grades-btn-secondary {
@@ -76,19 +81,29 @@
 .grades-label {
     -fx-font-size: 13px;
     -fx-font-weight: 600;
-    -fx-text-fill: #6B7280;
+    -fx-text-fill: #475569;
 }
 
 .grades-combo {
-    -fx-background-color: #FFFFFF;
-    -fx-background-radius: 10px;
-    -fx-border-color: #CBD5E1;
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #E2E8F0;
     -fx-border-radius: 10px;
-    -fx-padding: 8px 12px;
+    -fx-background-radius: 10px;
+    -fx-padding: 8px 14px;
     -fx-font-size: 14px;
+    -fx-text-fill: #0F172A;
 }
 .grades-combo:focused {
-    -fx-border-color: #0F489F;
+    -fx-border-color: #2563EB;
+    -fx-border-width: 2px;
+}
+.root-dark .grades-combo {
+    -fx-background-color: #0F172A;
+    -fx-border-color: #334155;
+    -fx-text-fill: #F8FAFC;
+}
+.root-dark .grades-combo:focused {
+    -fx-border-color: #3B82F6;
 }
 
 .grades-table {
@@ -146,6 +161,15 @@
 .student-email-label {
     -fx-font-size: 12px;
     -fx-text-fill: #6B7280;
+}
+
+.grade-total-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #059669;
+}
+.root-dark .grade-total-label {
+    -fx-text-fill: #34D399;
 }
 
 .grade-input {
@@ -236,14 +260,10 @@
 .root-dark .grades-label {
     -fx-text-fill: #94A3B8;
 }
-.root-dark .grades-combo {
-    -fx-background-color: #0F172A;
-    -fx-border-color: #334155;
-    -fx-text-fill: #F8FAFC;
+.root-dark .grades-label.input-label {
+    -fx-text-fill: #94A3B8;
 }
-.root-dark .grades-combo:focused {
-    -fx-border-color: #3B82F6;
-}
+
 .root-dark .grades-table .column-header-background {
     -fx-background-color: rgba(30,41,59,0.8);
     -fx-border-color: #334155;

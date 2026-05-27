@@ -19,6 +19,7 @@ import javafx.scene.text.Text;
 import javafx.util.Callback;
 import theme.ThemeManager;
 import util.LanguageManager;
+import java.util.function.Consumer;
 
 public class MaestrosController {
 
@@ -43,6 +44,12 @@ public class MaestrosController {
     @FXML private TableColumn<TeacherRow, String> colSeccion;
     @FXML private TableColumn<TeacherRow, String> colEstado;
     @FXML private TableColumn<TeacherRow, String> colAcciones;
+
+    private Consumer<TeacherRow> onVerDetalles;
+
+    public void setOnVerDetalles(Consumer<TeacherRow> callback) {
+        this.onVerDetalles = callback;
+    }
 
     private static final Insets HEADER_PADDING_DEFAULT = new Insets(32, 40, 0, 40);
     private static final Insets HEADER_PADDING_COMPACT = new Insets(16, 16, 0, 16);
@@ -148,7 +155,6 @@ public class MaestrosController {
         colMateria.setText(lang.get("teachers.colMateria", "MATERIA"));
         colSeccion.setText(lang.get("teachers.colSeccion", "SECCIÓN"));
         colEstado.setText(lang.get("teachers.colEstado", "ESTADO"));
-        colAcciones.setText(lang.get("teachers.colAcciones", "ACCIONES"));
     }
 
     private void configureTable() {
@@ -167,9 +173,8 @@ public class MaestrosController {
         colEstado.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().estado()));
         colEstado.setCellFactory(statusCell());
 
-        colAcciones.setCellValueFactory(d -> new SimpleStringProperty(""));
+        colAcciones.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().nombre()));
         colAcciones.setCellFactory(accionesCell());
-
         colAcciones.setStyle("-fx-alignment: CENTER-LEFT;");
         colAcciones.getStyleClass().add("col-acciones-header");
     }
@@ -283,18 +288,13 @@ public class MaestrosController {
         };
     }
 
+
+
     private Callback<TableColumn<TeacherRow, String>, TableCell<TeacherRow, String>> accionesCell() {
         return col -> new TableCell<>() {
             private final Button btn = new Button();
             {
                 btn.getStyleClass().add("btn-ver-detalles");
-                btn.setOnAction(e -> {
-                    var tv = getTableView();
-                    int idx = getIndex();
-                    if (tv != null && idx >= 0 && idx < tv.getItems().size()) {
-                        handleVerDetalles(tv.getItems().get(idx));
-                    }
-                });
                 setGraphic(btn);
                 setAlignment(Pos.CENTER_LEFT);
                 setPadding(new Insets(8, 16, 8, 16));
@@ -302,28 +302,20 @@ public class MaestrosController {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
+                var tv = getTableView();
+                if (empty || tv == null || getIndex() < 0 || getIndex() >= tv.getItems().size()) {
                     btn.setText(null);
                     btn.setVisible(false);
                 } else {
                     btn.setText(lang.get("teachers.btnVerDetalles", "Ver detalles"));
                     btn.setVisible(true);
+                    TeacherRow row = tv.getItems().get(getIndex());
+                    btn.setOnAction(e -> {
+                        if (onVerDetalles != null) onVerDetalles.accept(row);
+                    });
                 }
             }
         };
-    }
-
-    private void handleVerDetalles(TeacherRow teacher) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(lang.get("teachers.detallesTitle", "Detalles del Profesor"));
-        alert.setHeaderText(teacher.nombre());
-        alert.setContentText(
-            lang.get("teachers.colEmail", "Email") + ": " + teacher.email()
-            + "\n" + lang.get("teachers.colMateria", "Materia") + ": " + teacher.materia()
-            + "\n" + lang.get("teachers.colSeccion", "Sección") + ": " + teacher.seccion()
-            + "\n" + lang.get("teachers.colEstado", "Estado") + ": " + teacher.estado()
-        );
-        alert.showAndWait();
     }
 
     private void updateCount(int count) {

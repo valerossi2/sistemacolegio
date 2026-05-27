@@ -48,7 +48,7 @@
 .brand-name {
     -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: #0f172a;
 }
 
 .brand-sub {
@@ -131,7 +131,7 @@
     -fx-border-radius: 999px;
     -fx-padding: 10 16 10 44;
     -fx-font-size: 14px;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: #0f172a;
     -fx-prompt-text-fill: #94a3b8;
     -fx-pref-height: 44px;
 }
@@ -202,7 +202,7 @@
 .admin-name {
     -fx-font-size: 13px;
     -fx-font-weight: 600;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: #0f172a;
 }
 
 .admin-email {
@@ -261,7 +261,7 @@
 .card {
     -fx-background-color: #ffffff;
     -fx-background-radius: 24px;
-    -fx-border-color: #eef2f7;
+    -fx-border-color: #e2e8f0;
     -fx-border-width: 1px;
     -fx-border-radius: 24px;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 20, 0, 0, 4);
@@ -336,7 +336,7 @@
 .course-name {
     -fx-font-size: 14px;
     -fx-font-weight: 500;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: #0f172a;
 }
 
 /* ─────────────────────────── TIMELINE ──────────────────────────────────── */
@@ -372,7 +372,7 @@
 .timeline-time {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: #0f172a;
 }
 
 .timeline-class {

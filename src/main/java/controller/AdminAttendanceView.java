@@ -5,9 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -61,6 +59,7 @@ public class AdminAttendanceView {
     private final Label listSubtitle = new Label();
     private final Button loadMoreButton = new Button();
     private final Button saveButton = new Button();
+    private final Label saveFeedback = new Label();
     private final ComboBox<String> gradeSelector = new ComboBox<>();
     private final ComboBox<String> sectionSelector = new ComboBox<>();
     private final TextField searchField = new TextField();
@@ -202,20 +201,6 @@ public class AdminAttendanceView {
         summaryCard.setPrefWidth(300);
         summaryTitle.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 18));
 
-        HBox dateBadge = new HBox(4);
-        dateBadge.setPadding(new Insets(12, 14, 12, 14));
-        Label dateLabel = new Label();
-        dateLabel.setFont(Font.font("Plus Jakarta Sans", 13));
-        dateText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13));
-        dateLabel.setTextFill(Color.web(theme.isDark() ? "#fcd34d" : "#92400e"));
-        dateText.setTextFill(Color.web(theme.isDark() ? "#fde68a" : "#92400e"));
-        languageUpdaters.add(() -> dateLabel.setText(lang.get("attendance.currentDate")));
-        themeUpdaters.add(() -> {
-            dateBadge.setStyle("-fx-background-color: " + (theme.isDark() ? "#451a03" : "#fffbeb") + "; -fx-border-color: " + (theme.isDark() ? "#92400e" : "#fde68a") + "; -fx-border-radius: 12; -fx-background-radius: 12;");
-            dateLabel.setTextFill(Color.web(theme.isDark() ? "#fcd34d" : "#92400e"));
-            dateText.setTextFill(Color.web(theme.isDark() ? "#fde68a" : "#92400e"));
-        });
-
         VBox stats = new VBox(16,
             createStatRow("attendance.present", presentCount),
             createStatRow("attendance.absent", absentCount),
@@ -242,7 +227,7 @@ public class AdminAttendanceView {
             tutorName.setTextFill(Color.web(text()));
         });
 
-        summaryCard.getChildren().addAll(summaryTitle, dateBadge, stats, tutorCard);
+        summaryCard.getChildren().addAll(summaryTitle, stats, tutorCard);
     }
 
     private HBox createStatRow(String labelKey, Label value) {
@@ -264,7 +249,9 @@ public class AdminAttendanceView {
     private void buildTableCard() {
         VBox tableCard = new VBox();
         tableCard.setMinWidth(520);
-        VBox tableHeader = new VBox(4, listTitle, listSubtitle);
+        Label dateHeader = new Label();
+        dateHeader.setFont(Font.font("Plus Jakarta Sans", 13));
+        VBox tableHeader = new VBox(4, listTitle, listSubtitle, dateHeader);
         tableHeader.setPadding(new Insets(22, 24, 18, 24));
         listTitle.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 18));
         listSubtitle.setFont(Font.font("Plus Jakarta Sans", 13));
@@ -273,9 +260,7 @@ public class AdminAttendanceView {
         header.setPadding(new Insets(14, 24, 14, 24));
         header.getChildren().addAll(
             headerCell("attendance.student", 290),
-            headerCell("attendance.enrollment", 150),
-            headerCell("attendance.date", 120),
-            headerCell("attendance.attendance", 260)
+            headerCell("attendance.attendance", 360)
         );
 
         rowsBox.setFillWidth(true);
@@ -286,7 +271,7 @@ public class AdminAttendanceView {
         rowScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         rowScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        HBox tableFooter = new HBox(loadMoreButton);
+        HBox tableFooter = new HBox();
         tableFooter.setAlignment(Pos.CENTER);
         tableFooter.setPadding(new Insets(14));
 
@@ -298,9 +283,17 @@ public class AdminAttendanceView {
         saveButton.setMaxWidth(Double.MAX_VALUE);
         saveButton.setMinHeight(56);
         VBox.setVgrow(tableCard, Priority.ALWAYS);
-        tableColumn.getChildren().addAll(tableCard, saveButton);
+        saveFeedback.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 14));
+        saveFeedback.setAlignment(Pos.CENTER);
+        saveFeedback.setMaxWidth(Double.MAX_VALUE);
+        saveFeedback.setPadding(new Insets(8, 0, 0, 0));
+        saveFeedback.setVisible(false);
+        tableColumn.getChildren().addAll(tableCard, saveFeedback, saveButton);
 
-        languageUpdaters.add(() -> ((Label) saveContent.getChildren().get(1)).setText(lang.get("attendance.save")));
+        languageUpdaters.add(() -> {
+            ((Label) saveContent.getChildren().get(1)).setText(lang.get("attendance.save"));
+            dateHeader.setText(lang.get("attendance.currentDate") + ": " + LocalDate.now().format(DATE_FORMAT));
+        });
         themeUpdaters.add(() -> {
             tableCard.setStyle(cardStyle(16, borderSoft()));
             tableHeader.setStyle("-fx-border-color: transparent transparent " + borderSoft() + " transparent;");
@@ -309,7 +302,7 @@ public class AdminAttendanceView {
             tableFooter.setStyle("-fx-background-color: " + card() + "; -fx-border-color: " + borderSoft() + " transparent transparent transparent;");
             listTitle.setTextFill(Color.web(text()));
             listSubtitle.setTextFill(Color.web(textMuted()));
-            loadMoreButton.setStyle("-fx-background-color: transparent; -fx-text-fill: " + textSecondary() + "; -fx-font-weight: 600; -fx-cursor: hand;");
+            dateHeader.setTextFill(Color.web(textMuted()));
             saveButton.setStyle("-fx-background-color: #2563eb; -fx-background-radius: 16; -fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: 700; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.25), 8, 0.2, 0, 2);");
             ((Label) saveContent.getChildren().get(1)).setTextFill(Color.WHITE);
         });
@@ -354,20 +347,35 @@ public class AdminAttendanceView {
         studentCell.setMinWidth(290);
         studentCell.setPrefWidth(290);
 
-        Label enrollment = new Label(student.enrollment());
-        enrollment.setMinWidth(150);
-        enrollment.setPrefWidth(150);
-        Label date = new Label(LocalDate.now().format(DATE_FORMAT));
-        date.setMinWidth(120);
-        date.setPrefWidth(120);
+        Button btnPresent = statusButton(student, AttendanceStatus.PRESENT, "attendance.presentButton");
+        Button btnAbsent = statusButton(student, AttendanceStatus.ABSENT, "attendance.absentButton");
+        Button btnExcuse = statusButton(student, AttendanceStatus.EXCUSE, "attendance.excuseButton");
+        HBox actions = new HBox(8, btnPresent, btnAbsent, btnExcuse);
+        actions.setMinWidth(360);
+        actions.setAlignment(Pos.CENTER_LEFT);
+        row.getChildren().addAll(studentCell, actions);
 
-        HBox actions = new HBox(8,
-            statusButton(student, AttendanceStatus.PRESENT, "attendance.presentButton"),
-            statusButton(student, AttendanceStatus.ABSENT, "attendance.absentButton"),
-            statusButton(student, AttendanceStatus.EXCUSE, "attendance.excuseButton")
-        );
-        actions.setMinWidth(260);
-        row.getChildren().addAll(studentCell, enrollment, date, actions);
+        Runnable updateBtnStyles = () -> {
+            btnPresent.setStyle(attendanceBtnStyle(student.status == AttendanceStatus.PRESENT, AttendanceStatus.PRESENT));
+            btnAbsent.setStyle(attendanceBtnStyle(student.status == AttendanceStatus.ABSENT, AttendanceStatus.ABSENT));
+            btnExcuse.setStyle(attendanceBtnStyle(student.status == AttendanceStatus.EXCUSE, AttendanceStatus.EXCUSE));
+        };
+
+        btnPresent.setOnAction(e -> {
+            student.status = AttendanceStatus.PRESENT;
+            updateBtnStyles.run();
+            updateSummary();
+        });
+        btnAbsent.setOnAction(e -> {
+            student.status = AttendanceStatus.ABSENT;
+            updateBtnStyles.run();
+            updateSummary();
+        });
+        btnExcuse.setOnAction(e -> {
+            student.status = AttendanceStatus.EXCUSE;
+            updateBtnStyles.run();
+            updateSummary();
+        });
 
         themeUpdaters.add(() -> {
             row.setStyle("-fx-background-color: " + card() + "; -fx-border-color: transparent transparent " + borderSoft() + " transparent;");
@@ -375,8 +383,7 @@ public class AdminAttendanceView {
             ((Label) initials.getChildren().get(0)).setTextFill(Color.web(student.avatarText(theme.isDark())));
             ((Label) studentTexts.getChildren().get(0)).setTextFill(Color.web(text()));
             ((Label) studentTexts.getChildren().get(1)).setTextFill(Color.web(textMuted()));
-            enrollment.setTextFill(Color.web(textSecondary()));
-            date.setTextFill(Color.web(textSecondary()));
+            updateBtnStyles.run();
         });
         return row;
     }
@@ -384,49 +391,42 @@ public class AdminAttendanceView {
     private Button statusButton(StudentAttendance student, AttendanceStatus status, String key) {
         Button button = new Button();
         button.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 12));
-        button.setPadding(new Insets(6, 14, 6, 14));
-        button.setOnAction(e -> {
-            student.status = status;
-            refreshRows();
-        });
+        button.setPadding(new Insets(8, 20, 8, 20));
+        button.setMinWidth(90);
+        button.setMinHeight(36);
         languageUpdaters.add(() -> button.setText(lang.get(key)));
-        themeUpdaters.add(() -> button.setStyle(statusButtonStyle(student.status == status, status)));
         return button;
     }
 
-    private String statusButtonStyle(boolean active, AttendanceStatus status) {
+    private String attendanceBtnStyle(boolean active, AttendanceStatus status) {
         if (status == AttendanceStatus.PRESENT) {
-            return active ? buttonStyle("#16a34a", "#ffffff", "#15803d") : buttonStyle("#16a34a", "#ffffff", "transparent");
+            return active ? btnStyle("#16a34a", "#ffffff") : btnStyle(theme.isDark() ? "#374151" : "#d1d5db", theme.isDark() ? "#9ca3af" : "#6b7280");
         }
         if (status == AttendanceStatus.ABSENT) {
-            return active ? buttonStyle("#ef4444", "#ffffff", "#dc2626") : buttonStyle(theme.isDark() ? "#451a1a" : "#fee2e2", theme.isDark() ? "#fecaca" : "#b91c1c", "transparent");
+            return active ? btnStyle("#ef4444", "#ffffff") : btnStyle(theme.isDark() ? "#374151" : "#d1d5db", theme.isDark() ? "#9ca3af" : "#6b7280");
         }
-        return active ? buttonStyle("#f59e0b", "#ffffff", "#d97706") : buttonStyle(theme.isDark() ? "#422006" : "#fef9c3", theme.isDark() ? "#fde68a" : "#92400e", "transparent");
+        return active ? btnStyle("#f59e0b", "#ffffff") : btnStyle(theme.isDark() ? "#374151" : "#d1d5db", theme.isDark() ? "#9ca3af" : "#6b7280");
     }
 
-    private String buttonStyle(String bg, String text, String border) {
-        return "-fx-background-color: " + bg + "; -fx-text-fill: " + text + "; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: " + border + "; -fx-border-width: " + ("transparent".equals(border) ? "0" : "2") + "; -fx-cursor: hand;";
+    private String btnStyle(String bg, String text) {
+        return "-fx-background-color: " + bg + "; -fx-text-fill: " + text + "; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-width: 0; -fx-cursor: hand; -fx-font-weight: 700;";
     }
 
     private void wireEvents() {
         searchField.textProperty().addListener((obs, oldValue, newValue) -> refreshRows());
         gradeSelector.setOnAction(e -> updateLanguage());
         sectionSelector.setOnAction(e -> updateLanguage());
-        loadMoreButton.setOnAction(e -> {
-            int start = students.size() + 1;
-            students.addAll(
-                new StudentAttendance("Herrera, Sebastian " + start, "sebastian.h@student.edu", "STU-2023-20" + start, "SH", 0),
-                new StudentAttendance("Morales, Isabella " + (start + 1), "isabella.m@student.edu", "STU-2023-22" + start, "IM", 1)
-            );
-            refreshRows();
-        });
         saveButton.setOnAction(e -> {
             long pending = students.stream().filter(s -> s.status == AttendanceStatus.UNMARKED).count();
             if (pending > 0) {
-                new Alert(Alert.AlertType.WARNING, lang.get("attendance.pendingMessage").replace("{0}", String.valueOf(pending)), ButtonType.OK).showAndWait();
+                saveFeedback.setText("\u26a0 " + lang.get("attendance.pendingMessage").replace("{0}", String.valueOf(pending)));
+                saveFeedback.setStyle("-fx-text-fill: #ef4444;");
+                saveFeedback.setVisible(true);
                 return;
             }
-            new Alert(Alert.AlertType.INFORMATION, lang.get("attendance.savedMessage").replace("{0}", String.valueOf(students.size())), ButtonType.OK).showAndWait();
+            saveFeedback.setText("\u2713 " + lang.get("attendance.savedMessage").replace("{0}", String.valueOf(students.size())));
+            saveFeedback.setStyle("-fx-text-fill: #16a34a;");
+            saveFeedback.setVisible(true);
         });
     }
 
@@ -533,7 +533,7 @@ public class AdminAttendanceView {
         private final String enrollment;
         private final String initials;
         private final int colorIndex;
-        private AttendanceStatus status = AttendanceStatus.PRESENT;
+        private AttendanceStatus status = AttendanceStatus.UNMARKED;
 
         StudentAttendance(String name, String email, String enrollment, String initials, int colorIndex) {
             this.name = name;

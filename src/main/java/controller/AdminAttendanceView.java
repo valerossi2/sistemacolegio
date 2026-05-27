@@ -117,8 +117,12 @@ public class AdminAttendanceView {
         HBox.setHgrow(headerSpacer, Priority.ALWAYS);
         pageHeader.getChildren().addAll(titleBox, headerSpacer, selectorBox);
 
-        populateGradeOptions();
-        populateSectionOptions();
+        gradeSelector.setItems(FXCollections.observableArrayList(
+            DataStore.getCourses().stream().map(c -> c.grado()).distinct().sorted().toList()
+        ));
+        sectionSelector.setItems(FXCollections.observableArrayList(
+            DataStore.getCourses().stream().map(c -> c.seccion()).distinct().sorted().toList()
+        ));
         gradeSelector.getSelectionModel().selectFirst();
         sectionSelector.getSelectionModel().selectFirst();
 
@@ -419,40 +423,10 @@ public class AdminAttendanceView {
         return "-fx-background-color: " + bg + "; -fx-text-fill: " + text + "; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-width: 0; -fx-cursor: hand; -fx-font-weight: 700;";
     }
 
-    private void populateGradeOptions() {
-        var allCourses = DataStore.getCourses();
-        String curSection = sectionSelector.getValue();
-        gradeSelector.setItems(FXCollections.observableArrayList(
-            allCourses.stream()
-                .map(c -> c.grado())
-                .filter(g -> curSection == null || allCourses.stream().anyMatch(c -> c.grado().equals(g) && c.seccion().equals(curSection)))
-                .distinct().sorted().toList()
-        ));
-    }
-
-    private void populateSectionOptions() {
-        var allCourses = DataStore.getCourses();
-        String curGrade = gradeSelector.getValue();
-        sectionSelector.setItems(FXCollections.observableArrayList(
-            allCourses.stream()
-                .map(c -> c.seccion())
-                .filter(s -> curGrade == null || allCourses.stream().anyMatch(c -> c.seccion().equals(s) && c.grado().equals(curGrade)))
-                .distinct().sorted().toList()
-        ));
-    }
-
     private void wireEvents() {
         searchField.textProperty().addListener((obs, oldValue, newValue) -> refreshRows());
-        gradeSelector.setOnAction(e -> {
-            populateSectionOptions();
-            sectionSelector.getSelectionModel().selectFirst();
-            reloadForCourse();
-        });
-        sectionSelector.setOnAction(e -> {
-            populateGradeOptions();
-            gradeSelector.getSelectionModel().selectFirst();
-            reloadForCourse();
-        });
+        gradeSelector.setOnAction(e -> reloadForCourse());
+        sectionSelector.setOnAction(e -> reloadForCourse());
         saveButton.setOnAction(e -> {
             long pending = students.stream().filter(s -> s.status == AttendanceStatus.UNMARKED).count();
             if (pending > 0) {

@@ -274,6 +274,27 @@ public class DetalleCursoController {
         // ── Students ──
         fullStudentData.clear();
         displayedStudentData.clear();
+
+        String courseKey = currentCourse.grado() + " " + currentCourse.seccion();
+        java.util.Map<String, controller.AdminAttendanceView.AttendanceStatus> savedAttendance =
+            controller.AdminAttendanceView.getSavedAttendance(courseKey);
+
+        if (savedAttendance != null && !savedAttendance.isEmpty()) {
+            for (var entry : savedAttendance.entrySet()) {
+                String status;
+                switch (entry.getValue()) {
+                    case PRESENT -> status = "presente";
+                    case ABSENT -> status = "ausente";
+                    case EXCUSE -> status = "excusa";
+                    default -> status = "presente";
+                }
+                fullStudentData.add(new StudentRow(entry.getKey(), "MAT-000", status));
+            }
+            displayedStudentData.addAll(fullStudentData);
+            studentsTable.setItems(displayedStudentData);
+            updateStudentTableHeight(fullStudentData.size());
+            totalStudents.setText(String.valueOf(fullStudentData.size()));
+        } else {
         String[] firstNames = {"Liam","Emma","Noah","Olivia","Mateo","Isabella","Santiago","Sophia",
             "Lucas","Mía","Benjamín","Valentina","Sebastián","Camila","Daniel","Gabriela"};
         String[] lastNames = {"Castillo","Rodríguez","García","Martínez","Hernández","López","Pérez",
@@ -291,6 +312,7 @@ public class DetalleCursoController {
         studentsTable.setItems(displayedStudentData);
         updateStudentTableHeight(shownStudents);
         totalStudents.setText(String.valueOf(fullStudentData.size()));
+        }
 
         // ── Teachers ──
         fullTeacherData.clear();

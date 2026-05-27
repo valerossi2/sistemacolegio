@@ -46,6 +46,12 @@ public class AdminAttendanceView {
             "#10B981", "#EF4444", "#6366F1", "#14B8A6"
     };
 
+    private static final java.util.Map<String, java.util.Map<String, AttendanceStatus>> attendanceStore = new java.util.HashMap<>();
+
+    public static java.util.Map<String, AttendanceStatus> getSavedAttendance(String courseKey) {
+        return attendanceStore.get(courseKey);
+    }
+
     private final ThemeManager theme;
     private final LanguageManager lang = LanguageManager.getInstance();
     private final ObservableList<StudentAttendance> students = FXCollections.observableArrayList();
@@ -432,6 +438,11 @@ public class AdminAttendanceView {
         searchField.textProperty().addListener((obs, oldValue, newValue) -> refreshRows());
         saveButton.setOnAction(e -> {
             savedCourses.add(courseKey());
+            java.util.Map<String, AttendanceStatus> courseData = new java.util.HashMap<>();
+            for (StudentAttendance sa : students) {
+                courseData.put(sa.name(), sa.status);
+            }
+            attendanceStore.put(courseKey(), courseData);
             updateSaveButtonText();
         });
     }
@@ -568,7 +579,7 @@ public class AdminAttendanceView {
         "Ríos Paredes", "Delgado Rojas"
     };
 
-    private enum AttendanceStatus { UNMARKED, PRESENT, ABSENT, EXCUSE }
+    public enum AttendanceStatus { UNMARKED, PRESENT, ABSENT, EXCUSE }
 
     private static class StudentAttendance {
         private final String name;

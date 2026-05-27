@@ -1,64 +1,115 @@
 package util;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.edugrade.controllers.CursoController;
-import com.edugrade.controllers.MaestrosController;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class DataStore {
 
-    private static List<CursoController.CourseRow> courses = new ArrayList<>();
-    private static List<MaestrosController.TeacherRow> teachers = new ArrayList<>();
-    private static String cachedAttendanceRate = "0%";
+    // ── Records ──
+    public record TeacherInfo(String nombre, String email, String materia, String seccion, String estado, int avatarIdx) {}
+    public record CourseInfo(String grado, String seccion, String profesorNombre, int profesorIdx, int alumnos, double rendimiento, String estado) {}
+    public record ScheduleInfo(String time, String subject, String detail, String gradoSeccion) {}
+    public record StudentInfo(String nombre, String matricula) {}
 
-    private static final String[] NAMES = {
-        "Dr. Roberto", "Dra. Elena", "Prof. Juan Carlos", "Dra. Elena",
-        "Dr. Roberto", "Prof. Juan Carlos", "Mtra. Sofia", "Dr. Roberto"
-    };
-    private static final String[] SURNAMES = {
-        "S\u00e1nchez", "M\u00e9ndez", "Rico", "M\u00e9ndez",
-        "S\u00e1nchez", "Rico", "Vald\u00e9z", "S\u00e1nchez"
-    };
+    private static final List<TeacherInfo> TEACHERS = new ArrayList<>();
+    private static final List<CourseInfo> COURSES = new ArrayList<>();
+    private static final List<ScheduleInfo> SCHEDULE = new ArrayList<>();
+    private static final Map<String, List<StudentInfo>> COURSE_STUDENTS = new LinkedHashMap<>();
+    private static final Map<String, List<String>> TEACHER_COURSES = new LinkedHashMap<>();
 
-    public static void setCourses(List<CursoController.CourseRow> c) {
-        courses = new ArrayList<>(c);
+    private static boolean seeded = false;
+
+    public static synchronized void seedIfEmpty() {
+        if (seeded) return;
+        seeded = true;
+
+        String[][] rawTeachers = {
+            {"Prof. Laura Méndez", "laura.mendez@edu.com", "Matemáticas", "5to E", "Activo"},
+            {"Prof. Carlos Ruiz", "carlos.ruiz@edu.com", "Historia", "4to A", "Activo"},
+            {"Prof. Elena Torres", "elena.torres@edu.com", "Lenguaje", "3ro B", "Activo"},
+            {"Prof. Ana Silva", "ana.silva@edu.com", "Ciencias", "2do C", "Activo"},
+            {"Prof. Miguel Soto", "miguel.soto@edu.com", "Inglés", "1ro A", "Inactivo"},
+            {"Prof. Diana Ríos", "diana.rios@edu.com", "Arte", "5to B", "Activo"},
+            {"Prof. Pedro Lima", "pedro.lima@edu.com", "Educación Física", "4to B", "Activo"},
+            {"Prof. Sofía Vega", "sofia.vega@edu.com", "Música", "3ro A", "Activo"},
+            {"Prof. Luis Paz", "luis.paz@edu.com", "Filosofía", "6to A", "Inactivo"},
+            {"Prof. Carmen Rojas", "carmen.rojas@edu.com", "Biología", "5to C", "Activo"},
+            {"Prof. Andrés Cruz", "andres.cruz@edu.com", "Química", "4to C", "Activo"},
+            {"Prof. Valeria Solís", "valeria.solis@edu.com", "Historia del Arte", "6to B", "Activo"},
+        };
+
+        for (int i = 0; i < rawTeachers.length; i++) {
+            String[] r = rawTeachers[i];
+            TEACHERS.add(new TeacherInfo(r[0], r[1], r[2], r[3], r[4], i));
+        }
+
+        String[][] rawCourses = {
+            {"4to", "E", "Matemáticas", "0", "32", "9.2", "En clase"},
+            {"5to", "E", "Historia", "1", "28", "7.8", "En clase"},
+            {"6to", "E", "Lenguaje", "2", "24", "8.8", "En clase"},
+        };
+
+        String[] firstNames = {"Liam","Emma","Noah","Olivia","Mateo","Isabella","Santiago","Sophia","Lucas","Mía","Benjamín","Valentina"};
+        String[] lastNames = {"Castillo","Rodríguez","García","Martínez","Hernández","López","Pérez","González","Fernández","Torres"};
+
+        for (String[] rc : rawCourses) {
+            String grado = rc[0];
+            String seccion = rc[1];
+            int profIdx = Integer.parseInt(rc[3]);
+            int alumCount = Integer.parseInt(rc[4]);
+            double rend = Double.parseDouble(rc[5]);
+            String estado = rc[6];
+            String key = grado + " " + seccion;
+            String profName = rawTeachers[profIdx][0];
+
+            COURSES.add(new CourseInfo(grado, seccion, profName, profIdx, alumCount, rend, estado));
+
+            // Students for this course
+            List<StudentInfo> students = new ArrayList<>();
+            for (int s = 0; s < alumCount; s++) {
+                String name = firstNames[ThreadLocalRandom.current().nextInt(firstNames.length)] + " " + lastNames[ThreadLocalRandom.current().nextInt(lastNames.length)];
+                String mat = String.format("MAT-%03d", ThreadLocalRandom.current().nextInt(1, 999));
+                students.add(new StudentInfo(name, mat));
+            }
+            COURSE_STUDENTS.put(key, students);
+
+            // Teacher-course mapping
+            TEACHER_COURSES.computeIfAbsent(profName, k -> new ArrayList<>()).add(key);
+        }
+
+        // Schedule (real courses mapped to time slots)
+        String[][] rawSchedule = {
+            {"08:00", "4to E", "Salon 101"},
+            {"09:00", "5to E", "Salon 102"},
+            {"10:00", "6to E", "Salon 103"},
+        };
+
+        for (String[] rs : rawSchedule) {
+            String time = rs[0];
+            String gs = rs[1];
+            String location = rs[2];
+            CourseInfo match = COURSES.stream().filter(c -> (c.grado() + " " + c.seccion()).equals(gs)).findFirst().orElse(null);
+            if (match != null) {
+                String tutor = match.profesorNombre();
+                String subject = match.grado() + " " + match.seccion() + " - " + tutor;
+                String detail = location + " - " + tutor;
+                SCHEDULE.add(new ScheduleInfo(time, subject, detail, gs));
+            }
+        }
     }
 
-    public static List<CursoController.CourseRow> getCourses() {
-        return courses;
-    }
+    public static List<TeacherInfo> getTeachers() { return Collections.unmodifiableList(TEACHERS); }
+    public static List<CourseInfo> getCourses() { return Collections.unmodifiableList(COURSES); }
+    public static List<ScheduleInfo> getSchedule() { return Collections.unmodifiableList(SCHEDULE); }
+    public static List<StudentInfo> getStudentsForCourse(String gradoSeccion) { return COURSE_STUDENTS.getOrDefault(gradoSeccion, List.of()); }
+    public static List<String> getCoursesForTeacher(String teacherName) { return TEACHER_COURSES.getOrDefault(teacherName, List.of()); }
+    public static int getTotalStudents() { return COURSE_STUDENTS.values().stream().mapToInt(List::size).sum(); }
+    public static int getTotalCourses() { return COURSES.size(); }
+    public static int getTotalTeachers() { return TEACHERS.size(); }
 
-    public static void setTeachers(List<MaestrosController.TeacherRow> t) {
-        teachers = new ArrayList<>(t);
-    }
-
-    public static List<MaestrosController.TeacherRow> getTeachers() {
-        return teachers;
-    }
-
+    // Keep old API for backward compat
     public static String getTeacherName(int idx) {
-        int i = idx % NAMES.length;
-        return NAMES[i] + " " + SURNAMES[i];
-    }
-
-    public static int getTotalStudents() {
-        return courses.stream().mapToInt(CursoController.CourseRow::alumnos).sum();
-    }
-
-    public static int getTotalCourses() {
-        return courses.size();
-    }
-
-    public static int getTotalTeachers() {
-        return Math.max(teachers.size(), 1);
-    }
-
-    public static String getAttendanceRate() {
-        return cachedAttendanceRate;
-    }
-
-    public static void setAttendanceRate(String rate) {
-        cachedAttendanceRate = rate;
+        if (idx >= 0 && idx < TEACHERS.size()) return TEACHERS.get(idx).nombre();
+        return "Docente";
     }
 }

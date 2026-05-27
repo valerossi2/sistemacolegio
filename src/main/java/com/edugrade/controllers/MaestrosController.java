@@ -18,6 +18,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import theme.ThemeManager;
+import util.DataStore;
 import util.LanguageManager;
 import java.util.function.Consumer;
 
@@ -57,25 +58,17 @@ public class MaestrosController {
     private static final Insets COUNT_PADDING_COMPACT = new Insets(12, 16, 8, 16);
     private static final double COMPACT_THRESHOLD = 700;
 
-    private final ObservableList<TeacherRow> allTeachers = FXCollections.observableArrayList(
-        new TeacherRow("Prof. Laura Méndez", "laura.mendez@edu.com", "Matemáticas", "5to E", "Activo", 0),
-        new TeacherRow("Prof. Carlos Ruiz", "carlos.ruiz@edu.com", "Historia", "4to A", "Activo", 1),
-        new TeacherRow("Prof. Elena Torres", "elena.torres@edu.com", "Lenguaje", "3ro B", "Activo", 2),
-        new TeacherRow("Prof. Ana Silva", "ana.silva@edu.com", "Ciencias", "2do C", "Activo", 3),
-        new TeacherRow("Prof. Miguel Soto", "miguel.soto@edu.com", "Inglés", "1ro A", "Inactivo", 4),
-        new TeacherRow("Prof. Diana Ríos", "diana.rios@edu.com", "Arte", "5to B", "Activo", 5),
-        new TeacherRow("Prof. Pedro Lima", "pedro.lima@edu.com", "Educación Física", "4to B", "Activo", 6),
-        new TeacherRow("Prof. Sofía Vega", "sofia.vega@edu.com", "Música", "3ro A", "Activo", 7),
-        new TeacherRow("Prof. Luis Paz", "luis.paz@edu.com", "Filosofía", "6to A", "Inactivo", 0),
-        new TeacherRow("Prof. Carmen Rojas", "carmen.rojas@edu.com", "Biología", "5to C", "Activo", 1),
-        new TeacherRow("Prof. Andrés Cruz", "andres.cruz@edu.com", "Química", "4to C", "Activo", 2),
-        new TeacherRow("Prof. Valeria Solís", "valeria.solis@edu.com", "Historia del Arte", "6to B", "Activo", 3)
-    );
+    private final ObservableList<TeacherRow> allTeachers = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
         lang = LanguageManager.getInstance();
         theme = ThemeManager.getInstance();
+
+        DataStore.seedIfEmpty();
+        for (DataStore.TeacherInfo t : DataStore.getTeachers()) {
+            allTeachers.add(new TeacherRow(t.nombre(), t.email(), t.materia(), t.seccion(), t.estado(), t.avatarIdx()));
+        }
 
         configureTable();
         maestrosTable.setItems(allTeachers);

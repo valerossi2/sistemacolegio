@@ -23,6 +23,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import theme.ThemeManager;
+import util.DataStore;
 import util.LanguageManager;
 
 public class CursoController {
@@ -163,21 +164,11 @@ public class CursoController {
     }
 
     private void buildSampleData() {
+        DataStore.seedIfEmpty();
         allCourses.clear();
-        var rng = ThreadLocalRandom.current();
-        String[] grados = {"1ro","2do","3ro","4to","5to","6to"};
-        String[] secciones = {"A","B","C","D","E"};
-        String[] estados = {"En clase","Descanso"};
-        for (int i = 0; i < 16; i++) {
-            int alumnos = rng.nextInt(1, 41);
-            int profesores = rng.nextInt(1, 10);
-            allCourses.add(new CourseRow(null,
-                grados[rng.nextInt(grados.length)],
-                i % 8,
-                secciones[rng.nextInt(secciones.length)],
-                alumnos, profesores,
-                5.0 + rng.nextDouble() * 5.0,
-                estados[rng.nextInt(estados.length)]));
+        List<DataStore.CourseInfo> stored = DataStore.getCourses();
+        for (DataStore.CourseInfo c : stored) {
+            allCourses.add(new CourseRow(null, c.grado(), c.profesorIdx(), c.seccion(), c.alumnos(), 3, c.rendimiento(), c.estado()));
         }
     }
 
@@ -304,8 +295,8 @@ public class CursoController {
                 } else {
                     CourseRow row = tv.getItems().get(getIndex());
                     int idx = row.teacherIdx();
-                    firstName.setText(NAMES[idx]);
-                    lastName.setText(SURNAMES[idx]);
+                    firstName.setText(NAMES[idx % NAMES.length]);
+                    lastName.setText(SURNAMES[idx % NAMES.length]);
                     avatarCircle.setFill(Color.web(AVATAR_COLORS[idx % AVATAR_COLORS.length]));
                     initials.setText(NAMES[idx].substring(0, 1));
                 }

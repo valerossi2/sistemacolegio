@@ -590,13 +590,12 @@ public class MainController {
     }
 
     private void setupKpis() {
-        seedDataIfEmpty();
+        DataStore.seedIfEmpty();
         LanguageManager lang = LanguageManager.getInstance();
         kpiGrid.getChildren().addAll(
             createKpiCard(lang.get("kpi.totalStudents"), String.format("%,d", DataStore.getTotalStudents()), L_SECONDARY_FIXED, L_SECONDARY, ICON_PERSON_PIN),
             createKpiCard(lang.get("kpi.totalCourses"), String.valueOf(DataStore.getTotalCourses()), L_PRIMARY_FIXED, L_PRIMARY, ICON_TRENDING_UP),
-            createKpiCard(lang.get("kpi.totalTeachers"), String.valueOf(DataStore.getTotalTeachers()), L_TERTIARY_FIXED, L_TERTIARY, ICON_SCHOOL),
-            createKpiCard(lang.get("kpi.attendance"), DataStore.getAttendanceRate(), L_SECONDARY_FIXED, L_SECONDARY, ICON_CHECK_CIRCLE)
+            createKpiCard(lang.get("kpi.totalTeachers"), String.valueOf(DataStore.getTotalTeachers()), L_TERTIARY_FIXED, L_TERTIARY, ICON_SCHOOL)
         );
     }
 
@@ -657,6 +656,7 @@ public class MainController {
     }
 
     private void setupCourseManagement() {
+        DataStore.seedIfEmpty();
         HBox head = new HBox();
         head.setPadding(new Insets(12));
         head.setAlignment(Pos.CENTER_LEFT);
@@ -684,13 +684,20 @@ public class MainController {
         ));
         cols.getChildren().addAll(colHeaderList);
 
+        // Clear previous course rows (if any)
+        courseNameTexts.clear();
+        courseProfTexts.clear();
+        courseStudNumTexts.clear();
+        courseStudLabelTexts.clear();
+        courseScoreTexts.clear();
+
         table.getChildren().addAll(cols);
-        table.getChildren().addAll(
-            createCourseRow("Introduccion a la IA", "Dr. Roberto Sanchez", "32 Estudiantes", 0.92, "9.2"),
-            createCourseRow("Calculo Avanzado", "Dra. Elena Mendez", "28 Estudiantes", 0.78, "7.8"),
-            createCourseRow("Literatura Moderna", "Prof. Juan Carlos Rico", "40 Estudiantes", 0.85, "8.5"),
-            createCourseRow("Diseno UX/UI", "Mtra. Sofia Valdez", "24 Estudiantes", 0.88, "8.8")
-        );
+        for (DataStore.CourseInfo c : DataStore.getCourses()) {
+            String st = c.alumnos() + " Estudiantes";
+            String score = String.format("%.1f", c.rendimiento());
+            HBox row = createCourseRow(c.grado() + " " + c.seccion(), c.profesorNombre(), st, c.rendimiento() / 10.0, score);
+            table.getChildren().add(row);
+        }
 
         coursesBox.getChildren().addAll(head, table);
         coursesBox.setStyle(cardStyle(theme.isDark()));
@@ -851,19 +858,15 @@ public class MainController {
     }
 
     private void setupSchedulePanel() {
+        DataStore.seedIfEmpty();
         scheduleTitleText = new Text(LanguageManager.getInstance().get("schedule.title"));
         scheduleTitleText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 18));
         scheduleTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
 
         VBox list = new VBox(6);
-        list.getChildren().addAll(
-            createScheduleRow("08:00", "Matematicas Avanzadas", "Salon 402 - Prof. Sanchez", false),
-            createScheduleRow("10:00", "Historia Universal", "Biblioteca - Dra. Mendez", false),
-            createScheduleRow("12:00", "Quimica Organica", "Laboratorio B - Prof. Rico", false),
-            createScheduleRow("14:00", "Fisica Cuantica", "Laboratorio A - Prof. Einstein", false),
-            createScheduleRow("16:00", "Arte Moderno", "Galeria - Prof. Picasso", false),
-            createScheduleRow("18:00", "Ingles Tecnico", "Aula 10 - Prof. Smith", false)
-        );
+        for (DataStore.ScheduleInfo s : DataStore.getSchedule()) {
+            list.getChildren().add(createScheduleRow(s.time(), s.subject(), s.detail(), false));
+        }
 
         ScrollPane sp = new ScrollPane(list);
         sp.setFitToWidth(true);
@@ -1018,25 +1021,17 @@ public class MainController {
         for (var c : DataStore.getCourses()) {
             String label = c.grado() + " " + c.seccion();
             if (label.toLowerCase(Locale.ROOT).contains(q)
-                || DataStore.getTeacherName(c.teacherIdx()).toLowerCase(Locale.ROOT).contains(q)) {
-                results.add(new SearchResult(label, DataStore.getTeacherName(c.teacherIdx()) + " \u00b7 " + c.alumnos() + " alumnos", "Curso", 2, c));
+                || DataStore.getTeacherName(c.profesorIdx()).toLowerCase(Locale.ROOT).contains(q)) {
+                results.add(new SearchResult(label, DataStore.getTeacherName(c.profesorIdx()) + " \u00b7 " + c.alumnos() + " alumnos", "Curso", 2, c));
             }
         }
 
-        String[][] schedule = {
-            {"08:00", "Matematicas Avanzadas", "Salon 402 - Prof. Sanchez"},
-            {"10:00", "Historia Universal", "Biblioteca - Dra. Mendez"},
-            {"12:00", "Quimica Organica", "Laboratorio B - Prof. Rico"},
-            {"14:00", "Fisica Cuantica", "Laboratorio A - Prof. Einstein"},
-            {"16:00", "Arte Moderno", "Galeria - Prof. Picasso"},
-            {"18:00", "Ingles Tecnico", "Aula 10 - Prof. Smith"}
-        };
-        for (var s : schedule) {
-            String text = s[0] + " - " + s[1];
+        for (DataStore.ScheduleInfo s : DataStore.getSchedule()) {
+            String text = s.time() + " - " + s.subject();
             if (text.toLowerCase(Locale.ROOT).contains(q)
-                || s[1].toLowerCase(Locale.ROOT).contains(q)
-                || s[2].toLowerCase(Locale.ROOT).contains(q)) {
-                results.add(new SearchResult(s[1], s[0] + " \u00b7 " + s[2], "Horario", 4, null));
+                || s.subject().toLowerCase(Locale.ROOT).contains(q)
+                || s.detail().toLowerCase(Locale.ROOT).contains(q)) {
+                results.add(new SearchResult(s.subject(), s.time() + " \u00b7 " + s.detail(), "Horario", 4, null));
             }
         }
 
@@ -1113,10 +1108,10 @@ public class MainController {
     }
 
     private void handleSearchResultClick(SearchResult r) {
-        if ("Profesor".equals(r.type()) && r.data() instanceof MaestrosController.TeacherRow teacher) {
-            navigateToTeacherDetail(teacher);
-        } else if ("Curso".equals(r.type()) && r.data() instanceof CursoController.CourseRow course) {
-            navigateToCourseDetail(course);
+        if ("Profesor".equals(r.type()) && r.data() instanceof DataStore.TeacherInfo t) {
+            navigateToTeacherDetail(new MaestrosController.TeacherRow(t.nombre(), t.email(), t.materia(), t.seccion(), t.estado(), t.avatarIdx()));
+        } else if ("Curso".equals(r.type()) && r.data() instanceof DataStore.CourseInfo ci) {
+            navigateToCourseDetail(ci);
         } else if ("Estudiante".equals(r.type()) && r.data() instanceof Object[] arr && arr.length >= 2) {
             String courseKey = (String) arr[0];
             String studentName = (String) arr[1];
@@ -1138,13 +1133,23 @@ public class MainController {
         }
     }
 
-    private void navigateToCourseDetail(CursoController.CourseRow course) {
+    private void navigateToCourseDetail(DataStore.CourseInfo course) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Admin/AdminDetallesCursos.fxml"));
             Node detailView = loader.load();
             DetalleCursoController ctrl = loader.getController();
-            ctrl.setCourse(course, DataStore.getCourses(),
-                this::navigateToCourseDetail,
+            List<CursoController.CourseRow> allCourseRows = new ArrayList<>();
+            for (DataStore.CourseInfo ci : DataStore.getCourses()) {
+                allCourseRows.add(new CursoController.CourseRow(null, ci.grado(), ci.profesorIdx(), ci.seccion(), ci.alumnos(), 3, ci.rendimiento(), ci.estado()));
+            }
+            CursoController.CourseRow courseRow = new CursoController.CourseRow(null, course.grado(), course.profesorIdx(), course.seccion(), course.alumnos(), 3, course.rendimiento(), course.estado());
+            ctrl.setCourse(courseRow, allCourseRows,
+                cr -> {
+                    DataStore.CourseInfo match = DataStore.getCourses().stream()
+                        .filter(c -> c.grado().equals(cr.grado()) && c.seccion().equals(cr.seccion()))
+                        .findFirst().orElse(null);
+                    if (match != null) navigateToCourseDetail(match);
+                },
                 () -> handleNavigation(2));
             setCenterView(detailView);
         } catch (IOException e) {
@@ -1158,37 +1163,7 @@ public class MainController {
     }
 
     private void seedDataIfEmpty() {
-        if (!DataStore.getCourses().isEmpty() && !DataStore.getTeachers().isEmpty()) return;
-        var rng = ThreadLocalRandom.current();
-        String[] grados = {"1ro","2do","3ro","4to","5to","6to"};
-        String[] secciones = {"A","B","C","D","E"};
-        String[] estados = {"En clase","Descanso"};
-        List<CursoController.CourseRow> seed = new ArrayList<>();
-        for (int i = 0; i < 16; i++) {
-            seed.add(new CursoController.CourseRow(null,
-                grados[rng.nextInt(grados.length)],
-                i % 8,
-                secciones[rng.nextInt(secciones.length)],
-                rng.nextInt(1, 41),
-                rng.nextInt(1, 10),
-                5.0 + rng.nextDouble() * 5.0,
-                estados[rng.nextInt(estados.length)]));
-        }
-        DataStore.setCourses(seed);
-        var teachers = new ArrayList<MaestrosController.TeacherRow>();
-        teachers.add(new MaestrosController.TeacherRow("Prof. Laura M\u00e9ndez", "laura.mendez@edu.com", "Matem\u00e1ticas", "5to E", "Activo", 0));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Carlos Ruiz", "carlos.ruiz@edu.com", "Historia", "4to A", "Activo", 1));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Elena Torres", "elena.torres@edu.com", "Lenguaje", "3ro B", "Activo", 2));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Ana Silva", "ana.silva@edu.com", "Ciencias", "2do C", "Activo", 3));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Miguel Soto", "miguel.soto@edu.com", "Ingl\u00e9s", "1ro A", "Inactivo", 4));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Diana R\u00edos", "diana.rios@edu.com", "Arte", "5to B", "Activo", 5));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Pedro Lima", "pedro.lima@edu.com", "Educaci\u00f3n F\u00edsica", "4to B", "Activo", 6));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Sof\u00eda Vega", "sofia.vega@edu.com", "M\u00fasica", "3ro A", "Activo", 7));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Luis Paz", "luis.paz@edu.com", "Filosof\u00eda", "6to A", "Inactivo", 0));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Carmen Rojas", "carmen.rojas@edu.com", "Biolog\u00eda", "5to C", "Activo", 1));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Andr\u00e9s Cruz", "andres.cruz@edu.com", "Qu\u00edmica", "4to C", "Activo", 2));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Valeria Sol\u00eds", "valeria.solis@edu.com", "Historia del Arte", "6to B", "Activo", 3));
-        DataStore.setTeachers(teachers);
+        DataStore.seedIfEmpty();
     }
 
     private void setupTheme() {
@@ -1238,19 +1213,18 @@ public class MainController {
             txt.setText(lang.get(colKeys[i], colDefs[i]));
         }
         // Update course rows
-        String[] scoreDefs = {"9.2", "7.8", "8.5", "8.8"};
-        String[] stDefs = {"32", "28", "40", "24"};
-        String[] nameDefs = {"Introduccion a la IA", "Calculo Avanzado", "Literatura Moderna", "Diseno UX/UI"};
-        String[] profDefs = {"Dr. Roberto Sanchez", "Dra. Elena Mendez", "Prof. Juan Carlos Rico", "Mtra. Sofia Valdez"};
-        for (int i = 0; i < courseNameTexts.size(); i++) {
+        DataStore.seedIfEmpty();
+        List<DataStore.CourseInfo> courses = DataStore.getCourses();
+        for (int i = 0; i < courseNameTexts.size() && i < courses.size(); i++) {
+            DataStore.CourseInfo c = courses.get(i);
             String rowKey = "course.row" + (i + 1) + ".name";
             String profKey = "course.row" + (i + 1) + ".prof";
             String scoreKey = "course.row" + (i + 1) + ".score";
-            courseNameTexts.get(i).setText(lang.get(rowKey, nameDefs[i]));
-            courseProfTexts.get(i).setText(lang.get(profKey, profDefs[i]));
-            courseStudNumTexts.get(i).setText(lang.get("course.row" + (i + 1) + ".students", stDefs[i]));
+            courseNameTexts.get(i).setText(lang.get(rowKey, c.grado() + " " + c.seccion()));
+            courseProfTexts.get(i).setText(lang.get(profKey, c.profesorNombre()));
+            courseStudNumTexts.get(i).setText(lang.get("course.row" + (i + 1) + ".students", String.valueOf(c.alumnos())));
             courseStudLabelTexts.get(i).setText(lang.get("course.studentsLabel", "Estudiantes"));
-            courseScoreTexts.get(i).setText(lang.get(scoreKey, scoreDefs[i]));
+            courseScoreTexts.get(i).setText(lang.get(scoreKey, String.format("%.1f", c.rendimiento())));
         }
         // Update performance bar labels
         String[] perfKeys = {"perf.label1", "perf.label2", "perf.label3", "perf.label4", "perf.label5", "perf.label6"};
@@ -1259,23 +1233,21 @@ public class MainController {
             perfBarLabelList.get(i).setText(lang.get(perfKeys[i], perfDefs[i]));
         }
         // Update schedule items
-        String[] timeKeys = {"schedule.row1.time", "schedule.row2.time", "schedule.row3.time", "schedule.row4.time", "schedule.row5.time", "schedule.row6.time"};
-        String[] timeDefs = {"08:00", "10:00", "12:00", "14:00", "16:00", "18:00"};
-        String[] subjKeys = {"schedule.row1.subject", "schedule.row2.subject", "schedule.row3.subject", "schedule.row4.subject", "schedule.row5.subject", "schedule.row6.subject"};
-        String[] subjDefs = {"Matematicas Avanzadas", "Historia Universal", "Quimica Organica", "Fisica Cuantica", "Arte Moderno", "Ingles Tecnico"};
-        String[] detKeys = {"schedule.row1.detail", "schedule.row2.detail", "schedule.row3.detail", "schedule.row4.detail", "schedule.row5.detail", "schedule.row6.detail"};
-        String[] detDefs = {"Salon 402 - Prof. Sanchez", "Biblioteca - Dra. Mendez", "Laboratorio B - Prof. Rico", "Laboratorio A - Prof. Einstein", "Galeria - Prof. Picasso", "Aula 10 - Prof. Smith"};
-        for (int i = 0; i < scheduleSubjList.size() && i < subjKeys.length; i++) {
-            String tm = lang.get(timeKeys[i], timeDefs[i]);
-            scheduleSubjList.get(i).setText(tm + " - " + lang.get(subjKeys[i], subjDefs[i]));
-            scheduleDetList.get(i).setText(lang.get(detKeys[i], detDefs[i]));
+        DataStore.seedIfEmpty();
+        List<DataStore.ScheduleInfo> schedule = DataStore.getSchedule();
+        for (int i = 0; i < scheduleSubjList.size() && i < schedule.size(); i++) {
+            DataStore.ScheduleInfo s = schedule.get(i);
+            String timeKey = "schedule.row" + (i + 1) + ".time";
+            String subjKey = "schedule.row" + (i + 1) + ".subject";
+            String detKey = "schedule.row" + (i + 1) + ".detail";
+            scheduleSubjList.get(i).setText(lang.get(timeKey, s.time()) + " - " + lang.get(subjKey, s.subject()));
+            scheduleDetList.get(i).setText(lang.get(detKey, s.detail()));
         }
         // Update KPI labels
-        if (kpiLabelList.size() >= 4) {
+        if (kpiLabelList.size() >= 3) {
             kpiLabelList.get(0).setText(lang.get("kpi.totalStudents").toUpperCase());
             kpiLabelList.get(1).setText(lang.get("kpi.totalCourses").toUpperCase());
             kpiLabelList.get(2).setText(lang.get("kpi.totalTeachers").toUpperCase());
-            kpiLabelList.get(3).setText(lang.get("kpi.attendance").toUpperCase());
         }
     }
 }

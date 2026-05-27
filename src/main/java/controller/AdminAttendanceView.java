@@ -433,7 +433,6 @@ public class AdminAttendanceView {
         saveButton.setOnAction(e -> {
             savedCourses.add(courseKey());
             updateSaveButtonText();
-            new Alert(Alert.AlertType.INFORMATION, "Asistencia guardada", ButtonType.OK).showAndWait();
         });
     }
 

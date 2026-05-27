@@ -2,6 +2,7 @@ package com.edugrade.controller;
 
 import com.edugrade.cell.GradeInputCell;
 import com.edugrade.cell.StudentCell;
+import com.edugrade.controllers.CursoController;
 import com.edugrade.model.Student;
 import com.edugrade.model.Student.Gender;
 
@@ -13,25 +14,30 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import theme.ThemeManager;
-import util.DataStore;
 import util.LanguageManager;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class GradesController implements Initializable {
 
     @FXML private VBox root;
+    @FXML private HBox topBar;
     @FXML private VBox gradesCard;
     @FXML private Text pageTitle;
-    @FXML private HBox filterBox;
+    @FXML private Label breadcrumbCursos;
+    @FXML private Label breadcrumbCursoActual;
     @FXML private Label lblPeriodo;
     @FXML private Label lblTipoEval;
     @FXML private TableView<Student> gradesTable;
@@ -41,42 +47,31 @@ public class GradesController implements Initializable {
     @FXML private TableColumn<Student, String>  colNuevaCalif;
     @FXML private ComboBox<String> comboPeriodo;
     @FXML private ComboBox<String> comboTipoEval;
-    @FXML private Button btnVolver;
-    @FXML private Button btnGuardar;
+    @FXML private Button btnGuardarBottom;
+    @FXML private Button btnCancelar;
 
     private LanguageManager lang;
     private ThemeManager theme;
     private Runnable onBack;
-    private String courseKey = "";
-
-    private double currentMaxGrade = 100.0;
-
-    private static final java.util.Map<String, Double> EVAL_MAX = java.util.Map.of(
-        "Examen Parcial", 25.0,
-        "Examen Final", 35.0,
-        "Tareas", 25.0,
-        "Participación", 15.0
-    );
+    private Runnable onBackToList;
+    private List<CursoController.CourseRow> allCourses;
+    private CursoController.CourseRow currentCourse;
 
     private final ObservableList<Student> masterData = FXCollections.observableArrayList();
-
     private FilteredList<Student> filteredData;
 
-    public void setCourseKey(String key) {
-        this.courseKey = key;
-        loadStudentsFromDataStore();
-    }
-
-    private void loadStudentsFromDataStore() {
-        DataStore.seedIfEmpty();
-        masterData.clear();
-        var students = DataStore.getStudentsForCourse(courseKey);
-        for (var s : students) {
-            double grade = 5.0 + ThreadLocalRandom.current().nextDouble(5.0);
-            Gender g = ThreadLocalRandom.current().nextBoolean() ? Gender.MALE : Gender.FEMALE;
-            masterData.add(new Student(s.nombre(), s.nombre().toLowerCase().replace(" ",".") + "@student.edu", s.matricula(), Math.round(grade * 10.0) / 10.0, g));
-        }
-    }
+    private static final String[] FIRST_NAMES = {
+        "Liam","Emma","Noah","Olivia","Mateo","Isabella","Santiago","Sophia",
+        "Lucas","Mía","Benjamín","Valentina","Sebastián","Camila","Daniel","Gabriela",
+        "Joaquín","Abigail","Thiago","Emily","Samuel","Luna","Diego","Victoria",
+        "Tomás","Martina","Gabriel","Sara","Emiliano","Alice","Leo","Julia"
+    };
+    private static final String[] LAST_NAMES = {
+        "Castillo","Rodríguez","García","Martínez","Hernández","López","Pérez",
+        "González","Fernández","Torres","Ramírez","Morales","Ortiz","Cruz","Reyes","Vargas",
+        "Flores","Díaz","Mendoza","Álvarez","Rojas","Castro","Delgado","Peña","Navarro",
+        "Gutiérrez","Medina","Aguilar","Guerrero","Salazar"
+    };
 
     public void setOnBack(Runnable onBack) {
         this.onBack = onBack;
@@ -87,6 +82,7 @@ public class GradesController implements Initializable {
         lang = LanguageManager.getInstance();
         theme = ThemeManager.getInstance();
 
+        loadStudentsForCourse();
         filteredData = new FilteredList<>(masterData, p -> true);
 
         configureColumns();
@@ -98,30 +94,75 @@ public class GradesController implements Initializable {
                 root.minHeightProperty().bind(sp.viewportBoundsProperty().map(b -> b.getHeight()));
         }));
 
-        btnVolver.setOnAction(e -> { if (onBack != null) onBack.run(); });
-
-        btnGuardar.setOnAction(e -> handleSave());
+        btnGuardarBottom.setOnAction(e -> handleSave());
+        btnCancelar.setOnAction(e      -> { handleCancel(); if (onBack != null) onBack.run(); });
 
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);
 
-        comboPeriodo.getItems().addAll("Periodo 1", "Periodo 2", "Periodo 3");
+        comboPeriodo.getItems().addAll("Periodo 1", "Periodo 2", "Periodo 3", "Periodo 4");
         comboTipoEval.getItems().addAll("Examen Parcial", "Examen Final", "Tareas", "Participación");
         comboPeriodo.getSelectionModel().selectFirst();
         comboTipoEval.getSelectionModel().selectFirst();
 
-        comboTipoEval.valueProperty().addListener((obs, ov, nv) -> {
-            currentMaxGrade = EVAL_MAX.getOrDefault(nv, 100.0);
-            colNuevaCalif.setCellFactory(col -> {
-                GradeInputCell cell = new GradeInputCell();
-                cell.setMaxGrade(currentMaxGrade);
-                return cell;
-            });
-            gradesTable.refresh();
+        comboTipoEval.getSelectionModel().selectedItemProperty().addListener((obs, old, neu) -> {
+            masterData.forEach(s -> s.newGradeProperty().set(""));
         });
-        currentMaxGrade = EVAL_MAX.getOrDefault(comboTipoEval.getValue(), 100.0);
+
+        if (currentCourse != null) {
+            breadcrumbCursoActual.setText(currentCourse.grado() + " " + currentCourse.seccion());
+            pageTitle.setText(lang.get("grades.pageTitle", "Gestión de Calificaciones") + " - " + currentCourse.grado() + " " + currentCourse.seccion());
+        }
 
         setupResponsive();
+    }
+
+    private void loadStudentsForCourse() {
+        masterData.clear();
+        int count = currentCourse != null ? currentCourse.alumnos() : 12;
+        var rng = ThreadLocalRandom.current();
+        for (int i = 0; i < count; i++) {
+            String firstName = FIRST_NAMES[rng.nextInt(FIRST_NAMES.length)];
+            String lastName  = LAST_NAMES[rng.nextInt(LAST_NAMES.length)];
+            String name      = firstName + " " + lastName;
+            String email     = firstName.toLowerCase() + "." + lastName.toLowerCase() + "@student.edu";
+            String stuId     = String.format("STU-%04d", rng.nextInt(1, 9999));
+            double grade     = 0;
+            Gender gender    = rng.nextBoolean() ? Gender.MALE : Gender.FEMALE;
+            Student student = new Student(name, email, stuId, grade, gender);
+
+            student.newGradeProperty().addListener(new javafx.beans.value.ChangeListener<>() {
+                private boolean busy = false;
+                @Override
+                public void changed(javafx.beans.value.ObservableValue<? extends String> obs, String old, String val) {
+                    if (busy) return;
+                    if (val == null || val.isBlank()) return;
+                    busy = true;
+                    try {
+                        double g = Double.parseDouble(val);
+                        String evalType = comboTipoEval.getSelectionModel().getSelectedItem();
+                        if (evalType != null) {
+                            student.addEvalGrade(evalType, Math.min(100, Math.max(0, g)));
+                            gradesTable.refresh();
+                        }
+                    } catch (NumberFormatException ignored) {}
+                    student.newGradeProperty().set("");
+                    busy = false;
+                }
+            });
+
+            masterData.add(student);
+        }
+    }
+
+    private void switchToCourse(CursoController.CourseRow course) {
+        currentCourse = course;
+        loadStudentsForCourse();
+        filteredData = new FilteredList<>(masterData, p -> true);
+        gradesTable.setItems(filteredData);
+        String label = course.grado() + " " + course.seccion();
+        breadcrumbCursoActual.setText(label);
+        pageTitle.setText(lang.get("grades.pageTitle", "Gestión de Calificaciones") + " - " + label);
     }
 
     private void setupResponsive() {
@@ -160,15 +201,68 @@ public class GradesController implements Initializable {
     }
 
     private void updateTexts() {
-        pageTitle.setText(lang.get("grades.pageTitle", "Gestión de Calificaciones") + " - 5to E");
+        String courseLabel = currentCourse != null ? currentCourse.grado() + " " + currentCourse.seccion() : "5to E";
+        pageTitle.setText(lang.get("grades.pageTitle", "Gestión de Calificaciones") + " - " + courseLabel);
         lblPeriodo.setText(lang.get("grades.periodo", "Periodo"));
         lblTipoEval.setText(lang.get("grades.tipoEval", "Tipo de Evaluación"));
         colEstudiante.setText(lang.get("grades.colEstudiante", "ESTUDIANTE"));
         colMatricula.setText(lang.get("grades.colMatricula", "MATRÍCULA"));
-        colCalifActual.setText(lang.get("grades.colCalifActual", "NOTA ACTUAL"));
-        colNuevaCalif.setText(lang.get("grades.colFinal", "CALIF. FINAL"));
-        btnVolver.setText(lang.get("grades.cancelar", "Volver"));
-        btnGuardar.setText(lang.get("grades.guardar", "Guardar Cambios"));
+        colCalifActual.setText(lang.get("grades.colCalifActual", "NOTA FINAL"));
+        colNuevaCalif.setText(lang.get("grades.colNuevaCalif", "NUEVA NOTA"));
+        btnGuardarBottom.setText(lang.get("grades.guardar", "Guardar Cambios"));
+        btnCancelar.setText(lang.get("grades.cancelar", "Cancelar"));
+        breadcrumbCursos.setText(lang.get("detalle.breadcrumbListado", "Cursos"));
+    }
+
+    public void attachSearchField(TextField externalSearchField) {
+        externalSearchField.clear();
+        externalSearchField.setPromptText(lang.get("attendance.search", "Buscar estudiantes..."));
+        externalSearchField.textProperty().addListener((obs, oldValue, newValue) -> {
+            String q = newValue == null ? "" : newValue.toLowerCase().trim();
+            filteredData.setPredicate(s -> {
+                if (q.isEmpty()) return true;
+                return s.getName().toLowerCase().contains(q)
+                    || s.getStudentId().toLowerCase().contains(q)
+                    || s.getEmail().toLowerCase().contains(q);
+            });
+        });
+    }
+
+    public void setCourseData(CursoController.CourseRow course, List<CursoController.CourseRow> allCourses,
+                              Runnable onBackToList) {
+        this.currentCourse = course;
+        this.allCourses = allCourses;
+        this.onBackToList = onBackToList;
+        if (breadcrumbCursoActual != null) {
+            breadcrumbCursoActual.setText(course.grado() + " " + course.seccion());
+            String courseLabel = course.grado() + " " + course.seccion();
+            pageTitle.setText(lang.get("grades.pageTitle", "Gestión de Calificaciones") + " - " + courseLabel);
+        }
+    }
+
+    @FXML
+    private void onBreadcrumbCursos(MouseEvent event) {
+        if (onBackToList != null)
+            onBackToList.run();
+    }
+
+    @FXML
+    private void onBreadcrumbCursoActual(MouseEvent event) {
+        if (allCourses != null && !allCourses.isEmpty())
+            showCourseMenu(event);
+    }
+
+    private void showCourseMenu(MouseEvent event) {
+        ContextMenu menu = new ContextMenu();
+        for (CursoController.CourseRow c : allCourses) {
+            String name = c.grado() + " " + c.seccion();
+            MenuItem item = new MenuItem(name);
+            if (currentCourse != null && name.equals(currentCourse.grado() + " " + currentCourse.seccion()))
+                item.setDisable(true);
+            item.setOnAction(e -> switchToCourse(c));
+            menu.getItems().add(item);
+        }
+        menu.show(((Node) event.getSource()), Side.BOTTOM, 0, 0);
     }
 
     private void configureColumns() {
@@ -181,7 +275,7 @@ public class GradesController implements Initializable {
         colMatricula.setCellFactory(col -> new TableCell<>() {
             private final Label lbl = new Label();
             {
-                lbl.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 14px; -fx-font-weight: 500;");
+                lbl.setStyle("-fx-text-fill: #475569; -fx-font-size: 14px; -fx-font-weight: 500;");
                 setGraphic(lbl);
                 setPadding(new Insets(8, 16, 8, 16));
             }
@@ -208,15 +302,7 @@ public class GradesController implements Initializable {
         });
 
         colNuevaCalif.setCellValueFactory(new PropertyValueFactory<>("newGrade"));
-        colNuevaCalif.setCellFactory(col -> {
-            GradeInputCell cell = new GradeInputCell();
-            cell.setMaxGrade(currentMaxGrade);
-            return cell;
-        });
-        colNuevaCalif.setOnEditCommit(event -> {
-            Student s = event.getRowValue();
-            s.newGradeProperty().set(event.getNewValue());
-        });
+        colNuevaCalif.setCellFactory(col -> new GradeInputCell());
         colNuevaCalif.setEditable(true);
         gradesTable.setEditable(true);
     }
@@ -225,19 +311,16 @@ public class GradesController implements Initializable {
         for (Student s : masterData) {
             String ng = s.getNewGrade();
             if (ng != null && !ng.isBlank()) {
-                double increment = Double.parseDouble(ng);
-                double current = s.getCurrentGrade();
-                String tipo = comboTipoEval.getValue();
-                double max = EVAL_MAX.getOrDefault(tipo, 100.0);
-                if (increment > max) {
-                    System.out.printf("\u26a0 %s: +%.1f supera el m\u00e1ximo de %.0f para %s%n",
-                        s.getName(), increment, max, tipo);
-                    continue;
-                }
-                double finalGrade = current + increment;
-                System.out.printf("\u2713 %s: %.1f + %.1f = %.1f / %.0f (%s)%n",
-                    s.getName(), current, increment, finalGrade, max, tipo);
+                System.out.printf("Guardando → %s  |  Nueva calificación: %s%n",
+                    s.getName(), ng);
             }
         }
+    }
+
+    private void handleCancel() {
+        masterData.forEach(s -> {
+            s.clearEvalGrades();
+            s.newGradeProperty().set("");
+        });
     }
 }

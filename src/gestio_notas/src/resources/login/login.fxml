@@ -17,7 +17,7 @@
 
 <HBox xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="controller.LoginController"
+      fx:controller="LoginController"
       styleClass="root-container"
       minWidth="820"
       minHeight="560">
@@ -76,8 +76,6 @@
                            onAction="#onForgotPassword"/>
             </HBox>
 
-            <Label fx:id="errorLabel" styleClass="error-label" wrapText="true"
-                   visible="false" managed="false" maxWidth="Infinity"/>
             <Button text="Iniciar Sesión" styleClass="btn-primary"
                     maxWidth="Infinity" onAction="#onLogin">
                 <VBox.margin><Insets top="4"/></VBox.margin>

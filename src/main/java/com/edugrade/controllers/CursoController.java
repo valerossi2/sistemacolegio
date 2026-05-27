@@ -9,6 +9,15 @@ import javafx.fxml.FXMLLoader;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
+
+import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -73,6 +82,7 @@ public class CursoController {
         theme = ThemeManager.getInstance();
 
         buildSampleData();
+        DataStore.setCourses(allCourses);
         configureCourseTable();
         cursosTable.setItems(allCourses);
         updateTexts();

@@ -57,12 +57,22 @@
                 </graphic>
             </Button>
 
-            <!-- Botón Editar -->
+            <!-- Botón Editar / Guardar -->
             <Button fx:id="btnEditCourse" styleClass="btn-primary"
                     mnemonicParsing="false" onAction="#onEditarCurso">
                 <graphic>
                     <SVGPath styleClass="btn-svg-icon btn-svg-icon--white"
                              content="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                             scaleX="0.8" scaleY="0.8"/>
+                </graphic>
+            </Button>
+            <!-- Botón Cancelar (visible solo en modo edición) -->
+            <Button fx:id="btnCancelEdit" styleClass="btn-outlined"
+                    mnemonicParsing="false" onAction="#onCancelarEdicion"
+                    visible="false" managed="false">
+                <graphic>
+                    <SVGPath styleClass="btn-svg-icon"
+                             content="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
                              scaleX="0.8" scaleY="0.8"/>
                 </graphic>
             </Button>
@@ -76,6 +86,52 @@
                 </graphic>
             </Button>
         </HBox>
+
+        <!-- ════════════════════════════════════════
+             Edit Forms Panel (hidden, shown in edit mode)
+        ════════════════════════════════════════ -->
+        <VBox fx:id="editFormsPanel" spacing="16" visible="false" managed="false">
+            <padding><Insets left="40" right="40"/></padding>
+            <VBox styleClass="card" spacing="12">
+                <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                <Label fx:id="lblAddStudentTitle" text="Agregar Estudiante" styleClass="card__title"/>
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <TextField fx:id="studentNameField"
+                               promptText="Nombre del estudiante"
+                               HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="studentIdField"
+                               promptText="ID Matr\u00edcula"
+                               prefWidth="140"/>
+                    <Button fx:id="addStudentBtn" styleClass="btn-primary"
+                            mnemonicParsing="false" onAction="#onAddStudent">
+                        <graphic>
+                            <SVGPath styleClass="btn-svg-icon btn-svg-icon--white"
+                                     content="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                                     scaleX="0.8" scaleY="0.8"/>
+                        </graphic>
+                    </Button>
+                </HBox>
+            </VBox>
+            <VBox styleClass="card" spacing="12">
+                <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                <Label fx:id="lblAddTeacherTitle" text="Agregar Profesor" styleClass="card__title"/>
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <StackPane HBox.hgrow="ALWAYS">
+                        <TextField fx:id="teacherSearchField"
+                                   promptText="Buscar profesor..."
+                                   HBox.hgrow="ALWAYS"/>
+                    </StackPane>
+                    <Button fx:id="addTeacherBtn" styleClass="btn-primary"
+                            mnemonicParsing="false" onAction="#onAddTeacher">
+                        <graphic>
+                            <SVGPath styleClass="btn-svg-icon btn-svg-icon--white"
+                                     content="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                                     scaleX="0.8" scaleY="0.8"/>
+                        </graphic>
+                    </Button>
+                </HBox>
+            </VBox>
+        </VBox>
 
         <!-- ════════════════════════════════════════
              Bento Grid 33 / 67
@@ -179,8 +235,9 @@
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                         </columnResizePolicy>
                         <columns>
-                            <TableColumn fx:id="colTeacherName" text="DOCENTE" prefWidth="220"/>
-                            <TableColumn fx:id="colTeacherSubject" text="MATERIA" prefWidth="220"/>
+                            <TableColumn fx:id="colTeacherName" text="DOCENTE" prefWidth="200"/>
+                            <TableColumn fx:id="colTeacherSubject" text="MATERIA" prefWidth="200"/>
+                            <TableColumn fx:id="colTeacherHorario" text="HORARIO" prefWidth="180"/>
                         </columns>
                         <placeholder>
                             <Label text="No hay docentes asignados." styleClass="table-placeholder-label"/>
@@ -204,8 +261,9 @@
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                         </columnResizePolicy>
                         <columns>
-                            <TableColumn fx:id="colStudent"    text="ESTUDIANTE"   prefWidth="240"/>
-                            <TableColumn fx:id="colMatricula"  text="ID MATRÍCULA" prefWidth="140"/>
+                            <TableColumn fx:id="colStudent"    text="ESTUDIANTE"   prefWidth="200"/>
+                            <TableColumn fx:id="colGenero"    text="GENERO"       prefWidth="60"/>
+                            <TableColumn fx:id="colMatricula"  text="ID MATRÍCULA" prefWidth="120"/>
                             <TableColumn fx:id="colAsistencia" text="ASISTENCIA"   prefWidth="160"/>
                         </columns>
                         <placeholder>

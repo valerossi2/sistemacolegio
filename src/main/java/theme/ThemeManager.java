@@ -9,32 +9,32 @@ public class ThemeManager {
 
     public static ThemeManager getInstance() { return instance; }
 
-    public static final String COLOR_PRIMARY = "#2B54A8";
+    public static final String COLOR_PRIMARY = "#2563EB";
     public static final String COLOR_PRIMARY_CONTAINER = "#1D4ED8";
     public static final String COLOR_RED = "#DC2626";
     public static final String COLOR_RED_HOVER = "#B91C1C";
     public static final String COLOR_GREEN = "#22C55E";
 
-    public static final String LIGHT_BG = "#F8F9FA";
+    public static final String LIGHT_BG = "#F8FAFC";
     public static final String LIGHT_CARD = "#FFFFFF";
-    public static final String LIGHT_CARD_BORDER = "#E5E7EB";
-    public static final String LIGHT_TEXT = "#1F2937";
-    public static final String LIGHT_TEXT_SEC = "#6B7280";
-    public static final String LIGHT_TEXT_MUTED = "#9CA3AF";
-    public static final String LIGHT_INPUT_BG = "#F8FAFC";
-    public static final String LIGHT_INPUT_BORDER = "#E2E8F0";
-    public static final String LIGHT_TOGGLE_BG = "#E5E7EB";
-    public static final String LIGHT_DIVIDER = "#E5E7EB";
+    public static final String LIGHT_CARD_BORDER = "#E2E8F0";
+    public static final String LIGHT_TEXT = "#0F172A";
+    public static final String LIGHT_TEXT_SEC = "#475569";
+    public static final String LIGHT_TEXT_MUTED = "#94A3B8";
+    public static final String LIGHT_INPUT_BG = "#F1F5F9";
+    public static final String LIGHT_INPUT_BORDER = "#CBD5E1";
+    public static final String LIGHT_TOGGLE_BG = "#E2E8F0";
+    public static final String LIGHT_DIVIDER = "#E2E8F0";
     public static final String LIGHT_HEADER_BG = "#FFFFFF";
     public static final String LIGHT_SIDEBAR_BG = "#FFFFFF";
-    public static final String LIGHT_ROW_HOVER = "#F9FAFB";
-    public static final String LIGHT_ICON_CIRCLE_BG = "#DBEAFE";
+    public static final String LIGHT_ROW_HOVER = "#F1F5F9";
+    public static final String LIGHT_ICON_CIRCLE_BG = "#EFF6FF";
 
     public static final String DARK_BG = "#0F172A";
     public static final String DARK_CARD = "#1E293B";
     public static final String DARK_CARD_BORDER = "#334155";
     public static final String DARK_TEXT = "#F8FAFC";
-    public static final String DARK_TEXT_SEC = "#CBD5E1";
+    public static final String DARK_TEXT_SEC = "#94A3B8";
     public static final String DARK_TEXT_MUTED = "#64748B";
     public static final String DARK_INPUT_BG = "#0F172A";
     public static final String DARK_INPUT_BORDER = "#334155";
@@ -43,7 +43,7 @@ public class ThemeManager {
     public static final String DARK_HEADER_BG = "#1E293B";
     public static final String DARK_SIDEBAR_BG = "#1E293B";
     public static final String DARK_ROW_HOVER = "#334155";
-    public static final String DARK_ICON_CIRCLE_BG = "#1E3A5F";
+    public static final String DARK_ICON_CIRCLE_BG = "#1E3A8A";
 
     private boolean darkMode = true;
     private List<Runnable> listeners = new ArrayList<>();

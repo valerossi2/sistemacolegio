@@ -4,14 +4,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.application.Platform;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -23,20 +27,34 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import theme.ThemeManager;
 import util.LanguageManager;
-import util.DataStore;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Random;
 
 public class AdminAttendanceView {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final String ICON_SAVE = "M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zM12 19c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zM6 8V5h9v3H6z";
+    private static final String[] AVATAR_COLORS = {
+            "#3B82F6", "#8B5CF6", "#EC4899", "#F59E0B",
+            "#10B981", "#EF4444", "#6366F1", "#14B8A6"
+    };
+
+    private static final java.util.Map<String, java.util.Map<String, AttendanceStatus>> attendanceStore = new java.util.HashMap<>();
+
+    public static java.util.Map<String, AttendanceStatus> getSavedAttendance(String courseKey) {
+        return attendanceStore.get(courseKey);
+    }
+
+    public static java.util.Map<String, java.util.Map<String, AttendanceStatus>> getAttendanceStore() {
+        return attendanceStore;
+    }
 
     private final ThemeManager theme;
     private final LanguageManager lang = LanguageManager.getInstance();
@@ -57,23 +75,23 @@ public class AdminAttendanceView {
     private final Label excuseCount = new Label();
     private final Label tutorTag = new Label();
     private final Label tutorName = new Label();
-    private final Label tutorAvatarLabel = new Label();
     private final Label listTitle = new Label();
     private final Label listSubtitle = new Label();
-    private final Button loadMoreButton = new Button();
     private final Button saveButton = new Button();
-    private final Label saveFeedback = new Label();
-    private final ComboBox<String> gradeSelector = new ComboBox<>();
-    private final ComboBox<String> sectionSelector = new ComboBox<>();
+    private final Label saveLabel = new Label();
+    private final Label gradeLabel = new Label("5to");
+    private final Label sectionLabel = new Label("E");
     private final TextField searchField = new TextField();
     private final VBox titleBox = new VBox(8);
-    private final HBox selectorBox = new HBox(12);
+    private final HBox selectorBox = new HBox(8);
     private final HBox pageHeader = new HBox(24);
     private boolean compact;
+    private final java.util.Set<String> savedCourses = new java.util.HashSet<>();
 
     public AdminAttendanceView(ThemeManager theme) {
         this.theme = theme;
-        DataStore.seedIfEmpty();
+        System.out.println("[AdminAttendanceView] CREADO. isDark=" + theme.isDark() + " text()=" + text() + " textMuted()=" + textMuted());
+        loadInitialData();
         buildView();
         wireEvents();
         updateLanguage();
@@ -88,7 +106,6 @@ public class AdminAttendanceView {
                 Platform.runLater(() -> applyTheme());
             }
         });
-        reloadForCourse();
     }
 
     public Node getView() {
@@ -103,6 +120,30 @@ public class AdminAttendanceView {
         });
     }
 
+    public void setGradeSection(String grade, String section) {
+        gradeLabel.setText(grade);
+        sectionLabel.setText(section);
+        var saved = getSavedAttendance(courseKey());
+        if (saved != null && !saved.isEmpty()) {
+            students.clear();
+            int idx = 0;
+            for (var entry : saved.entrySet()) {
+                StudentAttendance sa = new StudentAttendance(entry.getKey(), idx % 8);
+                sa.status = entry.getValue();
+                students.add(sa);
+                idx++;
+            }
+            updateSaveButtonText();
+        } else {
+            reloadStudents();
+        }
+    }
+
+    public void filterStudent(String studentName) {
+        searchField.setText(studentName);
+        refreshRows();
+    }
+
     private void buildView() {
         root.setPadding(new Insets(20, 32, 32, 32));
         root.setMaxWidth(1200);
@@ -112,19 +153,10 @@ public class AdminAttendanceView {
         pageHeader.setSpacing(16);
         titleBox.getChildren().setAll(breadcrumb, title);
         selectorBox.setSpacing(8);
-        selectorBox.getChildren().setAll(createSelectorCard("attendance.grade", gradeSelector), createSelectorCard("attendance.section", sectionSelector));
+        selectorBox.getChildren().setAll(createLabelSelector("attendance.grade", gradeLabel), createLabelSelector("attendance.section", sectionLabel));
         Region headerSpacer = new Region();
         HBox.setHgrow(headerSpacer, Priority.ALWAYS);
         pageHeader.getChildren().setAll(titleBox, headerSpacer, selectorBox);
-
-        gradeSelector.setItems(FXCollections.observableArrayList(
-            DataStore.getCourses().stream().map(c -> c.grado()).distinct().sorted().toList()
-        ));
-        sectionSelector.setItems(FXCollections.observableArrayList(
-            DataStore.getCourses().stream().map(c -> c.seccion()).distinct().sorted().toList()
-        ));
-        gradeSelector.getSelectionModel().selectFirst();
-        sectionSelector.getSelectionModel().selectFirst();
 
         buildSummaryCard();
         buildTableCard();
@@ -140,65 +172,29 @@ public class AdminAttendanceView {
         setCompact(false);
     }
 
-    private HBox createSelectorCard(String labelKey, ComboBox<String> selector) {
+    private HBox createLabelSelector(String labelKey, Label valueLabel) {
         Label label = new Label();
-        label.setFont(Font.font("Plus Jakarta Sans", 11));
+        label.setFont(Font.font("Plus Jakarta Sans", 10));
         languageUpdaters.add(() -> label.setText(lang.get(labelKey)));
-        selector.setPrefWidth(55);
-        selector.setMinHeight(24);
-        selector.setVisibleRowCount(5);
-        selector.setCellFactory(list -> new ListCell<String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item);
-                    setTextFill(Color.web(text()));
-                    setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12));
-                }
-            }
-        });
-        selector.setButtonCell(new ListCell<String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item);
-                    setTextFill(Color.web(text()));
-                    setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12));
-                    setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-                }
-            }
-        });
-        HBox box = new HBox(4, label, selector);
+
+        valueLabel.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 11));
+        valueLabel.setPadding(new Insets(0, 2, 0, 0));
+
+        HBox box = new HBox(3, label, valueLabel);
         box.setAlignment(Pos.CENTER_LEFT);
-        box.setPadding(new Insets(4, 10, 4, 10));
-        Runnable updateSelector = () -> {
+        box.setPadding(new Insets(1, 6, 1, 6));
+        box.setCursor(javafx.scene.Cursor.HAND);
+        box.setOnMouseClicked(e -> {
+            if (valueLabel == gradeLabel)
+                showSelectorMenu(e, List.of("5to", "4to", "3ro", "2do", "1ro"), gradeLabel);
+            else
+                showSelectorMenu(e, List.of("A", "B", "C", "D", "E"), sectionLabel);
+        });
+        themeUpdaters.add(() -> {
             label.setTextFill(Color.web(textMuted()));
-            selector.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-font-weight: 700; -fx-font-size: 12; -fx-text-fill: " + text() + "; -fx-mark-color: " + textMuted() + ";");
-            box.setStyle(cardStyle(8, borderSoft()));
-            selector.setCellFactory(list -> new ListCell<String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) { setText(null); }
-                    else { setText(item); setTextFill(Color.web(text())); setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12)); }
-                }
-            });
-            selector.setButtonCell(new ListCell<String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) { setText(null); }
-                    else { setText(item); setTextFill(Color.web(text())); setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12)); setStyle("-fx-background-color: transparent; -fx-padding: 0;"); }
-                }
-            });
-        };
-        themeUpdaters.add(updateSelector);
+            valueLabel.setTextFill(Color.web(text()));
+            box.setStyle(cardStyle(6, borderSoft()));
+        });
         return box;
     }
 
@@ -207,6 +203,20 @@ public class AdminAttendanceView {
         summaryCard.setMinWidth(260);
         summaryCard.setPrefWidth(300);
         summaryTitle.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 18));
+
+        HBox dateBadge = new HBox(4);
+        dateBadge.setPadding(new Insets(12, 14, 12, 14));
+        Label dateLabel = new Label();
+        dateLabel.setFont(Font.font("Plus Jakarta Sans", 13));
+        dateText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13));
+        dateLabel.setTextFill(Color.web(theme.isDark() ? "#fcd34d" : "#92400e"));
+        dateText.setTextFill(Color.web(theme.isDark() ? "#fde68a" : "#92400e"));
+        languageUpdaters.add(() -> dateLabel.setText(lang.get("attendance.currentDate")));
+        themeUpdaters.add(() -> {
+            dateBadge.setStyle("-fx-background-color: " + (theme.isDark() ? "#451a03" : "#fffbeb") + "; -fx-border-color: " + (theme.isDark() ? "#92400e" : "#fde68a") + "; -fx-border-radius: 12; -fx-background-radius: 12;");
+            dateLabel.setTextFill(Color.web(theme.isDark() ? "#fcd34d" : "#92400e"));
+            dateText.setTextFill(Color.web(theme.isDark() ? "#fde68a" : "#92400e"));
+        });
 
         VBox stats = new VBox(16,
             createStatRow("attendance.present", presentCount),
@@ -217,7 +227,7 @@ public class AdminAttendanceView {
         HBox tutorCard = new HBox(14);
         tutorCard.setAlignment(Pos.CENTER_LEFT);
         tutorCard.setPadding(new Insets(14));
-        StackPane avatar = new StackPane(tutorAvatarLabel);
+        StackPane avatar = new StackPane(new Label("LM"));
         avatar.setMinSize(48, 48);
         avatar.setMaxSize(48, 48);
         VBox tutorTexts = new VBox(2, tutorTag, tutorName);
@@ -234,7 +244,7 @@ public class AdminAttendanceView {
             tutorName.setTextFill(Color.web(text()));
         });
 
-        summaryCard.getChildren().addAll(summaryTitle, stats, tutorCard);
+        summaryCard.getChildren().addAll(summaryTitle, dateBadge, stats, tutorCard);
     }
 
     private HBox createStatRow(String labelKey, Label value) {
@@ -253,21 +263,34 @@ public class AdminAttendanceView {
         return row;
     }
 
+    private final Label tableDateLabel = new Label();
     private void buildTableCard() {
         VBox tableCard = new VBox();
         tableCard.setMinWidth(520);
-        Label dateHeader = new Label();
-        dateHeader.setFont(Font.font("Plus Jakarta Sans", 13));
-        VBox tableHeader = new VBox(4, listTitle, listSubtitle, dateHeader);
-        tableHeader.setPadding(new Insets(22, 24, 18, 24));
+        tableDateLabel.setFont(Font.font("Plus Jakarta Sans", 12));
+        tableDateLabel.setText(LocalDate.now().format(DATE_FORMAT));
+        VBox tableHeader = new VBox(4, listTitle, listSubtitle, tableDateLabel);
+        tableHeader.setPadding(new Insets(22, 24, 14, 24));
         listTitle.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 18));
         listSubtitle.setFont(Font.font("Plus Jakarta Sans", 13));
 
         HBox header = new HBox();
         header.setPadding(new Insets(14, 24, 14, 24));
+        HBox studentHeader = headerCell("attendance.student", 200);
+        studentHeader.setAlignment(Pos.CENTER_LEFT);
+        studentHeader.setPadding(new Insets(0, 0, 0, 40));
+        HBox.setHgrow(studentHeader, Priority.ALWAYS);
+        Label attendanceLabel = new Label();
+        attendanceLabel.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 11));
+        languageUpdaters.add(() -> attendanceLabel.setText(lang.get("attendance.attendance").toUpperCase(Locale.ROOT)));
+        themeUpdaters.add(() -> attendanceLabel.setTextFill(Color.web(textMuted())));
+        HBox attendanceHeader = new HBox(attendanceLabel);
+        attendanceHeader.setAlignment(Pos.CENTER);
+        attendanceHeader.setMinWidth(260);
+        attendanceHeader.setPrefWidth(260);
         header.getChildren().addAll(
-            headerCell("attendance.student", 290),
-            headerCell("attendance.attendance", 360)
+            studentHeader,
+            attendanceHeader
         );
 
         rowsBox.setFillWidth(true);
@@ -275,43 +298,33 @@ public class AdminAttendanceView {
         rowScroll.setFitToWidth(true);
         rowScroll.setMinHeight(220);
         rowScroll.setPrefHeight(390);
-        rowScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        rowScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         rowScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        HBox tableFooter = new HBox();
-        tableFooter.setAlignment(Pos.CENTER);
-        tableFooter.setPadding(new Insets(14));
+        tableCard.getChildren().addAll(tableHeader, header, rowScroll);
 
-        tableCard.getChildren().addAll(tableHeader, header, rowScroll, tableFooter);
-
-        HBox saveContent = new HBox(8, icon(ICON_SAVE, 17, "#ffffff"), new Label());
+        HBox saveContent = new HBox(8, icon(ICON_SAVE, 17, "#ffffff"), saveLabel);
         saveContent.setAlignment(Pos.CENTER);
         saveButton.setGraphic(saveContent);
         saveButton.setMaxWidth(Double.MAX_VALUE);
         saveButton.setMinHeight(56);
         VBox.setVgrow(tableCard, Priority.ALWAYS);
-        saveFeedback.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 14));
-        saveFeedback.setAlignment(Pos.CENTER);
-        saveFeedback.setMaxWidth(Double.MAX_VALUE);
-        saveFeedback.setPadding(new Insets(8, 0, 0, 0));
-        saveFeedback.setVisible(false);
-        tableColumn.getChildren().addAll(tableCard, saveFeedback, saveButton);
+        tableColumn.getChildren().addAll(tableCard, saveButton);
 
-        languageUpdaters.add(() -> {
-            ((Label) saveContent.getChildren().get(1)).setText(lang.get("attendance.save"));
-            dateHeader.setText(lang.get("attendance.currentDate") + ": " + LocalDate.now().format(DATE_FORMAT));
-        });
+        saveButton.setOnMouseEntered(e -> saveButton.setStyle(saveButton.getStyle().replace("#2563eb", "#1d4ed8")));
+        saveButton.setOnMouseExited(e -> saveButton.setStyle(saveButton.getStyle().replace("#1d4ed8", "#2563eb")));
+
+        languageUpdaters.add(() -> updateSaveButtonText());
         themeUpdaters.add(() -> {
             tableCard.setStyle(cardStyle(16, borderSoft()));
             tableHeader.setStyle("-fx-border-color: transparent transparent " + borderSoft() + " transparent;");
             header.setStyle("-fx-background-color: " + surfaceLow() + "; -fx-border-color: transparent transparent " + borderSoft() + " transparent;");
             rowScroll.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
-            tableFooter.setStyle("-fx-background-color: " + card() + "; -fx-border-color: " + borderSoft() + " transparent transparent transparent;");
             listTitle.setTextFill(Color.web(text()));
             listSubtitle.setTextFill(Color.web(textMuted()));
-            dateHeader.setTextFill(Color.web(textMuted()));
+            tableDateLabel.setTextFill(Color.web(textMuted()));
             saveButton.setStyle("-fx-background-color: #2563eb; -fx-background-radius: 16; -fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: 700; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.25), 8, 0.2, 0, 2);");
-            ((Label) saveContent.getChildren().get(1)).setTextFill(Color.WHITE);
+            saveLabel.setTextFill(Color.WHITE);
         });
         refreshRows();
     }
@@ -329,71 +342,51 @@ public class AdminAttendanceView {
     private void refreshRows() {
         rowsBox.getChildren().clear();
         String q = searchField.getText() == null ? "" : searchField.getText().trim().toLowerCase(Locale.ROOT);
+        int idx = 1;
         for (StudentAttendance student : students) {
-            if (!q.isEmpty() && !student.name().toLowerCase(Locale.ROOT).contains(q) && !student.email().toLowerCase(Locale.ROOT).contains(q)) {
+            if (!q.isEmpty() && !student.name().toLowerCase(Locale.ROOT).contains(q)) {
                 continue;
             }
-            rowsBox.getChildren().add(createStudentRow(student));
+            rowsBox.getChildren().add(createStudentRow(student, idx++));
         }
         updateSummary();
         applyTheme();
     }
 
-    private HBox createStudentRow(StudentAttendance student) {
+    private HBox createStudentRow(StudentAttendance student, int number) {
         HBox row = new HBox();
         row.setAlignment(Pos.CENTER_LEFT);
-        row.setPadding(new Insets(12, 24, 12, 24));
-        row.setMinHeight(68);
+        row.setPadding(new Insets(8, 16, 8, 16));
+        row.setMinHeight(48);
 
-        StackPane initials = new StackPane(new Label(student.initials()));
-        initials.setMinSize(36, 36);
-        initials.setMaxSize(36, 36);
-        VBox studentTexts = new VBox(2, new Label(student.name()), new Label(student.email()));
-        HBox studentCell = new HBox(12, initials, studentTexts);
+        StackPane avatarContainer = new StackPane();
+        avatarContainer.setMinSize(28, 28);
+        avatarContainer.setPrefSize(28, 28);
+        Circle avatarCircle = new Circle(14);
+        Text numberText = new Text(String.valueOf(number));
+        numberText.setFont(Font.font("Segoe UI", FontWeight.BOLD, 12));
+        numberText.setFill(Color.WHITE);
+        avatarContainer.getChildren().addAll(avatarCircle, numberText);
+
+        Label nameLabel = new Label(student.name());
+        nameLabel.setFont(Font.font("Segoe UI", FontWeight.MEDIUM, 14));
+        nameLabel.setTextFill(Color.web(text()));
+        HBox studentCell = new HBox(12, avatarContainer, nameLabel);
         studentCell.setAlignment(Pos.CENTER_LEFT);
-        studentCell.setMinWidth(290);
-        studentCell.setPrefWidth(290);
+        HBox.setHgrow(studentCell, Priority.ALWAYS);
 
-        Button btnPresent = statusButton(student, AttendanceStatus.PRESENT, "attendance.presentButton");
-        Button btnAbsent = statusButton(student, AttendanceStatus.ABSENT, "attendance.absentButton");
-        Button btnExcuse = statusButton(student, AttendanceStatus.EXCUSE, "attendance.excuseButton");
-        HBox actions = new HBox(8, btnPresent, btnAbsent, btnExcuse);
-        actions.setMinWidth(360);
-        actions.setAlignment(Pos.CENTER_LEFT);
+        HBox actions = new HBox(8,
+            statusButton(student, AttendanceStatus.PRESENT, "attendance.presentButton"),
+            statusButton(student, AttendanceStatus.ABSENT, "attendance.absentButton"),
+            statusButton(student, AttendanceStatus.EXCUSE, "attendance.excuseButton")
+        );
+        actions.setMinWidth(210);
         row.getChildren().addAll(studentCell, actions);
-
-        Runnable updateBtnStyles = () -> {
-            btnPresent.setStyle(attendanceBtnStyle(student.status == AttendanceStatus.PRESENT, AttendanceStatus.PRESENT));
-            btnAbsent.setStyle(attendanceBtnStyle(student.status == AttendanceStatus.ABSENT, AttendanceStatus.ABSENT));
-            btnExcuse.setStyle(attendanceBtnStyle(student.status == AttendanceStatus.EXCUSE, AttendanceStatus.EXCUSE));
-        };
-
-        btnPresent.setOnAction(e -> {
-            student.status = AttendanceStatus.PRESENT;
-            updateBtnStyles.run();
-            updateSummary();
-            persistAttendance(student);
-        });
-        btnAbsent.setOnAction(e -> {
-            student.status = AttendanceStatus.ABSENT;
-            updateBtnStyles.run();
-            updateSummary();
-            persistAttendance(student);
-        });
-        btnExcuse.setOnAction(e -> {
-            student.status = AttendanceStatus.EXCUSE;
-            updateBtnStyles.run();
-            updateSummary();
-            persistAttendance(student);
-        });
 
         themeUpdaters.add(() -> {
             row.setStyle("-fx-background-color: " + card() + "; -fx-border-color: transparent transparent " + borderSoft() + " transparent;");
-            initials.setStyle("-fx-background-color: " + student.avatarBg(theme.isDark()) + "; -fx-background-radius: 100;");
-            ((Label) initials.getChildren().get(0)).setTextFill(Color.web(student.avatarText(theme.isDark())));
-            ((Label) studentTexts.getChildren().get(0)).setTextFill(Color.web(text()));
-            ((Label) studentTexts.getChildren().get(1)).setTextFill(Color.web(textMuted()));
-            updateBtnStyles.run();
+            avatarCircle.setFill(Color.web(AVATAR_COLORS[student.colorIndex % AVATAR_COLORS.length]));
+            nameLabel.setTextFill(Color.web(text()));
         });
         return row;
     }
@@ -401,53 +394,84 @@ public class AdminAttendanceView {
     private Button statusButton(StudentAttendance student, AttendanceStatus status, String key) {
         Button button = new Button();
         button.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 12));
-        button.setPadding(new Insets(8, 20, 8, 20));
-        button.setMinWidth(90);
-        button.setMinHeight(36);
+        button.setPadding(new Insets(6, 14, 6, 14));
+        button.setText(lang.get(key));
+        updateButtonState(button, student, status);
+        button.setOnAction(e -> {
+            if (student.status == status) {
+                student.status = AttendanceStatus.UNMARKED;
+            } else {
+                student.status = status;
+            }
+            refreshRows();
+        });
         languageUpdaters.add(() -> button.setText(lang.get(key)));
+        themeUpdaters.add(() -> button.setStyle(statusButtonStyle(student, status)));
         return button;
     }
 
-    private String attendanceBtnStyle(boolean active, AttendanceStatus status) {
-        if (status == AttendanceStatus.PRESENT) {
-            return active ? btnStyle("#16a34a", "#ffffff") : btnStyle(theme.isDark() ? "#374151" : "#d1d5db", theme.isDark() ? "#9ca3af" : "#6b7280");
-        }
-        if (status == AttendanceStatus.ABSENT) {
-            return active ? btnStyle("#ef4444", "#ffffff") : btnStyle(theme.isDark() ? "#374151" : "#d1d5db", theme.isDark() ? "#9ca3af" : "#6b7280");
-        }
-        return active ? btnStyle("#f59e0b", "#ffffff") : btnStyle(theme.isDark() ? "#374151" : "#d1d5db", theme.isDark() ? "#9ca3af" : "#6b7280");
+    private void updateButtonState(Button button, StudentAttendance student, AttendanceStatus btnStatus) {
+        button.setStyle(statusButtonStyle(student, btnStatus));
     }
 
-    private String btnStyle(String bg, String text) {
-        return "-fx-background-color: " + bg + "; -fx-text-fill: " + text + "; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-width: 0; -fx-cursor: hand; -fx-font-weight: 700;";
+    private String statusButtonStyle(StudentAttendance student, AttendanceStatus buttonStatus) {
+        boolean active = student.status == buttonStatus;
+        boolean anyChosen = student.status != AttendanceStatus.UNMARKED;
+
+        if (!anyChosen) {
+            if (buttonStatus == AttendanceStatus.PRESENT)
+                return buttonStyle("#16a34a", "#ffffff", "transparent");
+            if (buttonStatus == AttendanceStatus.ABSENT)
+                return buttonStyle("#ef4444", "#ffffff", "transparent");
+            return buttonStyle("#f59e0b", "#ffffff", "transparent");
+        }
+
+        if (active) {
+            if (buttonStatus == AttendanceStatus.PRESENT)
+                return buttonStyle("#16a34a", "#ffffff", "#15803d");
+            if (buttonStatus == AttendanceStatus.ABSENT)
+                return buttonStyle("#ef4444", "#ffffff", "#dc2626");
+            return buttonStyle("#f59e0b", "#ffffff", "#d97706");
+        }
+
+        String grayBg = theme.isDark() ? "#374151" : "#d1d5db";
+        String grayText = theme.isDark() ? "#6b7280" : "#9ca3af";
+        return buttonStyle(grayBg, grayText, "transparent");
+    }
+
+    private String buttonStyle(String bg, String text, String border) {
+        return "-fx-background-color: " + bg + "; -fx-text-fill: " + text + "; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: " + border + "; -fx-border-width: " + ("transparent".equals(border) ? "0" : "2") + "; -fx-cursor: hand;";
+    }
+
+    private void showSelectorMenu(MouseEvent event, List<String> options, Label target) {
+        ContextMenu menu = new ContextMenu();
+        String textC = theme.isDark() ? "#F8FAFC" : "#0f172a";
+        menu.setStyle("-fx-background-color: " + (theme.isDark() ? "#1E293B" : "#ffffff") + "; -fx-border-color: " + (theme.isDark() ? "#334155" : "#E2E8F0") + "; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 6; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 10, 0.15, 0, 4);");
+        for (String opt : options) {
+            MenuItem item = new MenuItem(opt);
+            boolean active = opt.equals(target.getText());
+            item.setStyle((active ? "-fx-text-fill: " + (theme.isDark() ? "#475569" : "#94A3B8") : "-fx-text-fill: " + textC) + "; -fx-font-weight: 700; -fx-font-size: 12; -fx-padding: 8 16;");
+            item.setDisable(active);
+            item.setOnAction(e -> {
+                target.setText(opt);
+                updateLanguage();
+                reloadStudents();
+            });
+            menu.getItems().add(item);
+        }
+        menu.show((Node) event.getSource(), Side.BOTTOM, 0, 0);
     }
 
     private void wireEvents() {
         searchField.textProperty().addListener((obs, oldValue, newValue) -> refreshRows());
-        gradeSelector.setOnAction(e -> reloadForCourse());
-        sectionSelector.setOnAction(e -> reloadForCourse());
         saveButton.setOnAction(e -> {
-            long pending = students.stream().filter(s -> s.status == AttendanceStatus.UNMARKED).count();
-            if (pending > 0) {
-                saveFeedback.setText("\u26a0 " + lang.get("attendance.pendingMessage").replace("{0}", String.valueOf(pending)));
-                saveFeedback.setStyle("-fx-text-fill: #ef4444;");
-                saveFeedback.setVisible(true);
-                return;
+            savedCourses.add(courseKey());
+            java.util.Map<String, AttendanceStatus> courseData = new java.util.HashMap<>();
+            for (StudentAttendance sa : students) {
+                courseData.put(sa.name(), sa.status);
             }
-            String grade = gradeSelector.getValue() == null ? "4to" : gradeSelector.getValue();
-            String section = sectionSelector.getValue() == null ? "E" : sectionSelector.getValue();
-            String courseKey = grade + " " + section;
-            for (var s : students) {
-                String status = switch (s.status) {
-                    case ABSENT -> "ausente";
-                    case EXCUSE -> "excusa";
-                    default -> "presente";
-                };
-                DataStore.setAttendance(courseKey, s.enrollment(), status);
-            }
-            saveFeedback.setText("\u2713 " + lang.get("attendance.savedMessage").replace("{0}", String.valueOf(students.size())));
-            saveFeedback.setStyle("-fx-text-fill: #16a34a;");
-            saveFeedback.setVisible(true);
+            attendanceStore.put(courseKey(), courseData);
+            updateSaveButtonText();
         });
     }
 
@@ -480,19 +504,16 @@ public class AdminAttendanceView {
     }
 
     private void updateLanguage() {
-        String grade = gradeSelector.getValue() == null ? "4to" : gradeSelector.getValue();
-        String section = sectionSelector.getValue() == null ? "E" : sectionSelector.getValue();
-        String courseKey = grade + " " + section;
+        String grade = gradeLabel.getText();
+        String section = sectionLabel.getText();
         breadcrumb.setText(lang.get("attendance.breadcrumb").replace("{0}", grade).replace("{1}", section));
         title.setText(lang.get("attendance.title"));
         summaryTitle.setText(lang.get("attendance.summary"));
         dateText.setText(LocalDate.now().format(DATE_FORMAT));
         tutorTag.setText(lang.get("attendance.tutorTag").toUpperCase(Locale.ROOT));
-        String encargado = DataStore.getEncargadoForCourse(courseKey);
-        tutorName.setText(encargado.isEmpty() ? lang.get("attendance.tutorName") : encargado);
+        tutorName.setText(lang.get("attendance.tutorName"));
         listTitle.setText(lang.get("attendance.studentList"));
         listSubtitle.setText(lang.get("attendance.enrolledCount").replace("{0}", String.valueOf(students.size())));
-        loadMoreButton.setText(lang.get("attendance.loadMore"));
         searchField.setPromptText(lang.get("attendance.search"));
         languageUpdaters.forEach(Runnable::run);
     }
@@ -502,23 +523,6 @@ public class AdminAttendanceView {
         absentCount.setText(String.valueOf(students.stream().filter(s -> s.status == AttendanceStatus.ABSENT).count()));
         excuseCount.setText(String.valueOf(students.stream().filter(s -> s.status == AttendanceStatus.EXCUSE).count()));
         listSubtitle.setText(lang.get("attendance.enrolledCount").replace("{0}", String.valueOf(students.size())));
-    }
-
-    private void persistAttendance(StudentAttendance student) {
-        String grade = gradeSelector.getValue() == null ? "4to" : gradeSelector.getValue();
-        String section = sectionSelector.getValue() == null ? "E" : sectionSelector.getValue();
-        String courseKey = grade + " " + section;
-        String status = switch (student.status) {
-            case ABSENT -> "ausente";
-            case EXCUSE -> "excusa";
-            default -> "presente";
-        };
-        DataStore.setAttendance(courseKey, student.enrollment(), status);
-    }
-
-    public void selectCourse(String grade, String section) {
-        gradeSelector.setValue(grade);
-        sectionSelector.setValue(section);
     }
 
     private void applyTheme() {
@@ -552,84 +556,69 @@ public class AdminAttendanceView {
     private String textSecondary() { return theme.isDark() ? "#CBD5E1" : "#1e293b"; }
     private String textMuted() { return theme.isDark() ? "#94A3B8" : "#334155"; }
 
-    private void reloadForCourse() {
+    private void loadInitialData() {
+        reloadStudents();
+    }
+
+    private void reloadStudents() {
         students.clear();
-        String grade = gradeSelector.getValue() == null ? "4to" : gradeSelector.getValue();
-        String section = sectionSelector.getValue() == null ? "E" : sectionSelector.getValue();
-        String courseKey = grade + " " + section;
-        DataStore.seedIfEmpty();
-        boolean courseExists = DataStore.getCourses().stream()
-            .anyMatch(c -> (c.grado() + " " + c.seccion()).equals(courseKey));
-        if (!courseExists) {
-            listSubtitle.setText(lang.get("attendance.enrolledCount").replace("{0}", "0"));
-            updateSummary();
-            refreshRows();
-            return;
+        String g = gradeLabel.getText();
+
+        int count;
+        if (g.startsWith("4")) count = 30 + RNG.nextInt(10);
+        else if (g.startsWith("5")) count = 30 + RNG.nextInt(6);
+        else if (g.startsWith("6")) count = 25 + RNG.nextInt(6);
+        else count = 20 + RNG.nextInt(11);
+
+        for (int i = 0; i < count; i++) {
+            String name = LAST_NAMES[RNG.nextInt(LAST_NAMES.length)] + ", " + FIRST_NAMES[RNG.nextInt(FIRST_NAMES.length)];
+            students.add(new StudentAttendance(name, RNG.nextInt(8)));
         }
-        var dbStudents = DataStore.getStudentsForCourse(courseKey);
-        var attendance = DataStore.getAttendanceForCourse(courseKey);
-        int colorIdx = 0;
-        for (var s : dbStudents) {
-            String initials = s.nombre().substring(0, 1);
-            if (s.nombre().contains(" ")) {
-                String[] parts = s.nombre().split(" ");
-                initials = parts[0].substring(0, 1) + parts[1].substring(0, 1);
-            }
-            StudentAttendance sa = new StudentAttendance(
-                s.nombre(), s.nombre().toLowerCase().replace(" ",".") + "@student.edu",
-                s.matricula(), initials.toUpperCase(Locale.ROOT), colorIdx % 4);
-            colorIdx++;
-            String attStatus = attendance.getOrDefault(s.matricula(), "presente");
-            sa.status = switch (attStatus) {
-                case "ausente" -> AttendanceStatus.ABSENT;
-                case "excusa" -> AttendanceStatus.EXCUSE;
-                default -> AttendanceStatus.PRESENT;
-            };
-            students.add(sa);
-        }
-        String encargado = DataStore.getEncargadoForCourse(courseKey);
-        tutorName.setText(encargado.isEmpty() ? "—" : encargado);
-        String encInit = encargado.isEmpty() ? "—" :
-            (encargado.contains(" ") ? encargado.split(" ")[0].substring(0,1) + encargado.split(" ")[1].substring(0,1)
-                                    : encargado.substring(0,1));
-        tutorAvatarLabel.setText(encInit);
-        updateSummary();
+        updateSaveButtonText();
         refreshRows();
     }
 
-    private enum AttendanceStatus { UNMARKED, PRESENT, ABSENT, EXCUSE }
+    private String courseKey() {
+        return gradeLabel.getText() + " " + sectionLabel.getText();
+    }
+
+    private void updateSaveButtonText() {
+        if (savedCourses.contains(courseKey())) {
+            saveLabel.setText(lang.get("attendance.saved"));
+        } else {
+            saveLabel.setText(lang.get("attendance.save"));
+        }
+    }
+
+    private static final Random RNG = new Random(42);
+    private static final String[] FIRST_NAMES = {
+        "Alejandro", "Lucía", "Carlos", "Sofía", "Diego", "Valentina", "Camila", "Daniel",
+        "Mariana", "Sebastián", "Isabella", "Mateo", "Ximena", "Santiago", "Fernanda", "Nicolás",
+        "Valeria", "Emiliano", "Renata", "Mauricio", "Paulina", "Alan", "Fátima", "Raúl",
+        "Abril", "Emilio", "Daniela", "Gustavo", "Jimena", "Fernando", "Benjamín", "Natalia"
+    };
+    private static final String[] LAST_NAMES = {
+        "García López", "Martínez Ríos", "Pérez Soto", "López Vargas", "Ramírez Cruz",
+        "Torres Medina", "Núñez Vera", "Santos Rojas", "Díaz Mendoza", "Ortiz Guzmán",
+        "Reyes Aguilar", "Medina Cárdenas", "Cruz Peña", "Vega Roldán", "Campos Navarro",
+        "Paredes Vega", "Figueroa Lara", "Acosta Molina", "Navarrete Ríos", "Salinas Cordero",
+        "Guerrero Luna", "Maldonado Pacheco", "Sosa Del Valle", "Castillo Peña", "Rivas Contreras",
+        "Peralta Sandoval", "Herrera Campos", "Morales Vega", "Castro Rivas", "Flores Delgado",
+        "Ríos Paredes", "Delgado Rojas"
+    };
+
+    public enum AttendanceStatus { UNMARKED, PRESENT, ABSENT, EXCUSE }
 
     private static class StudentAttendance {
         private final String name;
-        private final String email;
-        private final String enrollment;
-        private final String initials;
         private final int colorIndex;
         private AttendanceStatus status = AttendanceStatus.UNMARKED;
 
-        StudentAttendance(String name, String email, String enrollment, String initials, int colorIndex) {
+        StudentAttendance(String name, int colorIndex) {
             this.name = name;
-            this.email = email;
-            this.enrollment = enrollment;
-            this.initials = initials;
             this.colorIndex = colorIndex;
         }
 
         String name() { return name; }
-        String email() { return email; }
-        String enrollment() { return enrollment; }
-        String initials() { return initials; }
-
-        String avatarBg(boolean dark) {
-            String[] light = {"#e0e7ff", "#dbeafe", "#fce7f3", "#dcfce7"};
-            String[] darkColors = {"#312e81", "#1e3a8a", "#831843", "#14532d"};
-            return dark ? darkColors[colorIndex % darkColors.length] : light[colorIndex % light.length];
-        }
-
-        String avatarText(boolean dark) {
-            String[] light = {"#4338ca", "#1d4ed8", "#be185d", "#15803d"};
-            String[] darkColors = {"#c7d2fe", "#bfdbfe", "#f9a8d4", "#bbf7d0"};
-            return dark ? darkColors[colorIndex % darkColors.length] : light[colorIndex % light.length];
-        }
     }
 }

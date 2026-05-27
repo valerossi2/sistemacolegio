@@ -372,15 +372,6 @@ public class AdminAttendanceView {
     }
 
     private void updateButtonState(Button button, StudentAttendance student, AttendanceStatus btnStatus) {
-        boolean isUnmarked = student.status == AttendanceStatus.UNMARKED;
-        boolean isActive = student.status == btnStatus;
-        if (isUnmarked || isActive) {
-            button.setPadding(new Insets(6, 14, 6, 14));
-            button.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 12));
-        } else {
-            button.setPadding(new Insets(2, 6, 2, 6));
-            button.setFont(Font.font("Plus Jakarta Sans", FontWeight.NORMAL, 10));
-        }
         button.setStyle(statusButtonStyle(student, btnStatus));
     }
 

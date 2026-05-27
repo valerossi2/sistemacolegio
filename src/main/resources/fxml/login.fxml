@@ -76,6 +76,8 @@
                            onAction="#onForgotPassword"/>
             </HBox>
 
+            <Label fx:id="errorLabel" styleClass="error-label" wrapText="true"
+                   visible="false" managed="false" maxWidth="Infinity"/>
             <Button text="Iniciar Sesión" styleClass="btn-primary"
                     maxWidth="Infinity" onAction="#onLogin">
                 <VBox.margin><Insets top="4"/></VBox.margin>

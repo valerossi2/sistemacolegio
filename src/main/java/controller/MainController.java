@@ -4,7 +4,11 @@ import theme.ThemeManager;
 import util.LanguageManager;
 import java.io.File;
 import java.util.prefs.Preferences;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -87,6 +91,10 @@ public class MainController {
     private final List<Text> scheduleDetList = new ArrayList<>();
     private final List<Rectangle> perfBarsList = new ArrayList<>();
     private final List<Text> perfBarLabelList = new ArrayList<>();
+    private final int[] perfOriginalHeights = new int[6];
+    private int selectedPerfBar = -1;
+    private int defaultHighlightBar = -1;
+    private static final int PERF_BAR_GROW = 6;
     private Circle headerAvatar;
     private SVGPath headerAvatarSvg;
     private Preferences prefs = Preferences.userNodeForPackage(controller.Configuracion.class);
@@ -770,20 +778,57 @@ public class MainController {
         chart.setAlignment(Pos.BOTTOM_CENTER);
         chart.setPrefHeight(120);
 
-        String[] labels = {"5to E", "6to A", "4to B", "4to C", "5to A", "6to B"};
-        int[] heights = {60, 70, 80, 60, 110, 90};
+        // Top 6 cursos por promedio (grado + seccion)
+        var topCourses = List.of(
+            new String[]{"5to A", "9.2"},
+            new String[]{"4to B", "8.8"},
+            new String[]{"6to A", "8.5"},
+            new String[]{"3ro C", "8.1"},
+            new String[]{"5to E", "7.6"},
+            new String[]{"4to C", "7.2"}
+        );
+        double maxScore = Double.parseDouble(topCourses.get(0)[1]);
 
         List<Rectangle> bars = new ArrayList<>();
         List<Text> barLabels = new ArrayList<>();
 
-        for (int i = 0; i < labels.length; i++) {
+        for (int i = 0; i < topCourses.size(); i++) {
+            int h = (int)(Double.parseDouble(topCourses.get(i)[1]) / maxScore * 90 + 10);
+            perfOriginalHeights[i] = h;
+            if (i == 0) defaultHighlightBar = i;
+
+            int idx = i;
+            boolean isTop = i == 0;
             VBox barBox = new VBox(8);
             barBox.setAlignment(Pos.BOTTOM_CENTER);
-            Rectangle bar = new Rectangle(20, heights[i], Color.web(c(L_PRIMARY, D_PRIMARY)));
+            Rectangle bar = new Rectangle(20, h, Color.web(isTop ? c(L_PRIMARY, D_PRIMARY) : c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
             bar.setArcWidth(10); bar.setArcHeight(10);
-            Text lbl = new Text(labels[i]);
+            Text lbl = new Text(topCourses.get(i)[0]);
             lbl.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
-            lbl.setFill(Color.web(c(i == 4 ? L_PRIMARY : L_OUTLINE, D_ON_SURFACE)));
+            lbl.setFill(Color.web(isTop ? c(L_PRIMARY, D_ON_SURFACE) : c(L_OUTLINE, D_OUTLINE)));
+
+            bar.setOnMouseEntered(e -> {
+                if (selectedPerfBar == -1) {
+                    growBar(idx);
+                }
+            });
+            bar.setOnMouseExited(e -> {
+                if (selectedPerfBar == -1) {
+                    restoreBars();
+                } else {
+                    growBar(selectedPerfBar);
+                }
+            });
+            bar.setOnMouseClicked(e -> {
+                if (selectedPerfBar == idx) {
+                    selectedPerfBar = -1;
+                    restoreBars();
+                } else {
+                    selectedPerfBar = idx;
+                    growBar(idx);
+                }
+            });
+
             barBox.getChildren().addAll(bar, lbl);
             chart.getChildren().add(barBox);
             bars.add(bar);
@@ -813,11 +858,35 @@ public class MainController {
             perfSubText.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
             moreDots.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
             fT.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
-            for (int i = 0; i < bars.size(); i++) {
-                bars.get(i).setFill(Color.web(c(i == 4 ? L_PRIMARY : L_PRIMARY_FIXED, D_PRIMARY)));
-                barLabels.get(i).setFill(Color.web(c(i == 4 ? L_PRIMARY : L_OUTLINE, D_ON_SURFACE)));
+            for (int i = 0; i < perfBarsList.size(); i++) {
+                boolean isDefault = defaultHighlightBar == i;
+                perfBarsList.get(i).setFill(Color.web(isDefault ? c(L_PRIMARY, D_PRIMARY) : c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
+                if (i < perfBarLabelList.size())
+                    perfBarLabelList.get(i).setFill(Color.web(isDefault ? c(L_PRIMARY, D_ON_SURFACE) : c(L_OUTLINE, D_OUTLINE)));
             }
+            if (selectedPerfBar == -1) restoreBars(); else growBar(selectedPerfBar);
         });
+    }
+
+    private void animateBarHeight(Rectangle bar, double targetHeight) {
+        Timeline tl = new Timeline();
+        double start = bar.getHeight();
+        if (Math.abs(start - targetHeight) < 0.5) return;
+        tl.getKeyFrames().add(new KeyFrame(Duration.ZERO, new KeyValue(bar.heightProperty(), start, Interpolator.EASE_BOTH)));
+        tl.getKeyFrames().add(new KeyFrame(Duration.millis(500), new KeyValue(bar.heightProperty(), targetHeight, Interpolator.EASE_BOTH)));
+        tl.play();
+    }
+
+    private void growBar(int index) {
+        for (int i = 0; i < perfBarsList.size(); i++) {
+            animateBarHeight(perfBarsList.get(i), i == index ? perfOriginalHeights[i] + PERF_BAR_GROW : perfOriginalHeights[i]);
+        }
+    }
+
+    private void restoreBars() {
+        for (int i = 0; i < perfBarsList.size(); i++) {
+            animateBarHeight(perfBarsList.get(i), perfOriginalHeights[i]);
+        }
     }
 
     private void setupSchedulePanel() {

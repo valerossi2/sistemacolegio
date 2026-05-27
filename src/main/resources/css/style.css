@@ -246,3 +246,11 @@
     -fx-text-fill: #9999b5;
     -fx-font-size: 12px;
 }
+
+.error-label {
+    -fx-text-fill: #dc2626;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 0 0 0;
+    -fx-alignment: center;
+}

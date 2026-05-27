@@ -1,10 +1,10 @@
 .root {
-    -fx-background-color: #F8F9FA;
+    -fx-background-color: #F8FAFC;
 }
 
 .sidebar {
     -fx-background-color: #FFFFFF;
-    -fx-border-color: transparent #E5E7EB transparent transparent;
+    -fx-border-color: transparent #E2E8F0 transparent transparent;
     -fx-background-radius: 0 24 24 0;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0, 2, 0);
 }
@@ -20,24 +20,24 @@
     -fx-background-color: #F1F5F9; 
     -fx-cursor: hand; 
     -fx-background-radius: 12; 
-    -fx-text-fill: #2B54A8; 
+    -fx-text-fill: #2563EB; 
 } 
 
 .sidebar-active { 
-    -fx-background-color: #2B54A8; 
+    -fx-background-color: #2563EB; 
     -fx-cursor: hand; 
     -fx-background-radius: 12; 
 } 
 
 .sidebar-active:hover { 
-    -fx-background-color: #1E40AF; 
+    -fx-background-color: #1D4ED8; 
     -fx-background-radius: 12; 
 } 
 
 .search-container { 
     -fx-background-color: #F1F5F9; 
     -fx-background-radius: 32; 
-    -fx-border-color: #E5E7EB; 
+    -fx-border-color: #E2E8F0; 
     -fx-border-radius: 32; 
 } 
 
@@ -52,29 +52,29 @@
 .glass-card { 
     -fx-background-color: #FFFFFF; 
     -fx-background-radius: 24; 
-    -fx-border-color: #E5E7EB; 
+    -fx-border-color: #E2E8F0; 
     -fx-border-radius: 24; 
     -fx-border-width: 1;
 } 
 
 .course-row { 
-    -fx-border-color: transparent transparent #E5E7EB transparent; 
+    -fx-border-color: transparent transparent #E2E8F0 transparent; 
 } 
 
 .course-row:hover { 
-    -fx-background-color: #F9FAFB; 
+    -fx-background-color: #F1F5F9; 
 } 
 
 .schedule-row { 
-    -fx-border-color: transparent transparent #E5E7EB transparent; 
+    -fx-border-color: transparent transparent #E2E8F0 transparent; 
 } 
 
 .schedule-row:hover { 
-    -fx-background-color: #F9FAFB; 
+    -fx-background-color: #F1F5F9; 
 } 
 
 .text-button { 
-    -fx-text-fill: #2B54A8; 
+    -fx-text-fill: #2563EB; 
     -fx-background-color: transparent; 
     -fx-underline: false; 
     -fx-cursor: hand; 
@@ -91,15 +91,15 @@
 } 
 
 .growth-badge { 
-    -fx-background-color: #DBEAFE; 
-    -fx-text-fill: #2B54A8; 
+    -fx-background-color: #EFF6FF; 
+    -fx-text-fill: #2563EB; 
     -fx-font-weight: bold; 
     -fx-padding: 4 12 4 12; 
     -fx-background-radius: 16; 
 } 
 
 .fab-button { 
-    -fx-background-color: #2B54A8; 
+    -fx-background-color: #2563EB; 
     -fx-background-radius: 32; 
     -fx-cursor: hand; 
 } 

@@ -112,21 +112,21 @@ public class MainController {
 
     private Preferences prefs = Preferences.userNodeForPackage(controller.Configuracion.class);
 
-    private final String L_PRIMARY = "#2B54A8";
+    private final String L_PRIMARY = "#2563EB";
     private final String L_PRIMARY_CONTAINER = "#1D4ED8";
-    private final String L_BG = "#F8F9FA";
+    private final String L_BG = "#F8FAFC";
     private final String L_SURFACE_LOW = "#F1F5F9";
     private final String L_SURFACE_CONTAINER = "#E2E8F0";
-    private final String L_SURFACE_CONTAINER_HIGH = "#E5E7EB";
-    private final String L_ON_SURFACE = "#1F2937";
-    private final String L_ON_SURFACE_VARIANT = "#6B7280";
-    private final String L_OUTLINE = "#9CA3AF";
+    private final String L_SURFACE_CONTAINER_HIGH = "#E2E8F0";
+    private final String L_ON_SURFACE = "#0F172A";
+    private final String L_ON_SURFACE_VARIANT = "#475569";
+    private final String L_OUTLINE = "#94A3B8";
     private final String L_WHITE = "#ffffff";
-    private final String L_PRIMARY_FIXED = "#DBEAFE";
+    private final String L_PRIMARY_FIXED = "#EFF6FF";
     private final String L_SECONDARY = "#059669";
     private final String L_SECONDARY_FIXED = "#D1FAE5";
-    private final String L_TERTIARY = "#6B7280";
-    private final String L_TERTIARY_CONTAINER = "#9CA3AF";
+    private final String L_TERTIARY = "#475569";
+    private final String L_TERTIARY_CONTAINER = "#94A3B8";
     private final String L_TERTIARY_FIXED = "#F3F4F6";
 
     private final String D_PRIMARY = "#3B82F6";
@@ -136,10 +136,10 @@ public class MainController {
     private final String D_SURFACE_CONTAINER = "#334155";
     private final String D_SURFACE_CONTAINER_HIGH = "#475569";
     private final String D_ON_SURFACE = "#F8FAFC";
-    private final String D_ON_SURFACE_VARIANT = "#CBD5E1";
+    private final String D_ON_SURFACE_VARIANT = "#94A3B8";
     private final String D_OUTLINE = "#64748B";
     private final String D_WHITE = "#1E293B";
-    private final String D_PRIMARY_FIXED = "#1E3A5F";
+    private final String D_PRIMARY_FIXED = "#1E3A8A";
     private final String D_SECONDARY = "#34D399";
     private final String D_SECONDARY_FIXED = "#065F46";
     private final String D_TERTIARY = "#94A3B8";
@@ -818,7 +818,7 @@ public class MainController {
         if (dark) {
             return "-fx-background-color: #1E293B; -fx-background-radius: 24; -fx-border-color: #334155; -fx-border-radius: 24; -fx-border-width: 1;";
         }
-        return "-fx-background-color: #FFFFFF; -fx-background-radius: 24; -fx-border-color: #E5E7EB; -fx-border-radius: 24; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);";
+            return "-fx-background-color: #FFFFFF; -fx-background-radius: 24; -fx-border-color: #E2E8F0; -fx-border-radius: 24; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);";
     }
 
     private VBox createKpiCard(String label, String value, String lightBg, String iconColor, String iconPath) {

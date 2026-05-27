@@ -141,7 +141,7 @@
 .student-name-label {
     -fx-font-size: 14px;
     -fx-font-weight: 600;
-    -fx-text-fill: #1F2937;
+    -fx-text-fill: #0F172A;
 }
 .student-email-label {
     -fx-font-size: 12px;
@@ -156,7 +156,7 @@
     -fx-padding: 10px;
     -fx-font-size: 14px;
     -fx-font-weight: 600;
-    -fx-text-fill: #1F2937;
+    -fx-text-fill: #0F172A;
     -fx-alignment: CENTER;
     -fx-pref-width: 120px;
 }
@@ -179,10 +179,10 @@
     -fx-background-color: #FCE7F3;
 }
 .student-avatar-svg {
-    -fx-fill: #2B54A8;
+    -fx-fill: #2563EB;
 }
 .student-avatar-svg--male {
-    -fx-fill: #2B54A8;
+    -fx-fill: #2563EB;
 }
 .student-avatar-svg--female {
     -fx-fill: #EC4899;

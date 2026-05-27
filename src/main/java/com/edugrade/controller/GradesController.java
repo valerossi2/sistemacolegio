@@ -163,7 +163,7 @@ public class GradesController implements Initializable {
         colMatricula.setCellFactory(col -> new TableCell<>() {
             private final Label lbl = new Label();
             {
-                lbl.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 14px; -fx-font-weight: 500;");
+                lbl.setStyle("-fx-text-fill: #475569; -fx-font-size: 14px; -fx-font-weight: 500;");
                 setGraphic(lbl);
                 setPadding(new Insets(8, 16, 8, 16));
             }

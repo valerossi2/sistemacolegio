@@ -282,7 +282,7 @@ public class MaestrosController {
         return col -> new TableCell<>() {
             private final Label label = new Label();
             {
-                label.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 14px;");
+                label.setStyle("-fx-text-fill: #475569; -fx-font-size: 14px;");
                 setGraphic(label);
                 setPadding(new Insets(8, 16, 8, 16));
             }

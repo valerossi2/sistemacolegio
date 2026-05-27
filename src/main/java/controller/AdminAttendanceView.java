@@ -446,7 +446,7 @@ public class AdminAttendanceView {
     private void showSelectorMenu(MouseEvent event, List<String> options, Label target) {
         ContextMenu menu = new ContextMenu();
         String textC = theme.isDark() ? "#F8FAFC" : "#0f172a";
-        menu.setStyle("-fx-background-color: " + (theme.isDark() ? "#1E293B" : "#ffffff") + "; -fx-border-color: " + (theme.isDark() ? "#334155" : "#E5E7EB") + "; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 6; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 10, 0.15, 0, 4);");
+        menu.setStyle("-fx-background-color: " + (theme.isDark() ? "#1E293B" : "#ffffff") + "; -fx-border-color: " + (theme.isDark() ? "#334155" : "#E2E8F0") + "; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 6; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 10, 0.15, 0, 4);");
         for (String opt : options) {
             MenuItem item = new MenuItem(opt);
             boolean active = opt.equals(target.getText());

@@ -68,6 +68,7 @@ public class AdminAttendanceView {
     private final Label listTitle = new Label();
     private final Label listSubtitle = new Label();
     private final Button saveButton = new Button();
+    private final Label saveLabel = new Label();
     private final Label gradeLabel = new Label("5to");
     private final Label sectionLabel = new Label("E");
     private final TextField searchField = new TextField();
@@ -75,6 +76,7 @@ public class AdminAttendanceView {
     private final HBox selectorBox = new HBox(8);
     private final HBox pageHeader = new HBox(24);
     private boolean compact;
+    private final java.util.Set<String> savedCourses = new java.util.HashSet<>();
 
     public AdminAttendanceView(ThemeManager theme) {
         this.theme = theme;
@@ -267,7 +269,7 @@ public class AdminAttendanceView {
 
         tableCard.getChildren().addAll(tableHeader, header, rowScroll);
 
-        HBox saveContent = new HBox(8, icon(ICON_SAVE, 17, "#ffffff"), new Label());
+        HBox saveContent = new HBox(8, icon(ICON_SAVE, 17, "#ffffff"), saveLabel);
         saveContent.setAlignment(Pos.CENTER);
         saveButton.setGraphic(saveContent);
         saveButton.setMaxWidth(Double.MAX_VALUE);
@@ -278,7 +280,7 @@ public class AdminAttendanceView {
         saveButton.setOnMouseEntered(e -> saveButton.setStyle(saveButton.getStyle().replace("#2563eb", "#1d4ed8")));
         saveButton.setOnMouseExited(e -> saveButton.setStyle(saveButton.getStyle().replace("#1d4ed8", "#2563eb")));
 
-        languageUpdaters.add(() -> ((Label) saveContent.getChildren().get(1)).setText(lang.get("attendance.save")));
+        languageUpdaters.add(() -> updateSaveButtonText());
         themeUpdaters.add(() -> {
             tableCard.setStyle(cardStyle(16, borderSoft()));
             tableHeader.setStyle("-fx-border-color: transparent transparent " + borderSoft() + " transparent;");
@@ -288,7 +290,7 @@ public class AdminAttendanceView {
             listSubtitle.setTextFill(Color.web(textMuted()));
             tableDateLabel.setTextFill(Color.web(textMuted()));
             saveButton.setStyle("-fx-background-color: #2563eb; -fx-background-radius: 16; -fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: 700; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.25), 8, 0.2, 0, 2);");
-            ((Label) saveContent.getChildren().get(1)).setTextFill(Color.WHITE);
+            saveLabel.setTextFill(Color.WHITE);
         });
         refreshRows();
     }
@@ -429,6 +431,8 @@ public class AdminAttendanceView {
     private void wireEvents() {
         searchField.textProperty().addListener((obs, oldValue, newValue) -> refreshRows());
         saveButton.setOnAction(e -> {
+            savedCourses.add(courseKey());
+            updateSaveButtonText();
             new Alert(Alert.AlertType.INFORMATION, "Asistencia guardada", ButtonType.OK).showAndWait();
         });
     }
@@ -523,16 +527,29 @@ public class AdminAttendanceView {
         String g = gradeLabel.getText();
 
         int count;
-        if (g.startsWith("4")) count = 30 + RNG.nextInt(10); // 30-39
-        else if (g.startsWith("5")) count = 30 + RNG.nextInt(6); // 30-35
-        else if (g.startsWith("6")) count = 25 + RNG.nextInt(6); // 25-30
+        if (g.startsWith("4")) count = 30 + RNG.nextInt(10);
+        else if (g.startsWith("5")) count = 30 + RNG.nextInt(6);
+        else if (g.startsWith("6")) count = 25 + RNG.nextInt(6);
         else count = 20 + RNG.nextInt(11);
 
         for (int i = 0; i < count; i++) {
             String name = LAST_NAMES[RNG.nextInt(LAST_NAMES.length)] + ", " + FIRST_NAMES[RNG.nextInt(FIRST_NAMES.length)];
             students.add(new StudentAttendance(name, RNG.nextInt(8)));
         }
+        updateSaveButtonText();
         refreshRows();
+    }
+
+    private String courseKey() {
+        return gradeLabel.getText() + " " + sectionLabel.getText();
+    }
+
+    private void updateSaveButtonText() {
+        if (savedCourses.contains(courseKey())) {
+            saveLabel.setText("Asistencia guardada");
+        } else {
+            saveLabel.setText(lang.get("attendance.save"));
+        }
     }
 
     private static final Random RNG = new Random(42);

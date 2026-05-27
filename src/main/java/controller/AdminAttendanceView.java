@@ -36,6 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 public class AdminAttendanceView {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -523,59 +524,36 @@ public class AdminAttendanceView {
     private void reloadStudents() {
         students.clear();
         String g = gradeLabel.getText();
-        String s = sectionLabel.getText();
-        String key = g + " " + s;
-        List<StudentAttendance> data = sampleData.getOrDefault(key, sampleData.get("5to E"));
-        if (data != null) {
-            for (StudentAttendance sa : data) {
-                students.add(new StudentAttendance(sa.name(), sa.colorIndex));
-            }
+
+        int count;
+        if (g.startsWith("4")) count = 30 + RNG.nextInt(10); // 30-39
+        else if (g.startsWith("5")) count = 30 + RNG.nextInt(6); // 30-35
+        else if (g.startsWith("6")) count = 25 + RNG.nextInt(6); // 25-30
+        else count = 20 + RNG.nextInt(11);
+
+        for (int i = 0; i < count; i++) {
+            String name = LAST_NAMES[RNG.nextInt(LAST_NAMES.length)] + ", " + FIRST_NAMES[RNG.nextInt(FIRST_NAMES.length)];
+            students.add(new StudentAttendance(name, RNG.nextInt(8)));
         }
         refreshRows();
     }
 
-    private static final java.util.Map<String, List<StudentAttendance>> sampleData = new java.util.LinkedHashMap<>();
-    static {
-        sampleData.put("5to E", List.of(
-            new StudentAttendance("García López, Alejandro Miguel", 0),
-            new StudentAttendance("Martínez Ríos, Lucía Fernanda", 1),
-            new StudentAttendance("Pérez Soto, Carlos Andrés", 2),
-            new StudentAttendance("López Vargas, Sofía Elena", 3),
-            new StudentAttendance("Ramírez Cruz, Diego Antonio", 0),
-            new StudentAttendance("Torres Medina, Valentina Isabel", 1)
-        ));
-        sampleData.put("5to D", List.of(
-            new StudentAttendance("Herrera Campos, Sebastián", 2),
-            new StudentAttendance("Morales Vega, Isabella", 3),
-            new StudentAttendance("Castro Rivas, Mateo", 0),
-            new StudentAttendance("Flores Delgado, Camila", 1),
-            new StudentAttendance("Ríos Paredes, Benjamín", 2)
-        ));
-        sampleData.put("4to A", List.of(
-            new StudentAttendance("Díaz Mendoza, Valentina", 3),
-            new StudentAttendance("Ortiz Guzmán, Santiago", 0),
-            new StudentAttendance("Reyes Aguilar, Mariana", 1),
-            new StudentAttendance("Medina Cárdenas, Nicolás", 2),
-            new StudentAttendance("Cruz Peña, Ximena", 3),
-            new StudentAttendance("Vega Roldán, Fernando", 0),
-            new StudentAttendance("Campos Navarro, Jimena", 1)
-        ));
-        sampleData.put("4to B", List.of(
-            new StudentAttendance("Paredes Vega, Emiliano", 2),
-            new StudentAttendance("Figueroa Lara, Renata", 3),
-            new StudentAttendance("Acosta Molina, Mauricio", 0),
-            new StudentAttendance("Navarrete Ríos, Paulina", 1),
-            new StudentAttendance("Salinas Cordero, Alan", 2)
-        ));
-        sampleData.put("3ro C", List.of(
-            new StudentAttendance("Guerrero Luna, Fátima", 3),
-            new StudentAttendance("Maldonado Pacheco, Raúl", 0),
-            new StudentAttendance("Sosa Del Valle, Abril", 1),
-            new StudentAttendance("Castillo Peña, Emilio", 2),
-            new StudentAttendance("Rivas Contreras, Daniela", 3),
-            new StudentAttendance("Peralta Sandoval, Gustavo", 0)
-        ));
-    }
+    private static final Random RNG = new Random(42);
+    private static final String[] FIRST_NAMES = {
+        "Alejandro", "Lucía", "Carlos", "Sofía", "Diego", "Valentina", "Camila", "Daniel",
+        "Mariana", "Sebastián", "Isabella", "Mateo", "Ximena", "Santiago", "Fernanda", "Nicolás",
+        "Valeria", "Emiliano", "Renata", "Mauricio", "Paulina", "Alan", "Fátima", "Raúl",
+        "Abril", "Emilio", "Daniela", "Gustavo", "Jimena", "Fernando", "Benjamín", "Natalia"
+    };
+    private static final String[] LAST_NAMES = {
+        "García López", "Martínez Ríos", "Pérez Soto", "López Vargas", "Ramírez Cruz",
+        "Torres Medina", "Núñez Vera", "Santos Rojas", "Díaz Mendoza", "Ortiz Guzmán",
+        "Reyes Aguilar", "Medina Cárdenas", "Cruz Peña", "Vega Roldán", "Campos Navarro",
+        "Paredes Vega", "Figueroa Lara", "Acosta Molina", "Navarrete Ríos", "Salinas Cordero",
+        "Guerrero Luna", "Maldonado Pacheco", "Sosa Del Valle", "Castillo Peña", "Rivas Contreras",
+        "Peralta Sandoval", "Herrera Campos", "Morales Vega", "Castro Rivas", "Flores Delgado",
+        "Ríos Paredes", "Delgado Rojas"
+    };
 
     private enum AttendanceStatus { UNMARKED, PRESENT, ABSENT, EXCUSE }
 

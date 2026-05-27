@@ -60,9 +60,6 @@
                             <Label fx:id="professorName"
                                    text=""
                                    styleClass="professor-name"/>
-                            <Label fx:id="professorSubject"
-                                   text=""
-                                   styleClass="professor-subject"/>
                         </VBox>
                     </HBox>
 
@@ -131,13 +128,7 @@
                 <Region styleClass="card-divider" VBox.vgrow="NEVER">
                     <VBox.margin><Insets top="12" bottom="12"/></VBox.margin>
                 </Region>
-                <ScrollPane fitToWidth="true"
-                            hbarPolicy="NEVER"
-                            vbarPolicy="AS_NEEDED"
-                            prefHeight="320"
-                            style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
-                    <VBox fx:id="scheduleRows" spacing="8" />
-                </ScrollPane>
+                <VBox fx:id="scheduleRows" />
             </VBox>
         </HBox>
 

@@ -15,12 +15,14 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -37,6 +39,7 @@ public class DetalleProfesorController implements Initializable {
     private ThemeManager theme;
     private Runnable onBackToList;
     private MaestrosController.TeacherRow currentTeacher;
+    private java.time.LocalTime now = java.time.LocalTime.now();
 
     @FXML private VBox root;
     @FXML private ScrollPane scrollPane;
@@ -45,7 +48,6 @@ public class DetalleProfesorController implements Initializable {
     @FXML private Label pageTitle;
     @FXML private StackPane avatarContainer;
     @FXML private Label professorName;
-    @FXML private Label professorSubject;
     @FXML private Label professorEmail;
     @FXML private Label professorSection;
     @FXML private Label professorStatus;
@@ -91,7 +93,6 @@ public class DetalleProfesorController implements Initializable {
     private void loadTeacherData() {
         if (currentTeacher == null) return;
         professorName.setText(currentTeacher.nombre());
-        professorSubject.setText(currentTeacher.materia());
         professorEmail.setText(currentTeacher.email());
         professorSection.setText(currentTeacher.seccion());
         professorStatus.setText(currentTeacher.estado());
@@ -162,36 +163,116 @@ public class DetalleProfesorController implements Initializable {
 
     private void loadSchedule() {
         scheduleRows.getChildren().clear();
+
         String[][] data = {
-            {"08:00 - 09:30", "Matematicas", "Salon 402"},
-            {"09:45 - 11:15", currentTeacher != null ? currentTeacher.materia() : "Historia", "Aula 203"},
-            {"11:30 - 13:00", "Laboratorio", "Lab B"},
-            {"14:00 - 15:30", "Tutorias", "Salon 105"},
-            {"15:45 - 17:15", "Arte", "Galeria"}
+            {"07:00", "08:30", "Matematicas"},
+            {"08:45", "10:15", currentTeacher != null ? currentTeacher.materia() : "Historia"},
+            {"10:30", "12:00", "Laboratorio"},
+            {"13:00", "14:30", "Tutorias"},
+            {"14:45", "16:15", "Arte"}
         };
+
+        String trackColor = c("#E5E7EB", "#334155");
+        String fillColor = c("#2B54A8", "#3B82F6");
+        String currentColor = "#F59E0B";
+        String inactiveColor = c("#D1D5DB", "#475569");
+        String labelColor = c("#1F2937", "#F8FAFC");
+        String labelMuted = c("#6B7280", "#94A3B8");
+        String labelDim = c("#9CA3AF", "#64748B");
+
+        // find last active end for fill height
+        String lastActiveEnd = "07:00";
         for (var row : data) {
-            HBox rowBox = new HBox(12);
-            rowBox.setPadding(new Insets(10, 8, 10, 8));
-            rowBox.setAlignment(Pos.CENTER_LEFT);
-            rowBox.setStyle("-fx-background-color: " + (theme.isDark() ? "#1E293B" : "#F8FAFC")
-                + "; -fx-background-radius: 10;");
-
-            Circle dot = new Circle(4);
-            dot.setFill(Color.web(c("#2B54A8", "#3B82F6")));
-
-            VBox info = new VBox(2);
-            Text timeText = new Text(row[0]);
-            timeText.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12));
-            timeText.setFill(Color.web(c("#1F2937", "#F8FAFC")));
-            Text detailText = new Text(row[1] + " · " + row[2]);
-            detailText.setFont(Font.font("Plus Jakarta Sans", 11));
-            detailText.setFill(Color.web(c("#6B7280", "#94A3B8")));
-            info.getChildren().addAll(timeText, detailText);
-
-            rowBox.getChildren().addAll(dot, info);
-            HBox.setHgrow(info, Priority.ALWAYS);
-            scheduleRows.getChildren().add(rowBox);
+            var end = java.time.LocalTime.parse(row[1]);
+            if (!now.isAfter(end)) {
+                if (!now.isBefore(java.time.LocalTime.parse(row[0])) && !now.isAfter(end)) {
+                    lastActiveEnd = row[1];
+                    break;
+                }
+            } else {
+                lastActiveEnd = row[1];
+            }
         }
+        var earliest = java.time.LocalTime.parse("07:00");
+        var latest = java.time.LocalTime.parse("18:00");
+        double totalMinutes = java.time.temporal.ChronoUnit.MINUTES.between(earliest, latest);
+        double fillPct = java.time.temporal.ChronoUnit.MINUTES.between(earliest, java.time.LocalTime.parse(lastActiveEnd)) / totalMinutes;
+        if (fillPct < 0) fillPct = 0;
+
+        double rowHeight = 60;
+        double barTop = 10;
+        double barBottom = 10;
+        double barHeight = data.length * rowHeight - barTop - barBottom;
+        double centerX = 60;
+
+        Pane barPane = new Pane();
+        barPane.setPrefHeight(data.length * rowHeight);
+        barPane.setMinHeight(data.length * rowHeight);
+        barPane.setMaxWidth(Double.MAX_VALUE);
+
+        // vertical track
+        Rectangle track = new Rectangle(centerX - 2, barTop, 4, barHeight);
+        track.setFill(Color.web(trackColor));
+        track.setArcWidth(4);
+        track.setArcHeight(4);
+
+        // vertical fill
+        double fillH = barHeight * fillPct;
+        if (fillH > barHeight) fillH = barHeight;
+        Rectangle fill = new Rectangle(centerX - 2, barTop, 4, fillH);
+        fill.setFill(Color.web(fillColor));
+        fill.setArcWidth(4);
+        fill.setArcHeight(4);
+
+        barPane.getChildren().addAll(track, fill);
+
+        for (int i = 0; i < data.length; i++) {
+            String startStr = data[i][0];
+            String endStr = data[i][1];
+            String courseName = data[i][2];
+
+            var start = java.time.LocalTime.parse(startStr);
+            var end = java.time.LocalTime.parse(endStr);
+            boolean isPast = now.isAfter(end);
+            boolean isCurrent = !now.isBefore(start) && !now.isAfter(end);
+            boolean isActive = isPast || isCurrent;
+
+            double yCenter = i * rowHeight + rowHeight / 2.0;
+
+            // dot
+            Circle dot = new Circle(centerX, yCenter, 5);
+            if (isCurrent) {
+                dot.setFill(Color.web(currentColor));
+                dot.setStroke(Color.web(currentColor));
+                dot.setStrokeWidth(2);
+                dot.setRadius(6);
+            } else if (isPast) {
+                dot.setFill(Color.web(fillColor));
+            } else {
+                dot.setFill(Color.web(inactiveColor));
+            }
+            barPane.getChildren().add(dot);
+
+            // time label (left of bar)
+            Label timeLabel = new Label(startStr);
+            timeLabel.setFont(Font.font("Plus Jakarta Sans", 10));
+            timeLabel.setTextFill(Color.web(isActive ? labelMuted : labelDim));
+            timeLabel.setLayoutX(4);
+            timeLabel.setLayoutY(yCenter - 8);
+            timeLabel.setMinWidth(48);
+            timeLabel.setAlignment(Pos.CENTER_RIGHT);
+            barPane.getChildren().add(timeLabel);
+
+            // course name (right of bar)
+            Label nameLabel = new Label(courseName);
+            nameLabel.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 12));
+            nameLabel.setTextFill(Color.web(isActive ? labelColor : labelDim));
+            nameLabel.setLayoutX(centerX + 14);
+            nameLabel.setLayoutY(yCenter - 8);
+            barPane.getChildren().add(nameLabel);
+        }
+
+        scheduleRows.getChildren().add(barPane);
     }
 
     @FXML
@@ -239,7 +320,6 @@ public class DetalleProfesorController implements Initializable {
         colEntrada.setText(lang.get("detalleProfesor.colEntrada", "ENTRADA"));
         colSalida.setText(lang.get("detalleProfesor.colSalida", "SALIDA"));
         colEstado.setText(lang.get("detalle.colAsistencia", "ESTADO"));
-        professorSubject.setText(currentTeacher != null ? currentTeacher.materia() : "");
         professorEmail.setText(currentTeacher != null ? currentTeacher.email() : "");
         professorSection.setText(currentTeacher != null ? currentTeacher.seccion() : "");
         professorStatus.setText(currentTeacher != null ? currentTeacher.estado() : "");

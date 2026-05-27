@@ -24,18 +24,22 @@ public class DataStore {
         seeded = true;
 
         String[][] rawTeachers = {
-            {"Prof. Laura Méndez", "laura.mendez@edu.com", "Matemáticas", "5to E", "Activo"},
-            {"Prof. Carlos Ruiz", "carlos.ruiz@edu.com", "Historia", "4to A", "Activo"},
-            {"Prof. Elena Torres", "elena.torres@edu.com", "Lenguaje", "3ro B", "Activo"},
-            {"Prof. Ana Silva", "ana.silva@edu.com", "Ciencias", "2do C", "Activo"},
-            {"Prof. Miguel Soto", "miguel.soto@edu.com", "Inglés", "1ro A", "Inactivo"},
-            {"Prof. Diana Ríos", "diana.rios@edu.com", "Arte", "5to B", "Activo"},
-            {"Prof. Pedro Lima", "pedro.lima@edu.com", "Educación Física", "4to B", "Activo"},
-            {"Prof. Sofía Vega", "sofia.vega@edu.com", "Música", "3ro A", "Activo"},
-            {"Prof. Luis Paz", "luis.paz@edu.com", "Filosofía", "6to A", "Inactivo"},
-            {"Prof. Carmen Rojas", "carmen.rojas@edu.com", "Biología", "5to C", "Activo"},
-            {"Prof. Andrés Cruz", "andres.cruz@edu.com", "Química", "4to C", "Activo"},
-            {"Prof. Valeria Solís", "valeria.solis@edu.com", "Historia del Arte", "6to B", "Activo"},
+            {"Denis Ramirez", "denis.ramirez@edu.com", "Ofimática", "4to E", "Activo"},
+            {"Santa Hichez", "santa.hichez@edu.com", "Español", "4to E", "Activo"},
+            {"Luz Leclerc", "luz.leclerc@edu.com", "Matemáticas", "4to E", "Activo"},
+            {"Shirley Gómez", "shirley.gomez@edu.com", "Artística", "4to E", "Activo"},
+            {"Claudilina Ferrera", "claudilina.ferrera@edu.com", "Biología", "4to E", "Activo"},
+            {"Kelvis", "kelvis@edu.com", "Educación Física", "4to E", "Activo"},
+            {"DASI Profesor", "dasi.prof@edu.com", "DASI", "4to E", "Activo"},
+            {"Jose Sierra", "jose.sierra@edu.com", "DASI", "5to E", "Activo"},
+            {"Anderson", "anderson@edu.com", "Base de datos", "5to E", "Activo"},
+            {"Paola Dilone", "paola.dilone@edu.com", "Química", "5to E", "Activo"},
+            {"Sofía", "sofia@edu.com", "Español", "5to E", "Activo"},
+            {"Karina Pérez", "karina.perez@edu.com", "Matemáticas", "5to E", "Activo"},
+            {"María Rodríguez", "maria.rodriguez@edu.com", "Base de datos", "6to E", "Activo"},
+            {"Carlos Méndez", "carlos.mendez@edu.com", "Página web", "6to E", "Activo"},
+            {"Laura Jiménez", "laura.jimenez@edu.com", "DASI", "6to E", "Activo"},
+            {"Roberto Vargas", "roberto.vargas@edu.com", "Diseño de Reporte", "6to E", "Activo"},
         };
 
         for (int i = 0; i < rawTeachers.length; i++) {
@@ -44,9 +48,9 @@ public class DataStore {
         }
 
         String[][] rawCourses = {
-            {"4to", "E", "Matemáticas", "0", "32", "9.2", "En clase"},
-            {"5to", "E", "Historia", "1", "28", "7.8", "En clase"},
-            {"6to", "E", "Lenguaje", "2", "24", "8.8", "En clase"},
+            {"4to", "E", "Ofimática", "0", "32", "9.2", "En clase"},
+            {"5to", "E", "DASI", "7", "28", "7.8", "En clase"},
+            {"6to", "E", "Sistemas", "12", "24", "8.8", "En clase"},
         };
 
         String[] firstNames = {"Liam","Emma","Noah","Olivia","Mateo","Isabella","Santiago","Sophia","Lucas","Mía","Benjamín","Valentina"};

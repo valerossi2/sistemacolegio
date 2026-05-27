@@ -52,6 +52,10 @@ public class AdminAttendanceView {
         return attendanceStore.get(courseKey);
     }
 
+    public static java.util.Map<String, java.util.Map<String, AttendanceStatus>> getAttendanceStore() {
+        return attendanceStore;
+    }
+
     private final ThemeManager theme;
     private final LanguageManager lang = LanguageManager.getInstance();
     private final ObservableList<StudentAttendance> students = FXCollections.observableArrayList();
@@ -556,7 +560,7 @@ public class AdminAttendanceView {
 
     private void updateSaveButtonText() {
         if (savedCourses.contains(courseKey())) {
-            saveLabel.setText("Asistencia guardada");
+            saveLabel.setText(lang.get("attendance.saved"));
         } else {
             saveLabel.setText(lang.get("attendance.save"));
         }

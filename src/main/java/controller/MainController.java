@@ -92,6 +92,7 @@ public class MainController {
     private final List<Rectangle> perfBarsList = new ArrayList<>();
     private final List<Text> perfBarLabelList = new ArrayList<>();
     private final int[] perfOriginalHeights = new int[6];
+    private HBox perfChart;
     private int selectedPerfBar = -1;
     private int defaultHighlightBar = -1;
     private static final int PERF_BAR_GROW = 6;
@@ -276,6 +277,7 @@ public class MainController {
         if (index == 0) {
             centerWrapper.getChildren().setAll(mainCanvas);
             loadHeaderProfileImage();
+            refreshPerformanceBars();
         } else if (index == 1) {
             loadView("/fxml/Admin/AdminMaestros.fxml");
         } else if (index == 2) {
@@ -770,23 +772,76 @@ public class MainController {
         perfSubText.setFont(Font.font("Plus Jakarta Sans", 12));
         perfSubText.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
 
-        HBox chart = new HBox(12);
-        chart.setAlignment(Pos.BOTTOM_CENTER);
-        chart.setPrefHeight(120);
+        perfChart = new HBox(12);
+        perfChart.setAlignment(Pos.BOTTOM_CENTER);
+        perfChart.setPrefHeight(120);
 
-        // Top 6 cursos por promedio (grado + seccion)
-        var topCourses = List.of(
-            new String[]{"5to A", "9.2"},
-            new String[]{"4to B", "8.8"},
-            new String[]{"6to A", "8.5"},
-            new String[]{"3ro C", "8.1"},
-            new String[]{"5to E", "7.6"},
-            new String[]{"4to C", "7.2"}
-        );
+        refreshPerformanceBars();
+
+        HBox footer = new HBox();
+        Text fT = new Text(LanguageManager.getInstance().get("performance.growth"));
+        fT.setFont(Font.font("Plus Jakarta Sans", 12));
+        fT.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+        Region s2 = new Region();
+        HBox.setHgrow(s2, Priority.ALWAYS);
+        Label fV = new Label("+12.4%");
+        fV.getStyleClass().add("growth-badge");
+        footer.getChildren().addAll(fT, s2, fV);
+
+        performanceBox.getChildren().addAll(head, perfSubText, perfChart, footer);
+        performanceBox.setPadding(new Insets(12));
+        performanceBox.setSpacing(8);
+        performanceBox.setStyle(cardStyle(theme.isDark()));
+
+        themeUpdaters.add(() -> {
+            performanceBox.setStyle(cardStyle(theme.isDark()));
+            perfTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+            perfSubText.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+            moreDots.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+            fT.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+            for (int i = 0; i < perfBarsList.size(); i++) {
+                boolean isDefault = defaultHighlightBar == i;
+                perfBarsList.get(i).setFill(Color.web(isDefault ? c(L_PRIMARY, D_PRIMARY) : c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
+                if (i < perfBarLabelList.size())
+                    perfBarLabelList.get(i).setFill(Color.web(isDefault ? c(L_PRIMARY, D_ON_SURFACE) : c(L_OUTLINE, D_OUTLINE)));
+            }
+            if (selectedPerfBar == -1) restoreBars(); else growBar(selectedPerfBar);
+        });
+    }
+
+    private void refreshPerformanceBars() {
+        perfChart.getChildren().clear();
+        perfBarsList.clear();
+        perfBarLabelList.clear();
+        selectedPerfBar = -1;
+        defaultHighlightBar = -1;
+
+        java.util.List<String[]> topCourses = new java.util.ArrayList<>();
+        var store = AdminAttendanceView.getAttendanceStore();
+        if (store != null && !store.isEmpty()) {
+            for (var entry : store.entrySet()) {
+                var students = entry.getValue();
+                if (students.isEmpty()) continue;
+                long presentCount = students.values().stream()
+                    .filter(s -> s == AdminAttendanceView.AttendanceStatus.PRESENT)
+                    .count();
+                double avg = (double) presentCount / students.size() * 10.0;
+                topCourses.add(new String[]{entry.getKey(), String.format("%.1f", avg)});
+            }
+            topCourses.sort((a, b) -> Double.compare(Double.parseDouble(b[1]), Double.parseDouble(a[1])));
+            if (topCourses.size() > 6) topCourses = topCourses.subList(0, 6);
+        }
+        if (topCourses.isEmpty()) {
+            topCourses.addAll(java.util.List.of(
+                new String[]{"5to A", "9.2"},
+                new String[]{"4to B", "8.8"},
+                new String[]{"6to A", "8.5"},
+                new String[]{"3ro C", "8.1"},
+                new String[]{"5to E", "7.6"},
+                new String[]{"4to C", "7.2"}
+            ));
+        }
         double maxScore = Double.parseDouble(topCourses.get(0)[1]);
-
-        List<Rectangle> bars = new ArrayList<>();
-        List<Text> barLabels = new ArrayList<>();
 
         for (int i = 0; i < topCourses.size(); i++) {
             int h = (int)(Double.parseDouble(topCourses.get(i)[1]) / maxScore * 90 + 10);
@@ -826,42 +881,10 @@ public class MainController {
             });
 
             barBox.getChildren().addAll(bar, lbl);
-            chart.getChildren().add(barBox);
-            bars.add(bar);
-            barLabels.add(lbl);
+            perfChart.getChildren().add(barBox);
+            perfBarsList.add(bar);
             perfBarLabelList.add(lbl);
         }
-
-        HBox footer = new HBox();
-        Text fT = new Text(LanguageManager.getInstance().get("performance.growth"));
-        fT.setFont(Font.font("Plus Jakarta Sans", 12));
-        fT.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
-        Region s2 = new Region();
-        HBox.setHgrow(s2, Priority.ALWAYS);
-        Label fV = new Label("+12.4%");
-        fV.getStyleClass().add("growth-badge");
-        footer.getChildren().addAll(fT, s2, fV);
-
-        performanceBox.getChildren().addAll(head, perfSubText, chart, footer);
-        performanceBox.setPadding(new Insets(12));
-        performanceBox.setSpacing(8);
-        performanceBox.setStyle(cardStyle(theme.isDark()));
-        perfBarsList.addAll(bars);
-
-        themeUpdaters.add(() -> {
-            performanceBox.setStyle(cardStyle(theme.isDark()));
-            perfTitleText.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
-            perfSubText.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
-            moreDots.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
-            fT.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
-            for (int i = 0; i < perfBarsList.size(); i++) {
-                boolean isDefault = defaultHighlightBar == i;
-                perfBarsList.get(i).setFill(Color.web(isDefault ? c(L_PRIMARY, D_PRIMARY) : c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER_HIGH)));
-                if (i < perfBarLabelList.size())
-                    perfBarLabelList.get(i).setFill(Color.web(isDefault ? c(L_PRIMARY, D_ON_SURFACE) : c(L_OUTLINE, D_OUTLINE)));
-            }
-            if (selectedPerfBar == -1) restoreBars(); else growBar(selectedPerfBar);
-        });
     }
 
     private void animateBarHeight(Rectangle bar, double targetHeight) {

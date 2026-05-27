@@ -44,32 +44,51 @@ public class MaestrosController {
     @FXML private TableColumn<TeacherRow, String> colEstado;
     @FXML private TableColumn<TeacherRow, String> colAcciones;
 
+    private void initTeacherData() {
+        String activo = lang.get("teachers.activo", "Activo");
+        String inactivo = lang.get("teachers.inactivo", "Inactivo");
+        String _m = lang.get("teachers.subj.mathematics");
+        String _h = lang.get("teachers.subj.history");
+        String _l = lang.get("teachers.subj.language");
+        String _s = lang.get("teachers.subj.science");
+        String _e = lang.get("teachers.subj.english");
+        String _a = lang.get("teachers.subj.art");
+        String _p = lang.get("teachers.subj.pe");
+        String _mu = lang.get("teachers.subj.music");
+        String _ph = lang.get("teachers.subj.philosophy");
+        String _b = lang.get("teachers.subj.biology");
+        String _c = lang.get("teachers.subj.chemistry");
+        String _ah = lang.get("teachers.subj.artHistory");
+        allTeachers.setAll(
+            new TeacherRow("Prof. Laura Méndez", "laura.mendez@edu.com", _m, "5to E", activo, 0),
+            new TeacherRow("Prof. Carlos Ruiz", "carlos.ruiz@edu.com", _h, "4to A", activo, 1),
+            new TeacherRow("Prof. Elena Torres", "elena.torres@edu.com", _l, "3ro B", activo, 2),
+            new TeacherRow("Prof. Ana Silva", "ana.silva@edu.com", _s, "2do C", activo, 3),
+            new TeacherRow("Prof. Miguel Soto", "miguel.soto@edu.com", _e, "1ro A", inactivo, 4),
+            new TeacherRow("Prof. Diana Ríos", "diana.rios@edu.com", _a, "5to B", activo, 5),
+            new TeacherRow("Prof. Pedro Lima", "pedro.lima@edu.com", _p, "4to B", activo, 6),
+            new TeacherRow("Prof. Sofía Vega", "sofia.vega@edu.com", _mu, "3ro A", activo, 7),
+            new TeacherRow("Prof. Luis Paz", "luis.paz@edu.com", _ph, "6to A", inactivo, 0),
+            new TeacherRow("Prof. Carmen Rojas", "carmen.rojas@edu.com", _b, "5to C", activo, 1),
+            new TeacherRow("Prof. Andrés Cruz", "andres.cruz@edu.com", _c, "4to C", activo, 2),
+            new TeacherRow("Prof. Valeria Solís", "valeria.solis@edu.com", _ah, "6to B", activo, 3)
+        );
+    }
+
     private static final Insets HEADER_PADDING_DEFAULT = new Insets(32, 40, 0, 40);
     private static final Insets HEADER_PADDING_COMPACT = new Insets(16, 16, 0, 16);
     private static final Insets COUNT_PADDING_DEFAULT = new Insets(24, 40, 16, 40);
     private static final Insets COUNT_PADDING_COMPACT = new Insets(12, 16, 8, 16);
     private static final double COMPACT_THRESHOLD = 700;
 
-    private final ObservableList<TeacherRow> allTeachers = FXCollections.observableArrayList(
-        new TeacherRow("Prof. Laura Méndez", "laura.mendez@edu.com", "Matemáticas", "5to E", "Activo", 0),
-        new TeacherRow("Prof. Carlos Ruiz", "carlos.ruiz@edu.com", "Historia", "4to A", "Activo", 1),
-        new TeacherRow("Prof. Elena Torres", "elena.torres@edu.com", "Lenguaje", "3ro B", "Activo", 2),
-        new TeacherRow("Prof. Ana Silva", "ana.silva@edu.com", "Ciencias", "2do C", "Activo", 3),
-        new TeacherRow("Prof. Miguel Soto", "miguel.soto@edu.com", "Inglés", "1ro A", "Inactivo", 4),
-        new TeacherRow("Prof. Diana Ríos", "diana.rios@edu.com", "Arte", "5to B", "Activo", 5),
-        new TeacherRow("Prof. Pedro Lima", "pedro.lima@edu.com", "Educación Física", "4to B", "Activo", 6),
-        new TeacherRow("Prof. Sofía Vega", "sofia.vega@edu.com", "Música", "3ro A", "Activo", 7),
-        new TeacherRow("Prof. Luis Paz", "luis.paz@edu.com", "Filosofía", "6to A", "Inactivo", 0),
-        new TeacherRow("Prof. Carmen Rojas", "carmen.rojas@edu.com", "Biología", "5to C", "Activo", 1),
-        new TeacherRow("Prof. Andrés Cruz", "andres.cruz@edu.com", "Química", "4to C", "Activo", 2),
-        new TeacherRow("Prof. Valeria Solís", "valeria.solis@edu.com", "Historia del Arte", "6to B", "Activo", 3)
-    );
+    private final ObservableList<TeacherRow> allTeachers = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
         lang = LanguageManager.getInstance();
         theme = ThemeManager.getInstance();
 
+        initTeacherData();
         configureTable();
         maestrosTable.setItems(allTeachers);
         updateTexts();
@@ -121,6 +140,7 @@ public class MaestrosController {
 
     private void onLanguageChanged() {
         Platform.runLater(() -> {
+            initTeacherData();
             updateTexts();
             maestrosTable.refresh();
         });
@@ -271,7 +291,7 @@ public class MaestrosController {
                     label.setText(null);
                 } else {
                     label.getStyleClass().add("status-pill");
-                    if ("Activo".equals(item)) {
+                    if (lang.get("teachers.activo", "Activo").equals(item)) {
                         label.getStyleClass().add("status-pill--active");
                     } else {
                         label.getStyleClass().add("status-pill--inactive");

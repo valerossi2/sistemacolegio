@@ -34,6 +34,7 @@ public class DetalleCursoController {
 
     private LanguageManager lang;
     private ThemeManager theme;
+    private String currentCourseLabel = "";
     private boolean showingAllTeachers = false;
     private boolean showingAllStudents = false;
     private boolean editMode = false;
@@ -90,9 +91,9 @@ public class DetalleCursoController {
         this.allCourses = allCourses;
         this.navigateToCourse = navigator;
         this.onBackToList = onBackToList;
-        String label = course.grado() + " " + course.seccion();
-        breadcrumbCursoActual.setText(label);
-        pageTitle.setText(lang.get("detalle.pageTitle", "Detalles del Curso") + ": " + label);
+        currentCourseLabel = course.grado() + " " + course.seccion();
+        breadcrumbCursoActual.setText(currentCourseLabel);
+        pageTitle.setText(lang.get("detalle.pageTitle", "Detalles del Curso") + ": " + currentCourseLabel);
         loadRealData();
     }
 
@@ -185,19 +186,33 @@ public class DetalleCursoController {
     }
 
     private void initTeacherData() {
+        String activo = lang.get("detalle.activo", "Activo");
+        String inactivo = lang.get("detalle.inactivo", "Inactivo");
+        String _m = lang.get("detalle.subj.mathematics");
+        String _h = lang.get("detalle.subj.history");
+        String _l = lang.get("detalle.subj.language");
+        String _s = lang.get("detalle.subj.science");
+        String _e = lang.get("detalle.subj.english");
+        String _a = lang.get("detalle.subj.art");
+        String _p = lang.get("detalle.subj.pe");
+        String _mu = lang.get("detalle.subj.music");
+        String _ph = lang.get("detalle.subj.philosophy");
+        String _b = lang.get("detalle.subj.biology");
+        String _c = lang.get("detalle.subj.chemistry");
+        String _ah = lang.get("detalle.subj.artHistory");
         fullTeacherData.setAll(
-            new TeacherRow("Prof. Laura Méndez", "laura.mendez@edu.com", "Matemáticas", "5to E", "Activo", 0),
-            new TeacherRow("Prof. Carlos Ruiz", "carlos.ruiz@edu.com", "Historia", "4to A", "Activo", 1),
-            new TeacherRow("Prof. Elena Torres", "elena.torres@edu.com", "Lenguaje", "3ro B", "Activo", 2),
-            new TeacherRow("Prof. Ana Silva", "ana.silva@edu.com", "Ciencias", "2do C", "Activo", 3),
-            new TeacherRow("Prof. Miguel Soto", "miguel.soto@edu.com", "Inglés", "1ro A", "Inactivo", 4),
-            new TeacherRow("Prof. Diana Ríos", "diana.rios@edu.com", "Arte", "5to B", "Activo", 5),
-            new TeacherRow("Prof. Pedro Lima", "pedro.lima@edu.com", "Educación Física", "4to B", "Activo", 6),
-            new TeacherRow("Prof. Sofía Vega", "sofia.vega@edu.com", "Música", "3ro A", "Activo", 7),
-            new TeacherRow("Prof. Luis Paz", "luis.paz@edu.com", "Filosofía", "6to A", "Inactivo", 0),
-            new TeacherRow("Prof. Carmen Rojas", "carmen.rojas@edu.com", "Biología", "5to C", "Activo", 1),
-            new TeacherRow("Prof. Andrés Cruz", "andres.cruz@edu.com", "Química", "4to C", "Activo", 2),
-            new TeacherRow("Prof. Valeria Solís", "valeria.solis@edu.com", "Historia del Arte", "6to B", "Activo", 3)
+            new TeacherRow("Prof. Laura Méndez", "laura.mendez@edu.com", _m, "5to E", activo, 0),
+            new TeacherRow("Prof. Carlos Ruiz", "carlos.ruiz@edu.com", _h, "4to A", activo, 1),
+            new TeacherRow("Prof. Elena Torres", "elena.torres@edu.com", _l, "3ro B", activo, 2),
+            new TeacherRow("Prof. Ana Silva", "ana.silva@edu.com", _s, "2do C", activo, 3),
+            new TeacherRow("Prof. Miguel Soto", "miguel.soto@edu.com", _e, "1ro A", inactivo, 4),
+            new TeacherRow("Prof. Diana Ríos", "diana.rios@edu.com", _a, "5to B", activo, 5),
+            new TeacherRow("Prof. Pedro Lima", "pedro.lima@edu.com", _p, "4to B", activo, 6),
+            new TeacherRow("Prof. Sofía Vega", "sofia.vega@edu.com", _mu, "3ro A", activo, 7),
+            new TeacherRow("Prof. Luis Paz", "luis.paz@edu.com", _ph, "6to A", inactivo, 0),
+            new TeacherRow("Prof. Carmen Rojas", "carmen.rojas@edu.com", _b, "5to C", activo, 1),
+            new TeacherRow("Prof. Andrés Cruz", "andres.cruz@edu.com", _c, "4to C", activo, 2),
+            new TeacherRow("Prof. Valeria Solís", "valeria.solis@edu.com", _ah, "6to B", activo, 3)
         );
         displayedTeacherData.addAll(fullTeacherData.subList(0, INITIAL_TEACHER_COUNT));
         teacherTable.setItems(displayedTeacherData);
@@ -226,15 +241,15 @@ public class DetalleCursoController {
                     );
                     switch (status) {
                         case "presente" -> {
-                            lbl.setText("Presente");
+                            lbl.setText(lang.get("detalle.presente", "Presente"));
                             lbl.getStyleClass().add("attendance-btn--presente");
                         }
                         case "ausente" -> {
-                            lbl.setText("Ausente");
+                            lbl.setText(lang.get("detalle.ausente", "Ausente"));
                             lbl.getStyleClass().add("attendance-btn--ausente");
                         }
                         case "excusa" -> {
-                            lbl.setText("Excusa");
+                            lbl.setText(lang.get("detalle.excusa", "Excusa"));
                             lbl.getStyleClass().add("attendance-btn--excusa");
                         }
                     }
@@ -278,8 +293,10 @@ public class DetalleCursoController {
         String courseKey = currentCourse.grado() + " " + currentCourse.seccion();
         java.util.Map<String, controller.AdminAttendanceView.AttendanceStatus> savedAttendance =
             controller.AdminAttendanceView.getSavedAttendance(courseKey);
+        int studentCount;
 
         if (savedAttendance != null && !savedAttendance.isEmpty()) {
+            studentCount = fullStudentData.size();
             for (var entry : savedAttendance.entrySet()) {
                 String status;
                 switch (entry.getValue()) {
@@ -295,12 +312,12 @@ public class DetalleCursoController {
             updateStudentTableHeight(fullStudentData.size());
             totalStudents.setText(String.valueOf(fullStudentData.size()));
         } else {
+        studentCount = currentCourse.alumnos();
         String[] firstNames = {"Liam","Emma","Noah","Olivia","Mateo","Isabella","Santiago","Sophia",
             "Lucas","Mía","Benjamín","Valentina","Sebastián","Camila","Daniel","Gabriela"};
         String[] lastNames = {"Castillo","Rodríguez","García","Martínez","Hernández","López","Pérez",
             "González","Fernández","Torres","Ramírez","Morales","Ortiz","Cruz","Reyes","Vargas"};
         String[] statuses = {"presente","ausente","excusa"};
-        int studentCount = currentCourse.alumnos();
         for (int i = 0; i < studentCount; i++) {
             String name = firstNames[rng.nextInt(firstNames.length)] + " " + lastNames[rng.nextInt(lastNames.length)];
             String mat = String.format("MAT-%03d", rng.nextInt(1, 999));
@@ -320,12 +337,25 @@ public class DetalleCursoController {
         String[] teacherNames = {"Prof. Laura Méndez","Prof. Carlos Ruiz","Prof. Elena Torres",
             "Prof. Ana Silva","Prof. Miguel Soto","Prof. Diana Ríos","Prof. Pedro Lima",
             "Prof. Sofía Vega","Prof. Luis Paz"};
-        String[] subjects = {"Matemáticas","Historia","Lenguaje","Ciencias","Inglés","Arte",
-            "Educación Física","Música","Filosofía","Biología","Química"};
+        String[] subjects = {
+            lang.get("detalle.subj.mathematics"),
+            lang.get("detalle.subj.history"),
+            lang.get("detalle.subj.language"),
+            lang.get("detalle.subj.science"),
+            lang.get("detalle.subj.english"),
+            lang.get("detalle.subj.art"),
+            lang.get("detalle.subj.pe"),
+            lang.get("detalle.subj.music"),
+            lang.get("detalle.subj.philosophy"),
+            lang.get("detalle.subj.biology"),
+            lang.get("detalle.subj.chemistry")
+        };
+        String activo = lang.get("detalle.activo", "Activo");
+        String inactivo = lang.get("detalle.inactivo", "Inactivo");
         int teacherCount = currentCourse.profesores();
         for (int i = 0; i < teacherCount; i++) {
             String subj = subjects[rng.nextInt(subjects.length)];
-            String estado = rng.nextBoolean() ? "Activo" : "Inactivo";
+            String estado = rng.nextBoolean() ? activo : inactivo;
             fullTeacherData.add(new TeacherRow(teacherNames[i % teacherNames.length],
                 teacherNames[i % teacherNames.length].toLowerCase().replace(" ",".").replace("á","a").replace("é","e") + "@edu.com",
                 subj, currentCourse.seccion(), estado, i));
@@ -340,8 +370,8 @@ public class DetalleCursoController {
         int masc = rng.nextInt(studentCount + 1);
         int fem = studentCount - masc;
         genderChart.setData(FXCollections.observableArrayList(
-            new PieChart.Data("Masculino", masc),
-            new PieChart.Data("Femenino", fem)
+            new PieChart.Data(lang.get("detalle.masculino", "Masculino"), masc),
+            new PieChart.Data(lang.get("detalle.femenino", "Femenino"), fem)
         ));
         initGenderChartInteraction();
 
@@ -358,11 +388,11 @@ public class DetalleCursoController {
 
         lblAprobadosReprobados.setText("28 / 4");
 
-        lblPromedioMateria.setText("Matemáticas: 72.3 (La más baja)");
+        lblPromedioMateria.setText(lang.get("detalle.subj.mathematics") + ": 72.3");
 
         ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
-            new PieChart.Data("Masculino", 18),
-            new PieChart.Data("Femenino", 12)
+            new PieChart.Data(lang.get("detalle.masculino", "Masculino"), 18),
+            new PieChart.Data(lang.get("detalle.femenino", "Femenino"), 12)
         );
         genderChart.setData(pieData);
         initGenderChartInteraction();
@@ -385,8 +415,8 @@ public class DetalleCursoController {
             Node node = data.getNode();
             if (node != null) {
                 String label = switch (data.getName()) {
-                    case "Masculino" -> "varones";
-                    case "Femenino"  -> "mujeres";
+                    case "Masculino" -> lang.get("detalle.varones", "varones");
+                    case "Femenino"  -> lang.get("detalle.mujeres", "mujeres");
                     default          -> "otros";
                 };
                 int count = (int) data.getPieValue();
@@ -422,7 +452,11 @@ public class DetalleCursoController {
     }
 
     private void onLanguageChanged() {
-        Platform.runLater(this::updateTexts);
+        Platform.runLater(() -> {
+            updateTexts();
+            initTeacherData();
+            initStats();
+        });
     }
 
     private void onThemeChanged() {
@@ -440,7 +474,8 @@ public class DetalleCursoController {
     }
 
     private void updateTexts() {
-        pageTitle.setText(lang.get("detalle.pageTitle", "Detalles del Curso"));
+        String titleBase = lang.get("detalle.pageTitle", "Detalles del Curso");
+        pageTitle.setText(currentCourseLabel.isEmpty() ? titleBase : titleBase + ": " + currentCourseLabel);
         breadcrumbCursos.setText(lang.get("detalle.breadcrumbCursos", "Cursos"));
         btnPrint.setText(lang.get("detalle.btnPrint", "Imprimir Reporte"));
         btnEditCourse.setText(lang.get("detalle.btnEdit", "Editar Curso"));

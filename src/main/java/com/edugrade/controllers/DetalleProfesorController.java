@@ -12,10 +12,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.event.Event;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -78,7 +76,6 @@ public class DetalleProfesorController implements Initializable {
         updateTexts();
         applyTheme();
         setupAttendanceTable();
-        attendanceTable.addEventFilter(ScrollEvent.SCROLL, Event::consume);
 
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);

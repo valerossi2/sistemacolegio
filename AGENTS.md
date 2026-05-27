@@ -17,6 +17,26 @@
 - Java 17 source, `release 21` target. JDK must include JavaFX or the javafx-maven-plugin handles it.
 - No tests, no test framework, no CI found.
 
+## Build Executable (.exe)
+
+```sh
+./build-exe.ps1                                          # full build: fat jar + portable app image
+```
+
+Requires:
+- JDK 21 with `jpackage` (Temurin at `C:\Users\angel\.jdks\temurin-21.0.3`).
+- Internet on first run (downloads JavaFX jmods to `target/jmods/`).
+- WiX Toolset v3+ (optional, for installer EXE): https://wixtoolset.org
+
+Outputs:
+- Portable app: `target/dist/LuminaAcademy/LuminaAcademy.exe` (self-contained, run anywhere).
+- Installer (if WiX present): `target/dist/LuminaAcademy-1.0.0.exe`.
+
+Also available via Maven profile:
+```sh
+./mvnw.cmd package -P exe    # creates jlink runtime image in target/jlink/LuminaAcademy/
+```
+
 ## Key State Singletons
 
 - `ThemeManager.getInstance()` — shared dark/light state. Register listeners via `addListener(Runnable)`. Toggle with `toggle()`. **Never call `new ThemeManager()`** — all controllers must use the singleton.

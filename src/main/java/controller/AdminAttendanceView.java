@@ -342,7 +342,6 @@ public class AdminAttendanceView {
             statusButton(student, AttendanceStatus.EXCUSE, "attendance.excuseButton")
         );
         actions.setMinWidth(210);
-        actions.setAlignment(Pos.CENTER);
         row.getChildren().addAll(studentCell, actions);
 
         themeUpdaters.add(() -> {
@@ -375,18 +374,28 @@ public class AdminAttendanceView {
     private void updateButtonState(Button button, StudentAttendance student, AttendanceStatus btnStatus) {
         boolean isUnmarked = student.status == AttendanceStatus.UNMARKED;
         boolean isActive = student.status == btnStatus;
-        boolean visible = isUnmarked || isActive;
-        button.setVisible(visible);
-        button.setManaged(visible);
-        if (visible) {
+        if (isUnmarked || isActive) {
             button.setPadding(new Insets(6, 14, 6, 14));
             button.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 12));
+        } else {
+            button.setPadding(new Insets(2, 6, 2, 6));
+            button.setFont(Font.font("Plus Jakarta Sans", FontWeight.NORMAL, 10));
         }
-        button.setStyle(visible ? statusButtonStyle(student, btnStatus) : "");
+        button.setStyle(statusButtonStyle(student, btnStatus));
     }
 
     private String statusButtonStyle(StudentAttendance student, AttendanceStatus buttonStatus) {
         boolean active = student.status == buttonStatus;
+        boolean anyChosen = student.status != AttendanceStatus.UNMARKED;
+
+        if (!anyChosen) {
+            if (buttonStatus == AttendanceStatus.PRESENT)
+                return buttonStyle("#16a34a", "#ffffff", "transparent");
+            if (buttonStatus == AttendanceStatus.ABSENT)
+                return buttonStyle("#ef4444", "#ffffff", "transparent");
+            return buttonStyle("#f59e0b", "#ffffff", "transparent");
+        }
+
         if (active) {
             if (buttonStatus == AttendanceStatus.PRESENT)
                 return buttonStyle("#16a34a", "#ffffff", "#15803d");
@@ -394,11 +403,10 @@ public class AdminAttendanceView {
                 return buttonStyle("#ef4444", "#ffffff", "#dc2626");
             return buttonStyle("#f59e0b", "#ffffff", "#d97706");
         }
-        if (buttonStatus == AttendanceStatus.PRESENT)
-            return buttonStyle("#16a34a", "#ffffff", "transparent");
-        if (buttonStatus == AttendanceStatus.ABSENT)
-            return buttonStyle("#ef4444", "#ffffff", "transparent");
-        return buttonStyle("#f59e0b", "#ffffff", "transparent");
+
+        String grayBg = theme.isDark() ? "#374151" : "#d1d5db";
+        String grayText = theme.isDark() ? "#6b7280" : "#9ca3af";
+        return buttonStyle(grayBg, grayText, "transparent");
     }
 
     private String buttonStyle(String bg, String text, String border) {

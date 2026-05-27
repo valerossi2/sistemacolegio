@@ -53,9 +53,6 @@ public class DataStore {
             {"4to", "E", "Ofimática", "0", "9.2", "En clase"},
             {"5to", "E", "DASI", "6", "7.8", "En clase"},
             {"6to", "E", "Sistemas", "11", "8.8", "En clase"},
-            {"1ro", "A", "Matemática", "0", "8.5", "En clase"},
-            {"2do", "B", "Lenguaje", "1", "7.9", "En clase"},
-            {"3ro", "C", "Ciencias", "2", "8.2", "En clase"},
         };
 
         String[] firstNames = {"Liam","Emma","Noah","Olivia","Mateo","Isabella","Santiago","Sophia","Lucas","Mía","Benjamín","Valentina","Sebastián","Camila","Daniel","Gabriela","Carlos","Valeria","Diego","Sofía"};
@@ -70,13 +67,6 @@ public class DataStore {
             String estado = rc[5];
             String key = grado + " " + seccion;
             String profName = rawTeachers[profIdx][0];
-
-            // Filler courses (1ro A, 2do B, 3ro C) get random teachers
-            List<String> realKeys = List.of("4to E", "5to E", "6to E");
-            if (!realKeys.contains(key)) {
-                profIdx = ThreadLocalRandom.current().nextInt(rawTeachers.length);
-                profName = rawTeachers[profIdx][0];
-            }
 
             COURSES.add(new CourseInfo(grado, seccion, profName, profIdx, alumCount, rend, estado));
 
@@ -100,14 +90,11 @@ public class DataStore {
             TEACHER_COURSES.computeIfAbsent(profName, k -> new ArrayList<>()).add(key);
         }
 
-        // Schedule (real courses mapped to time slots)
+        // Schedule
         String[][] rawSchedule = {
             {"08:00", "4to E"},
             {"09:00", "5to E"},
             {"10:00", "6to E"},
-            {"11:00", "1ro A"},
-            {"12:00", "2do B"},
-            {"13:00", "3ro C"},
         };
 
         for (String[] rs : rawSchedule) {
@@ -126,9 +113,6 @@ public class DataStore {
         ct.put("4to E", List.of(0,1,2,3,4,5,6,7,8));
         ct.put("5to E", List.of(5,6,7,8,9,10,0,1,3));
         ct.put("6to E", List.of(11,12,13,14,0,6,7,5,8));
-        ct.put("1ro A", List.of(0,1,2,3,4,5,6,7,8));
-        ct.put("2do B", List.of(5,6,7,8,9,10,11,12,13));
-        ct.put("3ro C", List.of(0,2,4,6,8,10,11,12,14));
         ct.forEach((key, indices) -> COURSE_TEACHER_INDICES.put(key, List.copyOf(indices)));
     }
 

@@ -16,6 +16,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -29,6 +30,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
+import javafx.stage.Popup;
 import javafx.util.Callback;
 import theme.ThemeManager;
 import util.LanguageManager;
@@ -37,6 +39,7 @@ public class DetalleCursoController {
 
     private LanguageManager lang;
     private ThemeManager theme;
+    private String currentCourseLabel = "";
     private boolean showingAllTeachers = false;
     private boolean showingAllStudents = false;
     private boolean editMode = false;
@@ -56,6 +59,14 @@ public class DetalleCursoController {
     @FXML private Button btnEditCourse;
     @FXML private Button btnCancelEdit;
     @FXML private Button btnCalificaciones;
+    @FXML private VBox editFormsPanel;
+    @FXML private Label lblAddStudentTitle;
+    @FXML private Label lblAddTeacherTitle;
+    @FXML private TextField studentNameField;
+    @FXML private TextField studentIdField;
+    @FXML private Button addStudentBtn;
+    @FXML private TextField teacherSearchField;
+    @FXML private Button addTeacherBtn;
     @FXML private GridPane bentoGrid;
     @FXML private Label totalStudents;
     @FXML private Label totalTeachers;
@@ -65,6 +76,7 @@ public class DetalleCursoController {
     @FXML private TableColumn<TeacherRow, String> colTeacherSubject;
     @FXML private TableView<StudentRow> studentsTable;
     @FXML private TableColumn<StudentRow, String> colStudent;
+    @FXML private TableColumn<StudentRow, String> colGenero;
     @FXML private TableColumn<StudentRow, String> colMatricula;
     @FXML private TableColumn<StudentRow, String> colAsistencia;
     @FXML private Button btnLoadMore;
@@ -86,6 +98,9 @@ public class DetalleCursoController {
     private List<CursoController.CourseRow> allCourses;
     private Consumer<CursoController.CourseRow> navigateToCourse;
     private Runnable onBackToList;
+    private final Popup teacherSuggestPopup = new Popup();
+    private final Popup studentNamePopup = new Popup();
+    private final Popup studentIdPopup = new Popup();
 
     public void setCourse(CursoController.CourseRow course, List<CursoController.CourseRow> allCourses,
                           Consumer<CursoController.CourseRow> navigator, Runnable onBackToList) {
@@ -93,9 +108,9 @@ public class DetalleCursoController {
         this.allCourses = allCourses;
         this.navigateToCourse = navigator;
         this.onBackToList = onBackToList;
-        String label = course.grado() + " " + course.seccion();
-        breadcrumbCursoActual.setText(label);
-        pageTitle.setText(lang.get("detalle.pageTitle", "Detalles del Curso") + ": " + label);
+        currentCourseLabel = course.grado() + " " + course.seccion();
+        breadcrumbCursoActual.setText(currentCourseLabel);
+        pageTitle.setText(lang.get("detalle.pageTitle", "Detalles del Curso") + ": " + currentCourseLabel);
         loadRealData();
     }
 
@@ -115,6 +130,8 @@ public class DetalleCursoController {
 
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);
+        initTeacherAutocomplete();
+        initStudentAutocomplete();
     }
 
     private static final String[] AVATAR_COLORS = {
@@ -188,19 +205,33 @@ public class DetalleCursoController {
     }
 
     private void initTeacherData() {
+        String activo = lang.get("detalle.activo", "Activo");
+        String inactivo = lang.get("detalle.inactivo", "Inactivo");
+        String _m = lang.get("detalle.subj.mathematics");
+        String _h = lang.get("detalle.subj.history");
+        String _l = lang.get("detalle.subj.language");
+        String _s = lang.get("detalle.subj.science");
+        String _e = lang.get("detalle.subj.english");
+        String _a = lang.get("detalle.subj.art");
+        String _p = lang.get("detalle.subj.pe");
+        String _mu = lang.get("detalle.subj.music");
+        String _ph = lang.get("detalle.subj.philosophy");
+        String _b = lang.get("detalle.subj.biology");
+        String _c = lang.get("detalle.subj.chemistry");
+        String _ah = lang.get("detalle.subj.artHistory");
         fullTeacherData.setAll(
-            new TeacherRow("Prof. Laura Méndez", "laura.mendez@edu.com", "Matemáticas", "5to E", "Activo", 0),
-            new TeacherRow("Prof. Carlos Ruiz", "carlos.ruiz@edu.com", "Historia", "4to A", "Activo", 1),
-            new TeacherRow("Prof. Elena Torres", "elena.torres@edu.com", "Lenguaje", "3ro B", "Activo", 2),
-            new TeacherRow("Prof. Ana Silva", "ana.silva@edu.com", "Ciencias", "2do C", "Activo", 3),
-            new TeacherRow("Prof. Miguel Soto", "miguel.soto@edu.com", "Inglés", "1ro A", "Inactivo", 4),
-            new TeacherRow("Prof. Diana Ríos", "diana.rios@edu.com", "Arte", "5to B", "Activo", 5),
-            new TeacherRow("Prof. Pedro Lima", "pedro.lima@edu.com", "Educación Física", "4to B", "Activo", 6),
-            new TeacherRow("Prof. Sofía Vega", "sofia.vega@edu.com", "Música", "3ro A", "Activo", 7),
-            new TeacherRow("Prof. Luis Paz", "luis.paz@edu.com", "Filosofía", "6to A", "Inactivo", 0),
-            new TeacherRow("Prof. Carmen Rojas", "carmen.rojas@edu.com", "Biología", "5to C", "Activo", 1),
-            new TeacherRow("Prof. Andrés Cruz", "andres.cruz@edu.com", "Química", "4to C", "Activo", 2),
-            new TeacherRow("Prof. Valeria Solís", "valeria.solis@edu.com", "Historia del Arte", "6to B", "Activo", 3)
+            new TeacherRow("Prof. Laura Méndez", "laura.mendez@edu.com", _m, "5to E", activo, 0),
+            new TeacherRow("Prof. Carlos Ruiz", "carlos.ruiz@edu.com", _h, "4to A", activo, 1),
+            new TeacherRow("Prof. Elena Torres", "elena.torres@edu.com", _l, "3ro B", activo, 2),
+            new TeacherRow("Prof. Ana Silva", "ana.silva@edu.com", _s, "2do C", activo, 3),
+            new TeacherRow("Prof. Miguel Soto", "miguel.soto@edu.com", _e, "1ro A", inactivo, 4),
+            new TeacherRow("Prof. Diana Ríos", "diana.rios@edu.com", _a, "5to B", activo, 5),
+            new TeacherRow("Prof. Pedro Lima", "pedro.lima@edu.com", _p, "4to B", activo, 6),
+            new TeacherRow("Prof. Sofía Vega", "sofia.vega@edu.com", _mu, "3ro A", activo, 7),
+            new TeacherRow("Prof. Luis Paz", "luis.paz@edu.com", _ph, "6to A", inactivo, 0),
+            new TeacherRow("Prof. Carmen Rojas", "carmen.rojas@edu.com", _b, "5to C", activo, 1),
+            new TeacherRow("Prof. Andrés Cruz", "andres.cruz@edu.com", _c, "4to C", activo, 2),
+            new TeacherRow("Prof. Valeria Solís", "valeria.solis@edu.com", _ah, "6to B", activo, 3)
         );
         displayedTeacherData.addAll(fullTeacherData.subList(0, INITIAL_TEACHER_COUNT));
         teacherTable.setItems(displayedTeacherData);
@@ -209,6 +240,17 @@ public class DetalleCursoController {
 
     private void initStudentTable() {
         colStudent.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colGenero.setCellValueFactory(new PropertyValueFactory<>("genero"));
+        colGenero.setCellFactory(col -> new TableCell<StudentRow, String>() {
+            private final Label lbl = new Label();
+            { lbl.setAlignment(Pos.CENTER); setGraphic(lbl); setPadding(new Insets(8, 8, 8, 8)); }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { lbl.setText(null); }
+                else { lbl.setText(item); lbl.getStyleClass().add("cell-docente-name"); }
+            }
+        });
         colMatricula.setCellValueFactory(new PropertyValueFactory<>("matricula"));
         colAsistencia.setCellValueFactory(new PropertyValueFactory<>("status"));
         colAsistencia.setCellFactory(col -> new TableCell<StudentRow, String>() {
@@ -229,15 +271,15 @@ public class DetalleCursoController {
                     );
                     switch (status) {
                         case "presente" -> {
-                            lbl.setText("Presente");
+                            lbl.setText(lang.get("detalle.presente", "Presente"));
                             lbl.getStyleClass().add("attendance-btn--presente");
                         }
                         case "ausente" -> {
-                            lbl.setText("Ausente");
+                            lbl.setText(lang.get("detalle.ausente", "Ausente"));
                             lbl.getStyleClass().add("attendance-btn--ausente");
                         }
                         case "excusa" -> {
-                            lbl.setText("Excusa");
+                            lbl.setText(lang.get("detalle.excusa", "Excusa"));
                             lbl.getStyleClass().add("attendance-btn--excusa");
                         }
                     }
@@ -249,21 +291,21 @@ public class DetalleCursoController {
 
     private void initStudentData() {
         String[][] raw = {
-            {"Liam Castillo",     "MAT-001"},
-            {"Emma Rodríguez",    "MAT-002"},
-            {"Noah García",       "MAT-003"},
-            {"Olivia Martínez",   "MAT-004"},
-            {"Mateo Hernández",   "MAT-005"},
-            {"Isabella López",    "MAT-006"},
-            {"Santiago Pérez",    "MAT-007"},
-            {"Sophia González",   "MAT-008"},
-            {"Lucas Fernández",   "MAT-009"},
-            {"Mía Torres",        "MAT-010"},
+            {"Liam Castillo",     "M", "MAT-001"},
+            {"Emma Rodríguez",    "F", "MAT-002"},
+            {"Noah García",       "M", "MAT-003"},
+            {"Olivia Martínez",   "F", "MAT-004"},
+            {"Mateo Hernández",   "M", "MAT-005"},
+            {"Isabella López",    "F", "MAT-006"},
+            {"Santiago Pérez",    "M", "MAT-007"},
+            {"Sophia González",   "F", "MAT-008"},
+            {"Lucas Fernández",   "M", "MAT-009"},
+            {"Mía Torres",        "F", "MAT-010"},
         };
         String[] statuses = {"presente", "ausente", "excusa"};
         for (var r : raw) {
             String s = statuses[ThreadLocalRandom.current().nextInt(statuses.length)];
-            fullStudentData.add(new StudentRow(r[0], r[1], s));
+            fullStudentData.add(new StudentRow(r[0], r[1], r[2], s));
         }
         displayedStudentData.addAll(fullStudentData.subList(0, INITIAL_STUDENT_COUNT));
         studentsTable.setItems(displayedStudentData);
@@ -277,23 +319,48 @@ public class DetalleCursoController {
         // ── Students ──
         fullStudentData.clear();
         displayedStudentData.clear();
+
+        String courseKey = currentCourse.grado() + " " + currentCourse.seccion();
+        java.util.Map<String, controller.AdminAttendanceView.AttendanceStatus> savedAttendance =
+            controller.AdminAttendanceView.getSavedAttendance(courseKey);
+        int studentCount;
+
+        if (savedAttendance != null && !savedAttendance.isEmpty()) {
+            studentCount = fullStudentData.size();
+            for (var entry : savedAttendance.entrySet()) {
+                String status;
+                switch (entry.getValue()) {
+                    case PRESENT -> status = "presente";
+                    case ABSENT -> status = "ausente";
+                    case EXCUSE -> status = "excusa";
+                    default -> status = "presente";
+                }
+                fullStudentData.add(new StudentRow(entry.getKey(), rng.nextBoolean() ? "M" : "F", "MAT-000", status));
+            }
+            displayedStudentData.addAll(fullStudentData);
+            studentsTable.setItems(displayedStudentData);
+            updateStudentTableHeight(fullStudentData.size());
+            totalStudents.setText(String.valueOf(fullStudentData.size()));
+        } else {
+        studentCount = currentCourse.alumnos();
         String[] firstNames = {"Liam","Emma","Noah","Olivia","Mateo","Isabella","Santiago","Sophia",
             "Lucas","Mía","Benjamín","Valentina","Sebastián","Camila","Daniel","Gabriela"};
         String[] lastNames = {"Castillo","Rodríguez","García","Martínez","Hernández","López","Pérez",
             "González","Fernández","Torres","Ramírez","Morales","Ortiz","Cruz","Reyes","Vargas"};
         String[] statuses = {"presente","ausente","excusa"};
-        int studentCount = currentCourse.alumnos();
         for (int i = 0; i < studentCount; i++) {
             String name = firstNames[rng.nextInt(firstNames.length)] + " " + lastNames[rng.nextInt(lastNames.length)];
             String mat = String.format("MAT-%03d", rng.nextInt(1, 999));
             String status = statuses[rng.nextInt(statuses.length)];
-            fullStudentData.add(new StudentRow(name, mat, status));
+            String genero = rng.nextBoolean() ? "M" : "F";
+            fullStudentData.add(new StudentRow(name, genero, mat, status));
         }
         int shownStudents = Math.min(INITIAL_STUDENT_COUNT, fullStudentData.size());
         displayedStudentData.addAll(fullStudentData.subList(0, shownStudents));
         studentsTable.setItems(displayedStudentData);
         updateStudentTableHeight(shownStudents);
         totalStudents.setText(String.valueOf(fullStudentData.size()));
+        }
 
         // ── Teachers ──
         fullTeacherData.clear();
@@ -301,12 +368,25 @@ public class DetalleCursoController {
         String[] teacherNames = {"Prof. Laura Méndez","Prof. Carlos Ruiz","Prof. Elena Torres",
             "Prof. Ana Silva","Prof. Miguel Soto","Prof. Diana Ríos","Prof. Pedro Lima",
             "Prof. Sofía Vega","Prof. Luis Paz"};
-        String[] subjects = {"Matemáticas","Historia","Lenguaje","Ciencias","Inglés","Arte",
-            "Educación Física","Música","Filosofía","Biología","Química"};
+        String[] subjects = {
+            lang.get("detalle.subj.mathematics"),
+            lang.get("detalle.subj.history"),
+            lang.get("detalle.subj.language"),
+            lang.get("detalle.subj.science"),
+            lang.get("detalle.subj.english"),
+            lang.get("detalle.subj.art"),
+            lang.get("detalle.subj.pe"),
+            lang.get("detalle.subj.music"),
+            lang.get("detalle.subj.philosophy"),
+            lang.get("detalle.subj.biology"),
+            lang.get("detalle.subj.chemistry")
+        };
+        String activo = lang.get("detalle.activo", "Activo");
+        String inactivo = lang.get("detalle.inactivo", "Inactivo");
         int teacherCount = currentCourse.profesores();
         for (int i = 0; i < teacherCount; i++) {
             String subj = subjects[rng.nextInt(subjects.length)];
-            String estado = rng.nextBoolean() ? "Activo" : "Inactivo";
+            String estado = rng.nextBoolean() ? activo : inactivo;
             fullTeacherData.add(new TeacherRow(teacherNames[i % teacherNames.length],
                 teacherNames[i % teacherNames.length].toLowerCase().replace(" ",".").replace("á","a").replace("é","e") + "@edu.com",
                 subj, currentCourse.seccion(), estado, i));
@@ -321,8 +401,8 @@ public class DetalleCursoController {
         int masc = rng.nextInt(studentCount + 1);
         int fem = studentCount - masc;
         genderChart.setData(FXCollections.observableArrayList(
-            new PieChart.Data("Masculino", masc),
-            new PieChart.Data("Femenino", fem)
+            new PieChart.Data(lang.get("detalle.masculino", "Masculino"), masc),
+            new PieChart.Data(lang.get("detalle.femenino", "Femenino"), fem)
         ));
         initGenderChartInteraction();
 
@@ -339,11 +419,11 @@ public class DetalleCursoController {
 
         lblAprobadosReprobados.setText("28 / 4");
 
-        lblPromedioMateria.setText("Matemáticas: 72.3 (La más baja)");
+        lblPromedioMateria.setText(lang.get("detalle.subj.mathematics") + ": 72.3");
 
         ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
-            new PieChart.Data("Masculino", 18),
-            new PieChart.Data("Femenino", 12)
+            new PieChart.Data(lang.get("detalle.masculino", "Masculino"), 18),
+            new PieChart.Data(lang.get("detalle.femenino", "Femenino"), 12)
         );
         genderChart.setData(pieData);
         initGenderChartInteraction();
@@ -366,8 +446,8 @@ public class DetalleCursoController {
             Node node = data.getNode();
             if (node != null) {
                 String label = switch (data.getName()) {
-                    case "Masculino" -> "varones";
-                    case "Femenino"  -> "mujeres";
+                    case "Masculino" -> lang.get("detalle.varones", "varones");
+                    case "Femenino"  -> lang.get("detalle.mujeres", "mujeres");
                     default          -> "otros";
                 };
                 int count = (int) data.getPieValue();
@@ -403,7 +483,11 @@ public class DetalleCursoController {
     }
 
     private void onLanguageChanged() {
-        Platform.runLater(this::updateTexts);
+        Platform.runLater(() -> {
+            updateTexts();
+            initTeacherData();
+            initStats();
+        });
     }
 
     private void onThemeChanged() {
@@ -421,7 +505,8 @@ public class DetalleCursoController {
     }
 
     private void updateTexts() {
-        pageTitle.setText(lang.get("detalle.pageTitle", "Detalles del Curso"));
+        String titleBase = lang.get("detalle.pageTitle", "Detalles del Curso");
+        pageTitle.setText(currentCourseLabel.isEmpty() ? titleBase : titleBase + ": " + currentCourseLabel);
         breadcrumbCursos.setText(lang.get("detalle.breadcrumbCursos", "Cursos"));
         btnPrint.setText(lang.get("detalle.btnPrint", "Imprimir Reporte"));
         btnEditCourse.setText(lang.get("detalle.btnEdit", "Editar Curso"));
@@ -436,6 +521,7 @@ public class DetalleCursoController {
         colTeacherSubject.setText(lang.get("detalle.colMateria", "MATERIA"));
         colStudent.setText(lang.get("detalle.colStudent", "ESTUDIANTE"));
         colMatricula.setText(lang.get("detalle.colMatricula", "ID MATRÍCULA"));
+        colGenero.setText(lang.get("detalle.colGenero", "GÉNERO"));
         colAsistencia.setText(lang.get("detalle.colAsistencia", "ASISTENCIA"));
         if (lblStatsTitle != null) lblStatsTitle.setText(lang.get("detalle.statsTitle", "Estad\u00edsticas y Rendimiento"));
         if (lblTotalStudentsLabel != null) lblTotalStudentsLabel.setText(lang.get("detalle.totalStudentsLabel", "Total Estudiantes"));
@@ -446,6 +532,13 @@ public class DetalleCursoController {
         if (lblDistribucionGeneroLabel != null) lblDistribucionGeneroLabel.setText(lang.get("detalle.distribucionGeneroLabel", "Distribuci\u00f3n por G\u00e9nero"));
         if (lblEquipoDocenteCard != null) lblEquipoDocenteCard.setText(lang.get("detalle.equipoDocenteCard", "Equipo Docente"));
         if (lblListaEstudiantesCard != null) lblListaEstudiantesCard.setText(lang.get("detalle.listaEstudiantesCard", "Lista de Estudiantes"));
+        if (lblAddStudentTitle != null) lblAddStudentTitle.setText(lang.get("detalle.addStudentTitle", "Agregar Estudiante"));
+        if (lblAddTeacherTitle != null) lblAddTeacherTitle.setText(lang.get("detalle.addTeacherTitle", "Agregar Profesor"));
+        if (studentNameField != null) studentNameField.setPromptText(lang.get("detalle.studentNameLabel", "Nombre del estudiante"));
+        if (studentIdField != null) studentIdField.setPromptText(lang.get("detalle.studentIdLabel", "ID Matr\u00edcula"));
+        if (teacherSearchField != null) teacherSearchField.setPromptText(lang.get("detalle.teacherSearchLabel", "Buscar profesor..."));
+        if (addStudentBtn != null) addStudentBtn.setText(lang.get("detalle.btnAdd", "Agregar"));
+        if (addTeacherBtn != null) addTeacherBtn.setText(lang.get("detalle.btnAdd", "Agregar"));
     }
 
     @FXML
@@ -501,6 +594,9 @@ public class DetalleCursoController {
         btnEditCourse.setText(lang.get("detalle.btnGuardar", "Guardar"));
         btnCancelEdit.setVisible(true);
         btnCancelEdit.setManaged(true);
+
+        editFormsPanel.setVisible(true);
+        editFormsPanel.setManaged(true);
 
         // Make student table editable (name + matrícula)
         studentsTable.setEditable(true);
@@ -568,12 +664,223 @@ public class DetalleCursoController {
             }
         });
         colMatricula.setCellValueFactory(new PropertyValueFactory<>("matricula"));
+        colGenero.setCellValueFactory(new PropertyValueFactory<>("genero"));
+        colGenero.setCellFactory(col -> new TableCell<StudentRow, String>() {
+            private final Label lbl = new Label();
+            { lbl.setAlignment(Pos.CENTER); setGraphic(lbl); setPadding(new Insets(8, 8, 8, 8)); }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { lbl.setText(null); }
+                else { lbl.setText(item); lbl.getStyleClass().add("cell-docente-name"); }
+            }
+        });
 
         teacherTable.setEditable(false);
         colTeacherName.setCellFactory(nombreCell());
         colTeacherSubject.setCellFactory(defaultSubjectCell());
         teacherTable.refresh();
         studentsTable.refresh();
+        editFormsPanel.setVisible(false);
+        editFormsPanel.setManaged(false);
+    }
+
+    @FXML
+    private void onAddStudent(ActionEvent event) {
+        String name = studentNameField.getText().trim();
+        String id = studentIdField.getText().trim();
+        if (name.isEmpty() || id.isEmpty()) return;
+
+        String[] statuses = {"presente", "ausente", "excusa"};
+        String status = statuses[ThreadLocalRandom.current().nextInt(statuses.length)];
+        String genero = "M";
+        StudentRow row = new StudentRow(name, genero, id, status);
+        fullStudentData.add(row);
+        displayedStudentData.add(row);
+        int count = displayedStudentData.size();
+        updateStudentTableHeight(count);
+        totalStudents.setText(String.valueOf(fullStudentData.size()));
+        studentNameField.clear();
+        studentIdField.clear();
+    }
+
+    @FXML
+    private void onAddTeacher(ActionEvent event) {
+        String search = teacherSearchField.getText().trim();
+        if (search.isEmpty()) return;
+
+        // find first matching teacher from DataStore
+        var teachers = util.DataStore.getTeachers();
+        if (teachers == null || teachers.isEmpty()) {
+            // fallback: reuse the internal fullTeacherData
+            for (var t : fullTeacherData) {
+                if (t.getNombre().toLowerCase().contains(search.toLowerCase())) {
+                    addTeacherToCourse(t);
+                    teacherSearchField.clear();
+                    return;
+                }
+            }
+            return;
+        }
+        String q = search.toLowerCase();
+        for (var t : teachers) {
+            if (t.nombre().toLowerCase().contains(q)) {
+                TeacherRow newRow = new TeacherRow(t.nombre(), t.email(), t.materia(),
+                    currentCourse != null ? currentCourse.seccion() : "", t.estado(), t.avatarIdx());
+                addTeacherToCourse(newRow);
+                teacherSearchField.clear();
+                teacherSuggestPopup.hide();
+                return;
+            }
+        }
+    }
+
+    private void addTeacherToCourse(TeacherRow row) {
+        fullTeacherData.add(row);
+        displayedTeacherData.add(row);
+        int count = displayedTeacherData.size();
+        updateTeacherTableHeight(count);
+        totalTeachers.setText(String.valueOf(fullTeacherData.size()));
+    }
+
+    private void initTeacherAutocomplete() {
+        teacherSuggestPopup.setAutoHide(true);
+        teacherSuggestPopup.setHideOnEscape(true);
+
+        teacherSearchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null || newVal.trim().isEmpty()) {
+                teacherSuggestPopup.hide();
+                return;
+            }
+            String q = newVal.trim().toLowerCase();
+            VBox list = new VBox();
+            list.getStyleClass().add("search-suggestion-popup");
+            list.getStylesheets().add(getClass().getResource("/css/DetallesCurso.css").toExternalForm());
+
+            var teachers = util.DataStore.getTeachers();
+            if (teachers != null) {
+                for (var t : teachers) {
+                    if (t.nombre().toLowerCase().contains(q) || t.materia().toLowerCase().contains(q)) {
+                        Label item = new Label(t.nombre() + "  —  " + t.materia());
+                        item.getStyleClass().add("search-suggestion-item");
+                        item.setMaxWidth(Double.MAX_VALUE);
+                        item.setOnMouseClicked(e -> {
+                            TeacherRow newRow = new TeacherRow(t.nombre(), t.email(), t.materia(),
+                                currentCourse != null ? currentCourse.seccion() : "", t.estado(), t.avatarIdx());
+                            addTeacherToCourse(newRow);
+                            teacherSearchField.clear();
+                            teacherSuggestPopup.hide();
+                        });
+                        list.getChildren().add(item);
+                    }
+                }
+            }
+
+            if (list.getChildren().isEmpty()) {
+                Label empty = new Label(lang.get("detalle.noTeachersFound", "No se encontraron profesores"));
+                empty.getStyleClass().add("search-suggestion-item");
+                empty.setMaxWidth(Double.MAX_VALUE);
+                list.getChildren().add(empty);
+            }
+
+            teacherSuggestPopup.getContent().setAll(list);
+            if (!teacherSuggestPopup.isShowing()) {
+                teacherSuggestPopup.show(teacherSearchField, teacherSearchField.localToScreen(0, teacherSearchField.getHeight()).getX(),
+                    teacherSearchField.localToScreen(0, teacherSearchField.getHeight()).getY());
+            }
+        });
+
+        teacherSearchField.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                Platform.runLater(() -> teacherSuggestPopup.hide());
+            }
+        });
+    }
+
+    private void initStudentAutocomplete() {
+        // ── Name field autocomplete ──
+        studentNamePopup.setAutoHide(true);
+        studentNamePopup.setHideOnEscape(true);
+        studentNameField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null || newVal.trim().isEmpty()) {
+                studentNamePopup.hide();
+                return;
+            }
+            String q = newVal.trim().toLowerCase();
+            VBox list = new VBox();
+            list.getStyleClass().add("search-suggestion-popup");
+            list.getStylesheets().add(getClass().getResource("/css/DetallesCurso.css").toExternalForm());
+
+            for (var s : fullStudentData) {
+                if (s.getName().toLowerCase().contains(q)) {
+                    Label item = new Label(s.getName() + "  —  " + s.getMatricula());
+                    item.getStyleClass().add("search-suggestion-item");
+                    item.setMaxWidth(Double.MAX_VALUE);
+                    item.setOnMouseClicked(e -> {
+                        studentNameField.setText(s.getName());
+                        studentIdField.setText(s.getMatricula());
+                        studentNamePopup.hide();
+                    });
+                    list.getChildren().add(item);
+                }
+            }
+
+            if (!list.getChildren().isEmpty()) {
+                studentNamePopup.getContent().setAll(list);
+                if (!studentNamePopup.isShowing()) {
+                    studentNamePopup.show(studentNameField,
+                        studentNameField.localToScreen(0, studentNameField.getHeight()).getX(),
+                        studentNameField.localToScreen(0, studentNameField.getHeight()).getY());
+                }
+            } else {
+                studentNamePopup.hide();
+            }
+        });
+        studentNameField.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) Platform.runLater(() -> studentNamePopup.hide());
+        });
+
+        // ── ID field autocomplete ──
+        studentIdPopup.setAutoHide(true);
+        studentIdPopup.setHideOnEscape(true);
+        studentIdField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null || newVal.trim().isEmpty()) {
+                studentIdPopup.hide();
+                return;
+            }
+            String q = newVal.trim().toLowerCase();
+            VBox list = new VBox();
+            list.getStyleClass().add("search-suggestion-popup");
+            list.getStylesheets().add(getClass().getResource("/css/DetallesCurso.css").toExternalForm());
+
+            for (var s : fullStudentData) {
+                if (s.getMatricula().toLowerCase().contains(q)) {
+                    Label item = new Label(s.getMatricula() + "  —  " + s.getName());
+                    item.getStyleClass().add("search-suggestion-item");
+                    item.setMaxWidth(Double.MAX_VALUE);
+                    item.setOnMouseClicked(e -> {
+                        studentNameField.setText(s.getName());
+                        studentIdField.setText(s.getMatricula());
+                        studentIdPopup.hide();
+                    });
+                    list.getChildren().add(item);
+                }
+            }
+
+            if (!list.getChildren().isEmpty()) {
+                studentIdPopup.getContent().setAll(list);
+                if (!studentIdPopup.isShowing()) {
+                    studentIdPopup.show(studentIdField,
+                        studentIdField.localToScreen(0, studentIdField.getHeight()).getX(),
+                        studentIdField.localToScreen(0, studentIdField.getHeight()).getY());
+                }
+            } else {
+                studentIdPopup.hide();
+            }
+        });
+        studentIdField.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) Platform.runLater(() -> studentIdPopup.hide());
+        });
     }
 
     @FXML
@@ -631,11 +938,13 @@ public class DetalleCursoController {
 
     public static class StudentRow {
         private final StringProperty name;
+        private final StringProperty genero;
         private final StringProperty matricula;
         private final StringProperty status;
 
-        public StudentRow(String name, String matricula, String status) {
+        public StudentRow(String name, String genero, String matricula, String status) {
             this.name = new SimpleStringProperty(name);
+            this.genero = new SimpleStringProperty(genero);
             this.matricula = new SimpleStringProperty(matricula);
             this.status = new SimpleStringProperty(status);
         }
@@ -643,6 +952,10 @@ public class DetalleCursoController {
         public String getName() { return name.get(); }
         public void setName(String n) { name.set(n); }
         public StringProperty nameProperty() { return name; }
+
+        public String getGenero() { return genero.get(); }
+        public void setGenero(String g) { genero.set(g); }
+        public StringProperty generoProperty() { return genero; }
 
         public String getMatricula() { return matricula.get(); }
         public void setMatricula(String m) { matricula.set(m); }

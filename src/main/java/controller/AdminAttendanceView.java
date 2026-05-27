@@ -46,6 +46,16 @@ public class AdminAttendanceView {
             "#10B981", "#EF4444", "#6366F1", "#14B8A6"
     };
 
+    private static final java.util.Map<String, java.util.Map<String, AttendanceStatus>> attendanceStore = new java.util.HashMap<>();
+
+    public static java.util.Map<String, AttendanceStatus> getSavedAttendance(String courseKey) {
+        return attendanceStore.get(courseKey);
+    }
+
+    public static java.util.Map<String, java.util.Map<String, AttendanceStatus>> getAttendanceStore() {
+        return attendanceStore;
+    }
+
     private final ThemeManager theme;
     private final LanguageManager lang = LanguageManager.getInstance();
     private final ObservableList<StudentAttendance> students = FXCollections.observableArrayList();
@@ -68,6 +78,7 @@ public class AdminAttendanceView {
     private final Label listTitle = new Label();
     private final Label listSubtitle = new Label();
     private final Button saveButton = new Button();
+    private final Label saveLabel = new Label();
     private final Label gradeLabel = new Label("5to");
     private final Label sectionLabel = new Label("E");
     private final TextField searchField = new TextField();
@@ -75,6 +86,7 @@ public class AdminAttendanceView {
     private final HBox selectorBox = new HBox(8);
     private final HBox pageHeader = new HBox(24);
     private boolean compact;
+    private final java.util.Set<String> savedCourses = new java.util.HashSet<>();
 
     public AdminAttendanceView(ThemeManager theme) {
         this.theme = theme;
@@ -106,6 +118,30 @@ public class AdminAttendanceView {
         externalSearchField.textProperty().addListener((obs, oldValue, newValue) -> {
             searchField.setText(newValue);
         });
+    }
+
+    public void setGradeSection(String grade, String section) {
+        gradeLabel.setText(grade);
+        sectionLabel.setText(section);
+        var saved = getSavedAttendance(courseKey());
+        if (saved != null && !saved.isEmpty()) {
+            students.clear();
+            int idx = 0;
+            for (var entry : saved.entrySet()) {
+                StudentAttendance sa = new StudentAttendance(entry.getKey(), idx % 8);
+                sa.status = entry.getValue();
+                students.add(sa);
+                idx++;
+            }
+            updateSaveButtonText();
+        } else {
+            reloadStudents();
+        }
+    }
+
+    public void filterStudent(String studentName) {
+        searchField.setText(studentName);
+        refreshRows();
     }
 
     private void buildView() {
@@ -267,7 +303,7 @@ public class AdminAttendanceView {
 
         tableCard.getChildren().addAll(tableHeader, header, rowScroll);
 
-        HBox saveContent = new HBox(8, icon(ICON_SAVE, 17, "#ffffff"), new Label());
+        HBox saveContent = new HBox(8, icon(ICON_SAVE, 17, "#ffffff"), saveLabel);
         saveContent.setAlignment(Pos.CENTER);
         saveButton.setGraphic(saveContent);
         saveButton.setMaxWidth(Double.MAX_VALUE);
@@ -278,7 +314,7 @@ public class AdminAttendanceView {
         saveButton.setOnMouseEntered(e -> saveButton.setStyle(saveButton.getStyle().replace("#2563eb", "#1d4ed8")));
         saveButton.setOnMouseExited(e -> saveButton.setStyle(saveButton.getStyle().replace("#1d4ed8", "#2563eb")));
 
-        languageUpdaters.add(() -> ((Label) saveContent.getChildren().get(1)).setText(lang.get("attendance.save")));
+        languageUpdaters.add(() -> updateSaveButtonText());
         themeUpdaters.add(() -> {
             tableCard.setStyle(cardStyle(16, borderSoft()));
             tableHeader.setStyle("-fx-border-color: transparent transparent " + borderSoft() + " transparent;");
@@ -288,7 +324,7 @@ public class AdminAttendanceView {
             listSubtitle.setTextFill(Color.web(textMuted()));
             tableDateLabel.setTextFill(Color.web(textMuted()));
             saveButton.setStyle("-fx-background-color: #2563eb; -fx-background-radius: 16; -fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: 700; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.25), 8, 0.2, 0, 2);");
-            ((Label) saveContent.getChildren().get(1)).setTextFill(Color.WHITE);
+            saveLabel.setTextFill(Color.WHITE);
         });
         refreshRows();
     }
@@ -429,7 +465,13 @@ public class AdminAttendanceView {
     private void wireEvents() {
         searchField.textProperty().addListener((obs, oldValue, newValue) -> refreshRows());
         saveButton.setOnAction(e -> {
-            new Alert(Alert.AlertType.INFORMATION, "Asistencia guardada", ButtonType.OK).showAndWait();
+            savedCourses.add(courseKey());
+            java.util.Map<String, AttendanceStatus> courseData = new java.util.HashMap<>();
+            for (StudentAttendance sa : students) {
+                courseData.put(sa.name(), sa.status);
+            }
+            attendanceStore.put(courseKey(), courseData);
+            updateSaveButtonText();
         });
     }
 
@@ -523,16 +565,29 @@ public class AdminAttendanceView {
         String g = gradeLabel.getText();
 
         int count;
-        if (g.startsWith("4")) count = 30 + RNG.nextInt(10); // 30-39
-        else if (g.startsWith("5")) count = 30 + RNG.nextInt(6); // 30-35
-        else if (g.startsWith("6")) count = 25 + RNG.nextInt(6); // 25-30
+        if (g.startsWith("4")) count = 30 + RNG.nextInt(10);
+        else if (g.startsWith("5")) count = 30 + RNG.nextInt(6);
+        else if (g.startsWith("6")) count = 25 + RNG.nextInt(6);
         else count = 20 + RNG.nextInt(11);
 
         for (int i = 0; i < count; i++) {
             String name = LAST_NAMES[RNG.nextInt(LAST_NAMES.length)] + ", " + FIRST_NAMES[RNG.nextInt(FIRST_NAMES.length)];
             students.add(new StudentAttendance(name, RNG.nextInt(8)));
         }
+        updateSaveButtonText();
         refreshRows();
+    }
+
+    private String courseKey() {
+        return gradeLabel.getText() + " " + sectionLabel.getText();
+    }
+
+    private void updateSaveButtonText() {
+        if (savedCourses.contains(courseKey())) {
+            saveLabel.setText(lang.get("attendance.saved"));
+        } else {
+            saveLabel.setText(lang.get("attendance.save"));
+        }
     }
 
     private static final Random RNG = new Random(42);
@@ -552,7 +607,7 @@ public class AdminAttendanceView {
         "Ríos Paredes", "Delgado Rojas"
     };
 
-    private enum AttendanceStatus { UNMARKED, PRESENT, ABSENT, EXCUSE }
+    public enum AttendanceStatus { UNMARKED, PRESENT, ABSENT, EXCUSE }
 
     private static class StudentAttendance {
         private final String name;

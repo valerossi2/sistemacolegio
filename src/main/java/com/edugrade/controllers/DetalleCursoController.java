@@ -3,6 +3,7 @@ package com.edugrade.controllers;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
@@ -39,6 +40,7 @@ import javafx.stage.Popup;
 import javafx.util.Callback;
 import theme.ThemeManager;
 import util.LanguageManager;
+import util.DataStore;
 
 public class DetalleCursoController {
 
@@ -295,17 +297,12 @@ public class DetalleCursoController {
         // ── Students ──
         fullStudentData.clear();
         displayedStudentData.clear();
-        String[] firstNames = {"Liam","Emma","Noah","Olivia","Mateo","Isabella","Santiago","Sophia",
-            "Lucas","Mía","Benjamín","Valentina","Sebastián","Camila","Daniel","Gabriela"};
-        String[] lastNames = {"Castillo","Rodríguez","García","Martínez","Hernández","López","Pérez",
-            "González","Fernández","Torres","Ramírez","Morales","Ortiz","Cruz","Reyes","Vargas"};
-        String[] statuses = {"presente","ausente","excusa"};
-        int studentCount = currentCourse.alumnos();
-        for (int i = 0; i < studentCount; i++) {
-            String name = firstNames[rng.nextInt(firstNames.length)] + " " + lastNames[rng.nextInt(lastNames.length)];
-            String mat = String.format("MAT-%03d", rng.nextInt(1, 999));
-            String status = statuses[rng.nextInt(statuses.length)];
-            fullStudentData.add(new StudentRow(name, mat, status));
+        String courseKey = currentCourse.grado() + " " + currentCourse.seccion();
+        List<DataStore.StudentInfo> dbStudents = DataStore.getStudentsForCourse(courseKey);
+        Map<String, String> attendance = DataStore.getAttendanceForCourse(courseKey);
+        for (var s : dbStudents) {
+            String status = attendance.getOrDefault(s.matricula(), "presente");
+            fullStudentData.add(new StudentRow(s.nombre(), s.matricula(), status));
         }
         int shownStudents = Math.min(INITIAL_STUDENT_COUNT, fullStudentData.size());
         displayedStudentData.addAll(fullStudentData.subList(0, shownStudents));
@@ -316,18 +313,13 @@ public class DetalleCursoController {
         // ── Teachers ──
         fullTeacherData.clear();
         displayedTeacherData.clear();
-        String[] teacherNames = {"Prof. Laura Méndez","Prof. Carlos Ruiz","Prof. Elena Torres",
-            "Prof. Ana Silva","Prof. Miguel Soto","Prof. Diana Ríos","Prof. Pedro Lima",
-            "Prof. Sofía Vega","Prof. Luis Paz"};
-        String[] subjects = {"Matemáticas","Historia","Lenguaje","Ciencias","Inglés","Arte",
-            "Educación Física","Música","Filosofía","Biología","Química"};
-        int teacherCount = currentCourse.profesores();
-        for (int i = 0; i < teacherCount; i++) {
-            String subj = subjects[rng.nextInt(subjects.length)];
-            String estado = rng.nextBoolean() ? "Activo" : "Inactivo";
-            fullTeacherData.add(new TeacherRow(teacherNames[i % teacherNames.length],
-                teacherNames[i % teacherNames.length].toLowerCase().replace(" ",".").replace("á","a").replace("é","e") + "@edu.com",
-                subj, currentCourse.seccion(), estado, i));
+        List<Integer> teacherIndices = DataStore.getTeacherIndicesForCourse(courseKey);
+        for (int i = 0; i < teacherIndices.size(); i++) {
+            int idx = teacherIndices.get(i);
+            DataStore.TeacherInfo t = DataStore.getTeachers().get(idx);
+            String estado = "Activo";
+            fullTeacherData.add(new TeacherRow(t.nombre(), t.email(), t.materia(),
+                currentCourse.seccion(), estado, idx));
         }
         int shownTeachers = Math.min(INITIAL_TEACHER_COUNT, fullTeacherData.size());
         displayedTeacherData.addAll(fullTeacherData.subList(0, shownTeachers));
@@ -336,6 +328,7 @@ public class DetalleCursoController {
         totalTeachers.setText(String.valueOf(fullTeacherData.size()));
 
         // ── Gender distribution ──
+        int studentCount = fullStudentData.size();
         int masc = rng.nextInt(studentCount + 1);
         int fem = studentCount - masc;
         genderChart.setData(FXCollections.observableArrayList(
@@ -820,6 +813,8 @@ public class DetalleCursoController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Mestros/Calificaciones.fxml"));
             Node gradesView = loader.load();
             GradesController ctrl = loader.getController();
+            String courseKey = currentCourse.grado() + " " + currentCourse.seccion();
+            ctrl.setCourseKey(courseKey);
 
             Node p = root;
             while (p != null && !"cursosCard".equals(p.getId())) p = p.getParent();

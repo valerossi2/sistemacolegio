@@ -1,7 +1,8 @@
 package com.edugrade.controllers;
 
 import java.net.URL;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -29,6 +30,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import theme.ThemeManager;
+import util.DataStore;
 import util.LanguageManager;
 
 public class DetalleProfesorController implements Initializable {
@@ -166,14 +168,29 @@ public class DetalleProfesorController implements Initializable {
 
     private void loadSchedule() {
         scheduleRows.getChildren().clear();
+        if (currentTeacher == null) return;
 
-        String[][] data = {
-            {"07:00", "08:30", "Matematicas"},
-            {"08:45", "10:15", currentTeacher != null ? currentTeacher.materia() : "Historia"},
-            {"10:30", "12:00", "Laboratorio"},
-            {"13:00", "14:30", "Tutorias"},
-            {"14:45", "16:15", "Arte"}
+        DataStore.seedIfEmpty();
+        List<DataStore.CourseInfo> allCourses = DataStore.getCourses();
+        var rng = ThreadLocalRandom.current();
+
+        // Build time slots 8:00-16:00 with 1.5h blocks
+        String[][] slots = {
+            {"08:00", "09:30"}, {"09:30", "11:00"}, {"11:00", "12:30"},
+            {"13:00", "14:30"}, {"14:30", "16:00"}
         };
+
+        // Pick random courses for this teacher (up to 5 slots)
+        int n = slots.length;
+        String[][] data = new String[n][3];
+        for (int i = 0; i < n; i++) {
+            DataStore.CourseInfo c = allCourses.get(rng.nextInt(allCourses.size()));
+            String courseLabel = c.grado() + " " + c.seccion();
+            boolean isEncargado = c.profesorIdx() == currentTeacher.avatarIdx();
+            data[i][0] = slots[i][0];
+            data[i][1] = slots[i][1];
+            data[i][2] = isEncargado ? courseLabel + " — " + currentTeacher.materia() : courseLabel;
+        }
 
         String trackColor = c("#E5E7EB", "#334155");
         String fillColor = c("#2B54A8", "#3B82F6");
@@ -183,8 +200,7 @@ public class DetalleProfesorController implements Initializable {
         String labelMuted = c("#6B7280", "#94A3B8");
         String labelDim = c("#9CA3AF", "#64748B");
 
-        // find last active end for fill height
-        String lastActiveEnd = "07:00";
+        String lastActiveEnd = "08:00";
         for (var row : data) {
             var end = java.time.LocalTime.parse(row[1]);
             if (!now.isAfter(end)) {
@@ -196,8 +212,8 @@ public class DetalleProfesorController implements Initializable {
                 lastActiveEnd = row[1];
             }
         }
-        var earliest = java.time.LocalTime.parse("07:00");
-        var latest = java.time.LocalTime.parse("18:00");
+        var earliest = java.time.LocalTime.parse("08:00");
+        var latest = java.time.LocalTime.parse("16:00");
         double totalMinutes = java.time.temporal.ChronoUnit.MINUTES.between(earliest, latest);
         double fillPct = java.time.temporal.ChronoUnit.MINUTES.between(earliest, java.time.LocalTime.parse(lastActiveEnd)) / totalMinutes;
         if (fillPct < 0) fillPct = 0;
@@ -213,13 +229,11 @@ public class DetalleProfesorController implements Initializable {
         barPane.setMinHeight(data.length * rowHeight);
         barPane.setMaxWidth(Double.MAX_VALUE);
 
-        // vertical track
         Rectangle track = new Rectangle(centerX - 2, barTop, 4, barHeight);
         track.setFill(Color.web(trackColor));
         track.setArcWidth(4);
         track.setArcHeight(4);
 
-        // vertical fill
         double fillH = barHeight * fillPct;
         if (fillH > barHeight) fillH = barHeight;
         Rectangle fill = new Rectangle(centerX - 2, barTop, 4, fillH);
@@ -232,7 +246,7 @@ public class DetalleProfesorController implements Initializable {
         for (int i = 0; i < data.length; i++) {
             String startStr = data[i][0];
             String endStr = data[i][1];
-            String courseName = data[i][2];
+            String lineText = data[i][2];
 
             var start = java.time.LocalTime.parse(startStr);
             var end = java.time.LocalTime.parse(endStr);
@@ -242,7 +256,6 @@ public class DetalleProfesorController implements Initializable {
 
             double yCenter = i * rowHeight + rowHeight / 2.0;
 
-            // dot
             Circle dot = new Circle(centerX, yCenter, 5);
             if (isCurrent) {
                 dot.setFill(Color.web(currentColor));
@@ -256,7 +269,6 @@ public class DetalleProfesorController implements Initializable {
             }
             barPane.getChildren().add(dot);
 
-            // time label (left of bar)
             Label timeLabel = new Label(startStr);
             timeLabel.setFont(Font.font("Plus Jakarta Sans", 10));
             timeLabel.setTextFill(Color.web(isActive ? labelMuted : labelDim));
@@ -266,9 +278,8 @@ public class DetalleProfesorController implements Initializable {
             timeLabel.setAlignment(Pos.CENTER_RIGHT);
             barPane.getChildren().add(timeLabel);
 
-            // course name (right of bar)
-            Label nameLabel = new Label(courseName);
-            nameLabel.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 12));
+            Label nameLabel = new Label(lineText);
+            nameLabel.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 11));
             nameLabel.setTextFill(Color.web(isActive ? labelColor : labelDim));
             nameLabel.setLayoutX(centerX + 14);
             nameLabel.setLayoutY(yCenter - 8);

@@ -1,0 +1,213 @@
+╔══════════════════════════════════════════════════════════════╗
+║             LUMINA ACADEMY — DATOS COMPLETOS               ║
+║  (Basado en DataStore.java — seed determinístico + info    ║
+║   de estructura; datos aleatorios se generan al ejecutar)  ║
+╚══════════════════════════════════════════════════════════════╝
+
+====================================================================
+1. PROFESORES (15 total)
+====================================================================
+
+ #  Nombre               Email                        Materia               Curso Principal   Estado
+──  ───────────────────  ───────────────────────────  ────────────────────  ────────────────  ──────
+ 0  Denis Ramirez        denis.ramirez@edu.com        Ofimática             4to E             Activo
+ 1  Santa Hichez         santa.hichez@edu.com         Español               4to E             Activo
+ 2  Luz Leclerc          luz.leclerc@edu.com          Matemáticas           4to E             Activo
+ 3  Shirley Gómez        shirley.gomez@edu.com        Artística             4to E             Activo
+ 4  Claudilina Ferrera   claudilina.ferrera@edu.com   Biología              4to E             Activo
+ 5  Kelvis               kelvis@edu.com               Educación Física      4to E             Activo
+ 6  Jose Sierra          jose.sierra@edu.com          DASI                  5to E             Activo
+ 7  Anderson             anderson@edu.com             Base de datos         5to E             Activo
+ 8  Paola Dilone         paola.dilone@edu.com         Química               5to E             Activo
+ 9  Sofía                sofia@edu.com                Español               5to E             Activo
+10  Karina Pérez         karina.perez@edu.com         Matemáticas           5to E             Activo
+11  María Rodríguez      maria.rodriguez@edu.com      Base de datos         6to E             Activo
+12  Carlos Méndez        carlos.mendez@edu.com        Página web            6to E             Activo
+13  Laura Jiménez        laura.jimenez@edu.com        DASI                  6to E             Activo
+14  Roberto Vargas       roberto.vargas@edu.com       Diseño de Reporte     6to E             Activo
+
+====================================================================
+2. CURSOS (6 total)
+====================================================================
+
+ Curso     Encargado(a)             ProfIdx  Estudiantes   Rendimiento   Estado
+ ────────  ───────────────────────  ───────  ────────────  ───────────  ────────
+ 4to  E    Denis Ramirez               0     20–35 (rand)  9.2          En clase
+ 5to  E    Jose Sierra                 6     20–35 (rand)  7.8          En clase
+ 6to  E    María Rodríguez            11     20–35 (rand)  8.8          En clase
+ 1ro  A    (aleatorio cada seed)     rand    20–35 (rand)  8.5          En clase
+ 2do  B    (aleatorio cada seed)     rand    20–35 (rand)  7.9          En clase
+ 3ro  C    (aleatorio cada seed)     rand    20–35 (rand)  8.2          En clase
+
+Nota: El encargado de los cursos "relleno" (1ro A, 2do B, 3ro C)
+      se asigna aleatoriamente de los 15 profesores cada vez que
+      se ejecuta seedIfEmpty().
+
+====================================================================
+3. EQUIPO DOCENTE POR CURSO (8–12 profesores por curso)
+====================================================================
+
+4to E:
+  #  Profesor            Materia
+  0  Denis Ramirez       Ofimática
+  1  Santa Hichez        Español
+  2  Luz Leclerc         Matemáticas
+  3  Shirley Gómez       Artística
+  4  Claudilina Ferrera  Biología
+  5  Kelvis              Educación Física
+  6  Jose Sierra         DASI
+  7  Anderson            Base de datos
+  8  Paola Dilone        Química
+
+5to E:
+  #  Profesor            Materia
+  5  Kelvis              Educación Física
+  6  Jose Sierra         DASI
+  7  Anderson            Base de datos
+  8  Paola Dilone        Química
+  9  Sofía               Español
+ 10  Karina Pérez        Matemáticas
+  0  Denis Ramirez       Ofimática
+  1  Santa Hichez        Español
+  3  Shirley Gómez       Artística
+
+6to E:
+  #  Profesor            Materia
+ 11  María Rodríguez     Base de datos
+ 12  Carlos Méndez       Página web
+ 13  Laura Jiménez       DASI
+ 14  Roberto Vargas      Diseño de Reporte
+  0  Denis Ramirez       Ofimática
+  6  Jose Sierra         DASI
+  7  Anderson            Base de datos
+  5  Kelvis              Educación Física
+  8  Paola Dilone        Química
+
+1ro A:
+  #  Profesor            Materia
+  0  Denis Ramirez       Ofimática
+  1  Santa Hichez        Español
+  2  Luz Leclerc         Matemáticas
+  3  Shirley Gómez       Artística
+  4  Claudilina Ferrera  Biología
+  5  Kelvis              Educación Física
+  6  Jose Sierra         DASI
+  7  Anderson            Base de datos
+  8  Paola Dilone        Química
+
+2do B:
+  #  Profesor            Materia
+  5  Kelvis              Educación Física
+  6  Jose Sierra         DASI
+  7  Anderson            Base de datos
+  8  Paola Dilone        Química
+  9  Sofía               Español
+ 10  Karina Pérez        Matemáticas
+ 11  María Rodríguez     Base de datos
+ 12  Carlos Méndez       Página web
+ 13  Laura Jiménez       DASI
+
+3ro C:
+  #  Profesor            Materia
+  0  Denis Ramirez       Ofimática
+  2  Luz Leclerc         Matemáticas
+  4  Claudilina Ferrera  Biología
+  6  Jose Sierra         DASI
+  8  Paola Dilone        Química
+ 10  Karina Pérez        Matemáticas
+ 11  María Rodríguez     Base de datos
+ 12  Carlos Méndez       Página web
+ 14  Roberto Vargas      Diseño de Reporte
+
+====================================================================
+4. HORARIO (Dashboard — "Horario de Hoy")
+====================================================================
+
+ Hora     Curso     Detalle
+ ──────   ────────  ─────────────────
+ 08:00    4to E     4to E
+ 09:00    5to E     5to E
+ 10:00    6to E     6to E
+ 11:00    1ro A     1ro A
+ 12:00    2do B     2do B
+ 13:00    3ro C     3ro C
+
+Nota: El detalle ahora muestra el nombre del curso
+      (antes mostraba "Salon 101" etc.).
+
+====================================================================
+5. ESTUDIANTES (generados aleatoriamente al ejecutar)
+====================================================================
+
+ Por cada curso se generan entre 20 y 35 estudiantes.
+
+ Pool de nombres:
+   Nombres:  Liam, Emma, Noah, Olivia, Mateo, Isabella, Santiago,
+             Sophia, Lucas, Mía, Benjamín, Valentina, Sebastián,
+             Camila, Daniel, Gabriela, Carlos, Valeria, Diego, Sofía
+   Apellidos: Castillo, Rodríguez, García, Martínez, Hernández,
+              López, Pérez, González, Fernández, Torres, Ramírez,
+              Morales, Ortiz, Cruz, Reyes, Vargas
+
+ Formato matrícula: MAT-XXX (001–999)
+
+ Ejemplo de estudiantes para un curso (aleatorio cada ejecución):
+   Liam Castillo       MAT-452
+   Emma Rodríguez      MAT-178
+   Noah García         MAT-934
+   ... (20 a 35 por curso)
+
+ Asistencia inicial: todos los estudiantes comienzan en "presente".
+   Se puede cambiar desde AdminAttendanceView (Presente/Ausente/Excusa).
+   El cambio persiste en DataStore.ATTENDANCE mientras la app
+   esté ejecutándose. DetalleCursoController lee el mismo mapa,
+   por lo que la asistencia se refleja en ambas vistas.
+
+====================================================================
+6. CALIFICACIONES (generadas aleatoriamente al entrar a cada curso)
+====================================================================
+
+ Al abrir "Calificaciones" desde DetalleCursoController:
+   - Se cargan los mismos estudiantes del curso desde DataStore
+     (mismos nombres y matrículas que en DetalleCurso)
+   - A cada estudiante se le asigna una nota base aleatoria
+     entre 5.0 y 10.0
+   - El género (MALE/FEMALE) se asigna aleatoriamente
+
+ Las calificaciones no persisten entre sesiones; solo se
+ mantienen en memoria mientras la pantalla esté abierta.
+
+====================================================================
+7. VISTAS CRUZADAS (consistencia de datos)
+====================================================================
+
+ DetalleCursoController ─carga─> DataStore.getStudentsForCourse()
+                                        │
+ GradesController       ─carga─> DataStore.getStudentsForCourse()
+                                        │ (mismos nombres y matrículas)
+ AdminAttendanceView    ─carga─> DataStore.getStudentsForCourse()
+                            ─lee─> DataStore.getAttendanceForCourse()
+                            ─escribe─> DataStore.setAttendance()
+                                        │
+ DetalleCursoController ─lee─> DataStore.getAttendanceForCourse()
+                               (muestra el mismo estado de asistencia)
+
+ Encargado visible en AdminAttendanceView:
+   Se obtiene de DataStore.getEncargadoForCourse(), que devuelve
+   el profesorNombre del CourseInfo correspondiente.
+
+====================================================================
+8. MAPA DE ARCHIVOS FUENTE
+====================================================================
+
+ Utilidad           Ruta
+ ─────────────────  ──────────────────────────────────────────────
+ DataStore          src/main/java/util/DataStore.java
+ DetalleCursoCtrl   src/main/java/com/edugrade/controllers/DetalleCursoController.java
+ GradesController   src/main/java/com/edugrade/controller/GradesController.java
+ AttendView         src/main/java/controller/AdminAttendanceView.java
+ DetalleProfCtrl    src/main/java/com/edugrade/controllers/DetalleProfesorController.java
+ MainController     src/main/java/controller/MainController.java
+
+====================================================================
+FIN DEL REPORTE

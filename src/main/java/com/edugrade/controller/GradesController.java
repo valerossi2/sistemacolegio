@@ -19,10 +19,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import theme.ThemeManager;
+import util.DataStore;
 import util.LanguageManager;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class GradesController implements Initializable {
 
@@ -45,6 +47,7 @@ public class GradesController implements Initializable {
     private LanguageManager lang;
     private ThemeManager theme;
     private Runnable onBack;
+    private String courseKey = "";
 
     private double currentMaxGrade = 100.0;
 
@@ -55,15 +58,25 @@ public class GradesController implements Initializable {
         "Participación", 15.0
     );
 
-    private final ObservableList<Student> masterData =
-        FXCollections.observableArrayList(
-            new Student("Alejandro García",  "alejandro.g@student.edu", "STU-2023-045", 8.5, Gender.MALE),
-            new Student("Lucia Martinez",    "lucia.m@student.edu",     "STU-2023-089", 8.5, Gender.FEMALE),
-            new Student("Juan Pérez",        "juan.p@student.edu",      "STU-2023-112", 7.5, Gender.MALE),
-            new Student("Valeria Ramirez",   "valeria.r@student.edu",   "STU-2023-156", 9.0, Gender.FEMALE)
-        );
+    private final ObservableList<Student> masterData = FXCollections.observableArrayList();
 
     private FilteredList<Student> filteredData;
+
+    public void setCourseKey(String key) {
+        this.courseKey = key;
+        loadStudentsFromDataStore();
+    }
+
+    private void loadStudentsFromDataStore() {
+        DataStore.seedIfEmpty();
+        masterData.clear();
+        var students = DataStore.getStudentsForCourse(courseKey);
+        for (var s : students) {
+            double grade = 5.0 + ThreadLocalRandom.current().nextDouble(5.0);
+            Gender g = ThreadLocalRandom.current().nextBoolean() ? Gender.MALE : Gender.FEMALE;
+            masterData.add(new Student(s.nombre(), s.nombre().toLowerCase().replace(" ",".") + "@student.edu", s.matricula(), Math.round(grade * 10.0) / 10.0, g));
+        }
+    }
 
     public void setOnBack(Runnable onBack) {
         this.onBack = onBack;

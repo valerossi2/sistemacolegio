@@ -25,12 +25,14 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import theme.ThemeManager;
 import util.LanguageManager;
+import util.DataStore;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class AdminAttendanceView {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -55,6 +57,7 @@ public class AdminAttendanceView {
     private final Label excuseCount = new Label();
     private final Label tutorTag = new Label();
     private final Label tutorName = new Label();
+    private final Label tutorAvatarLabel = new Label();
     private final Label listTitle = new Label();
     private final Label listSubtitle = new Label();
     private final Button loadMoreButton = new Button();
@@ -70,8 +73,7 @@ public class AdminAttendanceView {
 
     public AdminAttendanceView(ThemeManager theme) {
         this.theme = theme;
-        System.out.println("[AdminAttendanceView] CREADO. isDark=" + theme.isDark() + " text()=" + text() + " textMuted()=" + textMuted());
-        loadInitialData();
+        DataStore.seedIfEmpty();
         buildView();
         wireEvents();
         updateLanguage();
@@ -86,6 +88,7 @@ public class AdminAttendanceView {
                 Platform.runLater(() -> applyTheme());
             }
         });
+        reloadForCourse();
     }
 
     public Node getView() {
@@ -114,8 +117,12 @@ public class AdminAttendanceView {
         HBox.setHgrow(headerSpacer, Priority.ALWAYS);
         pageHeader.getChildren().setAll(titleBox, headerSpacer, selectorBox);
 
-        gradeSelector.setItems(FXCollections.observableArrayList("5to", "4to"));
-        sectionSelector.setItems(FXCollections.observableArrayList("E", "A"));
+        gradeSelector.setItems(FXCollections.observableArrayList(
+            DataStore.getCourses().stream().map(c -> c.grado()).distinct().sorted().toList()
+        ));
+        sectionSelector.setItems(FXCollections.observableArrayList(
+            DataStore.getCourses().stream().map(c -> c.seccion()).distinct().sorted().toList()
+        ));
         gradeSelector.getSelectionModel().selectFirst();
         sectionSelector.getSelectionModel().selectFirst();
 
@@ -210,7 +217,7 @@ public class AdminAttendanceView {
         HBox tutorCard = new HBox(14);
         tutorCard.setAlignment(Pos.CENTER_LEFT);
         tutorCard.setPadding(new Insets(14));
-        StackPane avatar = new StackPane(new Label("LM"));
+        StackPane avatar = new StackPane(tutorAvatarLabel);
         avatar.setMinSize(48, 48);
         avatar.setMaxSize(48, 48);
         VBox tutorTexts = new VBox(2, tutorTag, tutorName);
@@ -365,16 +372,19 @@ public class AdminAttendanceView {
             student.status = AttendanceStatus.PRESENT;
             updateBtnStyles.run();
             updateSummary();
+            persistAttendance(student);
         });
         btnAbsent.setOnAction(e -> {
             student.status = AttendanceStatus.ABSENT;
             updateBtnStyles.run();
             updateSummary();
+            persistAttendance(student);
         });
         btnExcuse.setOnAction(e -> {
             student.status = AttendanceStatus.EXCUSE;
             updateBtnStyles.run();
             updateSummary();
+            persistAttendance(student);
         });
 
         themeUpdaters.add(() -> {
@@ -414,8 +424,8 @@ public class AdminAttendanceView {
 
     private void wireEvents() {
         searchField.textProperty().addListener((obs, oldValue, newValue) -> refreshRows());
-        gradeSelector.setOnAction(e -> updateLanguage());
-        sectionSelector.setOnAction(e -> updateLanguage());
+        gradeSelector.setOnAction(e -> reloadForCourse());
+        sectionSelector.setOnAction(e -> reloadForCourse());
         saveButton.setOnAction(e -> {
             long pending = students.stream().filter(s -> s.status == AttendanceStatus.UNMARKED).count();
             if (pending > 0) {
@@ -423,6 +433,17 @@ public class AdminAttendanceView {
                 saveFeedback.setStyle("-fx-text-fill: #ef4444;");
                 saveFeedback.setVisible(true);
                 return;
+            }
+            String grade = gradeSelector.getValue() == null ? "4to" : gradeSelector.getValue();
+            String section = sectionSelector.getValue() == null ? "E" : sectionSelector.getValue();
+            String courseKey = grade + " " + section;
+            for (var s : students) {
+                String status = switch (s.status) {
+                    case ABSENT -> "ausente";
+                    case EXCUSE -> "excusa";
+                    default -> "presente";
+                };
+                DataStore.setAttendance(courseKey, s.enrollment(), status);
             }
             saveFeedback.setText("\u2713 " + lang.get("attendance.savedMessage").replace("{0}", String.valueOf(students.size())));
             saveFeedback.setStyle("-fx-text-fill: #16a34a;");
@@ -459,14 +480,16 @@ public class AdminAttendanceView {
     }
 
     private void updateLanguage() {
-        String grade = gradeSelector.getValue() == null ? "5to" : gradeSelector.getValue();
+        String grade = gradeSelector.getValue() == null ? "4to" : gradeSelector.getValue();
         String section = sectionSelector.getValue() == null ? "E" : sectionSelector.getValue();
+        String courseKey = grade + " " + section;
         breadcrumb.setText(lang.get("attendance.breadcrumb").replace("{0}", grade).replace("{1}", section));
         title.setText(lang.get("attendance.title"));
         summaryTitle.setText(lang.get("attendance.summary"));
         dateText.setText(LocalDate.now().format(DATE_FORMAT));
         tutorTag.setText(lang.get("attendance.tutorTag").toUpperCase(Locale.ROOT));
-        tutorName.setText(lang.get("attendance.tutorName"));
+        String encargado = DataStore.getEncargadoForCourse(courseKey);
+        tutorName.setText(encargado.isEmpty() ? lang.get("attendance.tutorName") : encargado);
         listTitle.setText(lang.get("attendance.studentList"));
         listSubtitle.setText(lang.get("attendance.enrolledCount").replace("{0}", String.valueOf(students.size())));
         loadMoreButton.setText(lang.get("attendance.loadMore"));
@@ -479,6 +502,23 @@ public class AdminAttendanceView {
         absentCount.setText(String.valueOf(students.stream().filter(s -> s.status == AttendanceStatus.ABSENT).count()));
         excuseCount.setText(String.valueOf(students.stream().filter(s -> s.status == AttendanceStatus.EXCUSE).count()));
         listSubtitle.setText(lang.get("attendance.enrolledCount").replace("{0}", String.valueOf(students.size())));
+    }
+
+    private void persistAttendance(StudentAttendance student) {
+        String grade = gradeSelector.getValue() == null ? "4to" : gradeSelector.getValue();
+        String section = sectionSelector.getValue() == null ? "E" : sectionSelector.getValue();
+        String courseKey = grade + " " + section;
+        String status = switch (student.status) {
+            case ABSENT -> "ausente";
+            case EXCUSE -> "excusa";
+            default -> "presente";
+        };
+        DataStore.setAttendance(courseKey, student.enrollment(), status);
+    }
+
+    public void selectCourse(String grade, String section) {
+        gradeSelector.setValue(grade);
+        sectionSelector.setValue(section);
     }
 
     private void applyTheme() {
@@ -512,17 +552,49 @@ public class AdminAttendanceView {
     private String textSecondary() { return theme.isDark() ? "#CBD5E1" : "#1e293b"; }
     private String textMuted() { return theme.isDark() ? "#94A3B8" : "#334155"; }
 
-    private void loadInitialData() {
-        students.addAll(
-            new StudentAttendance("Garcia, Alejandro", "alejandro.g@student.edu", "STU-2023-045", "AG", 0),
-            new StudentAttendance("Martinez, Lucia", "lucia.m@student.edu", "STU-2023-089", "LM", 1),
-            new StudentAttendance("Perez, Carlos", "carlos.p@student.edu", "STU-2023-112", "PC", 2),
-            new StudentAttendance("Lopez, Sofia", "sofia.l@student.edu", "STU-2023-134", "LS", 3),
-            new StudentAttendance("Ramirez, Diego", "diego.r@student.edu", "STU-2023-158", "RD", 0),
-            new StudentAttendance("Torres, Valentina", "valentina.t@student.edu", "STU-2023-177", "VT", 1),
-            new StudentAttendance("Nunez, Camila", "camila.n@student.edu", "STU-2023-188", "CN", 2),
-            new StudentAttendance("Santos, Daniel", "daniel.s@student.edu", "STU-2023-196", "DS", 3)
-        );
+    private void reloadForCourse() {
+        students.clear();
+        String grade = gradeSelector.getValue() == null ? "4to" : gradeSelector.getValue();
+        String section = sectionSelector.getValue() == null ? "E" : sectionSelector.getValue();
+        String courseKey = grade + " " + section;
+        DataStore.seedIfEmpty();
+        boolean courseExists = DataStore.getCourses().stream()
+            .anyMatch(c -> (c.grado() + " " + c.seccion()).equals(courseKey));
+        if (!courseExists) {
+            listSubtitle.setText(lang.get("attendance.enrolledCount").replace("{0}", "0"));
+            updateSummary();
+            refreshRows();
+            return;
+        }
+        var dbStudents = DataStore.getStudentsForCourse(courseKey);
+        var attendance = DataStore.getAttendanceForCourse(courseKey);
+        int colorIdx = 0;
+        for (var s : dbStudents) {
+            String initials = s.nombre().substring(0, 1);
+            if (s.nombre().contains(" ")) {
+                String[] parts = s.nombre().split(" ");
+                initials = parts[0].substring(0, 1) + parts[1].substring(0, 1);
+            }
+            StudentAttendance sa = new StudentAttendance(
+                s.nombre(), s.nombre().toLowerCase().replace(" ",".") + "@student.edu",
+                s.matricula(), initials.toUpperCase(Locale.ROOT), colorIdx % 4);
+            colorIdx++;
+            String attStatus = attendance.getOrDefault(s.matricula(), "presente");
+            sa.status = switch (attStatus) {
+                case "ausente" -> AttendanceStatus.ABSENT;
+                case "excusa" -> AttendanceStatus.EXCUSE;
+                default -> AttendanceStatus.PRESENT;
+            };
+            students.add(sa);
+        }
+        String encargado = DataStore.getEncargadoForCourse(courseKey);
+        tutorName.setText(encargado.isEmpty() ? "—" : encargado);
+        String encInit = encargado.isEmpty() ? "—" :
+            (encargado.contains(" ") ? encargado.split(" ")[0].substring(0,1) + encargado.split(" ")[1].substring(0,1)
+                                    : encargado.substring(0,1));
+        tutorAvatarLabel.setText(encInit);
+        updateSummary();
+        refreshRows();
     }
 
     private enum AttendanceStatus { UNMARKED, PRESENT, ABSENT, EXCUSE }

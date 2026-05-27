@@ -298,7 +298,7 @@ public class CursoController {
                     firstName.setText(NAMES[idx % NAMES.length]);
                     lastName.setText(SURNAMES[idx % NAMES.length]);
                     avatarCircle.setFill(Color.web(AVATAR_COLORS[idx % AVATAR_COLORS.length]));
-                    initials.setText(NAMES[idx].substring(0, 1));
+                    initials.setText(NAMES[idx % NAMES.length].substring(0, 1));
                 }
             }
         };

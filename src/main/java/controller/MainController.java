@@ -692,12 +692,12 @@ public class MainController {
         courseScoreTexts.clear();
 
         table.getChildren().addAll(cols);
-        for (DataStore.CourseInfo c : DataStore.getCourses()) {
+        DataStore.getCourses().stream().limit(4).forEach(c -> {
             String st = c.alumnos() + " Estudiantes";
             String score = String.format("%.1f", c.rendimiento());
             HBox row = createCourseRow(c.grado() + " " + c.seccion(), c.profesorNombre(), st, c.rendimiento() / 10.0, score);
             table.getChildren().add(row);
-        }
+        });
 
         coursesBox.getChildren().addAll(head, table);
         coursesBox.setStyle(cardStyle(theme.isDark()));
@@ -1159,6 +1159,10 @@ public class MainController {
 
     private void navigateToStudentInCourse(String courseKey, String studentName) {
         AdminAttendanceView attendanceView = new AdminAttendanceView(theme);
+        String[] parts = courseKey.split(" ");
+        if (parts.length >= 2) {
+            attendanceView.selectCourse(parts[0], parts[1]);
+        }
         setCenterView(attendanceView.getView());
     }
 

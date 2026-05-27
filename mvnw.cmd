@@ -33,6 +33,12 @@
 @REM MAVEN_SKIP_RC - flag to disable loading of mavenrc files
 @REM ----------------------------------------------------------------------------
 
+@REM Auto-detect JAVA_HOME if not set
+if "%JAVA_HOME%" == "" (
+    if exist "C:\Program Files\Java\jdk-21.0.10" set "JAVA_HOME=C:\Program Files\Java\jdk-21.0.10"
+    if exist "C:\Program Files\Java\jdk-21" set "JAVA_HOME=C:\Program Files\Java\jdk-21"
+)
+
 @REM Begin all REM lines with '@' in case MAVEN_BATCH_ECHO is 'on'
 @echo off
 @REM set title of command window

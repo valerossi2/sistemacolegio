@@ -1,5 +1,6 @@
 package com.edugrade.controllers;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
@@ -10,8 +11,10 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.chart.PieChart;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import com.edugrade.controller.GradesController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
@@ -584,11 +587,19 @@ public class DetalleCursoController {
 
     @FXML
     private void onCalificaciones(ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(lang.get("detalle.calificacionesTitle", "Calificaciones"));
-        alert.setHeaderText(null);
-        alert.setContentText(lang.get("detalle.calificacionesMsg", "Gestión de calificaciones no implementada."));
-        alert.showAndWait();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Mestros/Calificaciones.fxml"));
+            Node gradesView = loader.load();
+            GradesController ctrl = loader.getController();
+
+            VBox cursosCard = (VBox) root.getParent().getParent().getParent();
+            List<Node> savedChildren = new java.util.ArrayList<>(cursosCard.getChildrenUnmodifiable());
+
+            ctrl.setOnBack(() -> cursosCard.getChildren().setAll(savedChildren));
+            cursosCard.getChildren().setAll(gradesView);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateTeacherTableHeight(int rowCount) {

@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -26,12 +27,13 @@ import java.util.ResourceBundle;
 public class GradesController implements Initializable {
 
     @FXML private VBox root;
+    @FXML private HBox topBar;
     @FXML private VBox gradesCard;
+    @FXML private TextField searchField;
     @FXML private Text pageTitle;
-    @FXML private Text pageSubtitle;
+    @FXML private HBox filterBox;
     @FXML private Label lblPeriodo;
     @FXML private Label lblTipoEval;
-    @FXML private Label lblListaEstudiantes;
     @FXML private TableView<Student> gradesTable;
     @FXML private TableColumn<Student, Student> colEstudiante;
     @FXML private TableColumn<Student, String>  colMatricula;
@@ -45,8 +47,9 @@ public class GradesController implements Initializable {
 
     private LanguageManager lang;
     private ThemeManager theme;
+    private Runnable onBack;
 
-    private final ObservableList<Student> studentData =
+    private final ObservableList<Student> masterData =
         FXCollections.observableArrayList(
             new Student("Alejandro García",  "alejandro.g@student.edu", "STU-2023-045", 8.5, Gender.MALE),
             new Student("Lucia Martinez",    "lucia.m@student.edu",     "STU-2023-089", 8.5, Gender.FEMALE),
@@ -54,13 +57,21 @@ public class GradesController implements Initializable {
             new Student("Valeria Ramirez",   "valeria.r@student.edu",   "STU-2023-156", 9.0, Gender.FEMALE)
         );
 
+    private FilteredList<Student> filteredData;
+
+    public void setOnBack(Runnable onBack) {
+        this.onBack = onBack;
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         lang = LanguageManager.getInstance();
         theme = ThemeManager.getInstance();
 
+        filteredData = new FilteredList<>(masterData, p -> true);
+
         configureColumns();
-        gradesTable.setItems(studentData);
+        gradesTable.setItems(filteredData);
         updateTexts();
         Platform.runLater(() -> Platform.runLater(() -> {
             applyTheme();
@@ -70,7 +81,17 @@ public class GradesController implements Initializable {
 
         btnGuardarTop.setOnAction(e    -> handleSave());
         btnGuardarBottom.setOnAction(e -> handleSave());
-        btnCancelar.setOnAction(e      -> handleCancel());
+        btnCancelar.setOnAction(e      -> { handleCancel(); if (onBack != null) onBack.run(); });
+
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            String q = newVal == null ? "" : newVal.toLowerCase().trim();
+            filteredData.setPredicate(s -> {
+                if (q.isEmpty()) return true;
+                return s.getName().toLowerCase().contains(q)
+                    || s.getStudentId().toLowerCase().contains(q)
+                    || s.getEmail().toLowerCase().contains(q);
+            });
+        });
 
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);
@@ -79,6 +100,22 @@ public class GradesController implements Initializable {
         comboTipoEval.getItems().addAll("Examen Parcial", "Examen Final", "Tareas", "Participación");
         comboPeriodo.getSelectionModel().selectFirst();
         comboTipoEval.getSelectionModel().selectFirst();
+
+        setupResponsive();
+    }
+
+    private void setupResponsive() {
+        root.widthProperty().addListener((obs, oldVal, newVal) -> {
+            double w = newVal.doubleValue();
+            boolean compact = w < 700;
+            boolean wasCompact = oldVal.doubleValue() < 700;
+            if (compact == wasCompact) return;
+            if (compact) {
+                root.getStyleClass().add("cursos-compact");
+            } else {
+                root.getStyleClass().remove("cursos-compact");
+            }
+        });
     }
 
     private void onLanguageChanged() {
@@ -94,27 +131,26 @@ public class GradesController implements Initializable {
 
     private void applyTheme() {
         boolean dark = theme.isDark();
-        root.getStyleClass().removeAll("cursos-root-dark");
+        root.getStyleClass().removeAll("cursos-root-dark", "root-dark");
         gradesCard.getStyleClass().removeAll("cursos-card-dark");
         if (dark) {
-            root.getStyleClass().add("cursos-root-dark");
+            root.getStyleClass().addAll("cursos-root-dark", "root-dark");
             gradesCard.getStyleClass().add("cursos-card-dark");
         }
     }
 
     private void updateTexts() {
-        pageTitle.setText(lang.get("grades.pageTitle", "Gestión de Calificaciones"));
-        pageSubtitle.setText(lang.get("grades.pageSubtitle", "Ingresa y gestiona las calificaciones de los estudiantes."));
+        pageTitle.setText(lang.get("grades.pageTitle", "Gestión de Calificaciones") + " - 5to E");
         lblPeriodo.setText(lang.get("grades.periodo", "Periodo"));
         lblTipoEval.setText(lang.get("grades.tipoEval", "Tipo de Evaluación"));
-        lblListaEstudiantes.setText(lang.get("grades.listaEstudiantes", "Lista de Estudiantes"));
         colEstudiante.setText(lang.get("grades.colEstudiante", "ESTUDIANTE"));
-        colMatricula.setText(lang.get("grades.colMatricula", "ID MATRÍCULA"));
-        colCalifActual.setText(lang.get("grades.colCalifActual", "CALIFICACIÓN"));
+        colMatricula.setText(lang.get("grades.colMatricula", "MATRÍCULA"));
+        colCalifActual.setText(lang.get("grades.colCalifActual", "NOTA ACTUAL"));
         colNuevaCalif.setText(lang.get("grades.colNuevaCalif", "NUEVA NOTA"));
         btnGuardarTop.setText(lang.get("grades.guardar", "Guardar Cambios"));
         btnGuardarBottom.setText(lang.get("grades.guardar", "Guardar Cambios"));
         btnCancelar.setText(lang.get("grades.cancelar", "Cancelar"));
+        searchField.setPromptText(lang.get("attendance.search", "Buscar estudiantes..."));
     }
 
     private void configureColumns() {
@@ -164,7 +200,7 @@ public class GradesController implements Initializable {
     }
 
     private void handleSave() {
-        for (Student s : studentData) {
+        for (Student s : masterData) {
             String ng = s.getNewGrade();
             if (ng != null && !ng.isBlank()) {
                 System.out.printf("Guardando → %s  |  Nueva calificación: %s%n",
@@ -174,6 +210,6 @@ public class GradesController implements Initializable {
     }
 
     private void handleCancel() {
-        studentData.forEach(s -> s.newGradeProperty().set(""));
+        masterData.forEach(s -> s.newGradeProperty().set(""));
     }
 }

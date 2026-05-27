@@ -143,6 +143,7 @@ public class MainController {
     private final String ICON_MORE_HORIZ = "M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z";
     private final String ICON_SCHEDULE = "M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z";
     private final String ICON_CHEVRON_RIGHT = "M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z";
+    private final String ICON_ASSIGNMENT = "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z";
     private final String ICON_BOLT = "M14.69 2.21c-.29-.27-.71-.27-1.01 0l-10 9.52c-.29.28-.35.73-.14 1.07.2.34.58.51.98.44l5.93-.85-2.46 8.38c-.12.41.08.85.46 1.03.23.11.49.12.71.03.09-.04.17-.09.24-.16l10-9.52c.29-.28.35-.73.14-1.07-.2-.34-.58-.51-.98-.44l-5.93.85 2.46-8.38c.12-.41-.08-.85-.46-1.03-.11-.05-.23-.07-.34-.06z";
     private final String ICON_AVATAR = "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z";
 
@@ -188,11 +189,12 @@ public class MainController {
 
     private void setupNavigation() {
         LanguageManager lang = LanguageManager.getInstance();
-        String[] navKeys = {"sidebar.home", "sidebar.teachers", "sidebar.courses", "sidebar.attendance", "sidebar.schedule", "sidebar.settings"};
+        String[] navKeys = {"sidebar.home", "sidebar.teachers", "sidebar.courses", "sidebar.grades", "sidebar.attendance", "sidebar.schedule", "sidebar.settings"};
         String[][] items = {
             {lang.get("sidebar.home"), ICON_HOME},
             {lang.get("sidebar.teachers"), ICON_GROUP},
             {lang.get("sidebar.courses"), ICON_BOOK},
+            {lang.get("sidebar.grades"), ICON_ASSIGNMENT},
             {lang.get("sidebar.attendance"), ICON_CHECK_CIRCLE},
             {lang.get("sidebar.schedule"), ICON_CALENDAR},
             {lang.get("sidebar.settings"), ICON_SETTINGS}
@@ -272,28 +274,16 @@ public class MainController {
             loadView("/fxml/Admin/AdminMaestros.fxml");
         } else if (index == 2) {
             loadView("/fxml/Admin/AdminCursos.fxml");
-
+        } else if (index == 3) {
+            loadView("/fxml/Mestros/Calificaciones.fxml");
         } else if (index == 4) {
-
             AdminAttendanceView attendanceView = new AdminAttendanceView(theme);
             attendanceView.attachSearchField(searchField);
             setCenterView(attendanceView.getView());
+        } else if (index == 5) {
+            loadView("/fxml/Admin/AdminHorario.fxml");
         } else if (index == 6) {
             controller.Configuracion config = new controller.Configuracion();
-
-            loadView("/fxml/Admin/AdminHorario.fxml");
-        } else if (index == 5) {
-            controller.Configuracion config = new controller.Configuracion();
-
-        } else if (index == 3) {
-            AdminAttendanceView attendanceView = new AdminAttendanceView(theme);
-            attendanceView.attachSearchField(searchField);
-            setCenterView(attendanceView.getView());
-        } else if (index == 4) {
-            loadView("/fxml/Admin/AdminHorario.fxml");
-        } else if (index == 5) {
-            controller.Configuracion config = new controller.Configuracion();
-
             config.setOwnerStage(stage);
             setCenterView(config.getView());
         }
@@ -303,7 +293,7 @@ public class MainController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Node view = loader.load();
-            boolean noOuterScroll = fxmlPath.contains("AdminMaestros") || fxmlPath.contains("AdminCursos");
+            boolean noOuterScroll = fxmlPath.contains("AdminMaestros") || fxmlPath.contains("AdminCursos") || fxmlPath.contains("Calificaciones");
             if (noOuterScroll) {
                 setCenterViewDirect(view);
             } else {
@@ -1021,7 +1011,7 @@ public class MainController {
         btnAll.setText(lang.get("course.viewAll"));
         searchField.setPromptText(lang.get("search.prompt"));
         // Update sidebar labels
-        String[] navKeys = {"sidebar.home", "sidebar.teachers", "sidebar.courses", "sidebar.attendance", "sidebar.schedule", "sidebar.settings"};
+        String[] navKeys = {"sidebar.home", "sidebar.teachers", "sidebar.courses", "sidebar.grades", "sidebar.attendance", "sidebar.schedule", "sidebar.settings"};
         for (int i = 0; i < navLabelList.size() && i < navKeys.length; i++) {
             navLabelList.get(i).setText(lang.get(navKeys[i]));
         }

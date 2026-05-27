@@ -120,6 +120,30 @@ public class AdminAttendanceView {
         });
     }
 
+    public void setGradeSection(String grade, String section) {
+        gradeLabel.setText(grade);
+        sectionLabel.setText(section);
+        var saved = getSavedAttendance(courseKey());
+        if (saved != null && !saved.isEmpty()) {
+            students.clear();
+            int idx = 0;
+            for (var entry : saved.entrySet()) {
+                StudentAttendance sa = new StudentAttendance(entry.getKey(), idx % 8);
+                sa.status = entry.getValue();
+                students.add(sa);
+                idx++;
+            }
+            updateSaveButtonText();
+        } else {
+            reloadStudents();
+        }
+    }
+
+    public void filterStudent(String studentName) {
+        searchField.setText(studentName);
+        refreshRows();
+    }
+
     private void buildView() {
         root.setPadding(new Insets(20, 32, 32, 32));
         root.setMaxWidth(1200);

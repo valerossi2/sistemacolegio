@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.edugrade.controllers.DetalleProfesorController"
+            fx:id="scrollPane"
+            styleClass="main-scroll-pane"
+            stylesheets="@../../css/base.css,@../../css/DetallesCurso.css,@../../css/Profesores.css"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED">
+
+    <VBox fx:id="root" styleClass="content-area" spacing="32">
+
+        <!-- Page Header Breadcrumb -->
+        <HBox styleClass="page-header" alignment="CENTER_LEFT" spacing="16">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <HBox spacing="6" alignment="CENTER_LEFT">
+                    <Label fx:id="breadcrumbListado"
+                           text="Profesores"
+                           styleClass="breadcrumb__parent btn-link"
+                           onMouseClicked="#onBreadcrumbListado"/>
+                    <Label text="›" styleClass="breadcrumb__separator"/>
+                    <Label fx:id="breadcrumbActual"
+                           text=""
+                           styleClass="breadcrumb__current"/>
+                </HBox>
+                <Label fx:id="pageTitle"
+                       text="Detalles del Profesor"
+                       styleClass="page-title"/>
+            </VBox>
+        </HBox>
+
+        <!-- Profile + Schedule side by side -->
+        <HBox spacing="24" VBox.vgrow="ALWAYS">
+            <padding>
+                <Insets left="40" right="40"/>
+            </padding>
+
+            <!-- Left column: Profile card + Attendance -->
+            <VBox spacing="24" HBox.hgrow="ALWAYS">
+                <!-- Profile Card -->
+                <VBox styleClass="card" spacing="16" VBox.vgrow="NEVER">
+                    <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+
+                    <HBox spacing="20" alignment="CENTER_LEFT">
+                        <StackPane fx:id="avatarContainer"
+                                   styleClass="professor-avatar-container"
+                                   prefWidth="96" prefHeight="96"
+                                   maxWidth="96" maxHeight="96"
+                                   minWidth="96" minHeight="96">
+                        </StackPane>
+                        <VBox spacing="6">
+                            <Label fx:id="professorName"
+                                   text=""
+                                   styleClass="professor-name"/>
+                            <Label fx:id="professorSubject"
+                                   text=""
+                                   styleClass="professor-subject"/>
+                        </VBox>
+                    </HBox>
+
+                    <Region styleClass="card-divider"/>
+
+                    <GridPane hgap="24" vgap="8" VBox.vgrow="NEVER">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50"/>
+                            <ColumnConstraints percentWidth="50"/>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints vgrow="NEVER"/>
+                            <RowConstraints vgrow="NEVER"/>
+                        </rowConstraints>
+
+                        <VBox spacing="2" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="Email" styleClass="stat-mini-card__label"/>
+                            <Label fx:id="professorEmail" text="" styleClass="stat-mini-card__value" wrapText="true"/>
+                        </VBox>
+                        <VBox spacing="2" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="Curso encargado" styleClass="stat-mini-card__label"/>
+                            <Label fx:id="professorSection" text="" styleClass="stat-mini-card__value"/>
+                        </VBox>
+                        <VBox spacing="2" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <Label text="Estado" styleClass="stat-mini-card__label"/>
+                            <Label fx:id="professorStatus" text="" styleClass="stat-mini-card__value"/>
+                        </VBox>
+                    </GridPane>
+                </VBox>
+
+                <!-- Attendance Table -->
+                <VBox styleClass="card" spacing="0" VBox.vgrow="ALWAYS">
+                    <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+                    <Label fx:id="lblAsistenciaTitle"
+                           text="Registro de Asistencia"
+                           styleClass="card__title"
+                           VBox.vgrow="NEVER"/>
+
+                    <TableView fx:id="attendanceTable"
+                               styleClass="teacher-table"
+                               VBox.vgrow="ALWAYS">
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                        </columnResizePolicy>
+                        <columns>
+                            <TableColumn fx:id="colFecha"   text="FECHA"   prefWidth="120"/>
+                            <TableColumn fx:id="colEntrada" text="ENTRADA" prefWidth="120"/>
+                            <TableColumn fx:id="colSalida"  text="SALIDA"  prefWidth="120"/>
+                            <TableColumn fx:id="colEstado"  text="ESTADO"  prefWidth="140"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No hay registros de asistencia."
+                                   styleClass="table-placeholder-label"/>
+                        </placeholder>
+                    </TableView>
+                </VBox>
+            </VBox>
+
+            <!-- Right column: Mini Schedule -->
+            <VBox fx:id="scheduleCard" styleClass="card" spacing="0" prefWidth="280" maxWidth="280" VBox.vgrow="NEVER">
+                <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                <Label fx:id="lblScheduleTitle"
+                       text="Horario"
+                       styleClass="card__title"
+                       VBox.vgrow="NEVER"/>
+                <Region styleClass="card-divider" VBox.vgrow="NEVER">
+                    <VBox.margin><Insets top="12" bottom="12"/></VBox.margin>
+                </Region>
+                <ScrollPane fitToWidth="true"
+                            hbarPolicy="NEVER"
+                            vbarPolicy="AS_NEEDED"
+                            prefHeight="320"
+                            style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+                    <VBox fx:id="scheduleRows" spacing="8" />
+                </ScrollPane>
+            </VBox>
+        </HBox>
+
+    </VBox>
+</ScrollPane>

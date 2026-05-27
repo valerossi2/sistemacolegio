@@ -1,8 +1,15 @@
 package controller;
 
 import theme.ThemeManager;
+import util.DataStore;
 import util.LanguageManager;
+import com.edugrade.controllers.CursoController;
+import com.edugrade.controllers.MaestrosController;
+import com.edugrade.controllers.DetalleCursoController;
+import com.edugrade.controllers.DetalleProfesorController;
 import java.io.File;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.Locale;
 import java.util.prefs.Preferences;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -21,6 +28,7 @@ import javafx.scene.text.*;
 import javafx.util.Duration;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -98,6 +106,10 @@ public class MainController {
     private static final int PERF_BAR_GROW = 6;
     private Circle headerAvatar;
     private SVGPath headerAvatarSvg;
+    private Popup searchPopup;
+
+    private record SearchResult(String label, String sublabel, String type, int navigateTo, Object data) {}
+
     private Preferences prefs = Preferences.userNodeForPackage(controller.Configuracion.class);
 
     private final String L_PRIMARY = "#2B54A8";
@@ -540,6 +552,19 @@ public class MainController {
             }
             headerAvatar.setStroke(Color.web(c(L_PRIMARY_FIXED, D_PRIMARY_FIXED)));
         });
+
+        searchPopup = new Popup();
+        searchPopup.setAutoHide(true);
+        searchPopup.setHideOnEscape(true);
+        searchField.setOnAction(e -> showSearchResults());
+        searchField.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) searchPopup.hide();
+        });
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null || newVal.isBlank()) {
+                searchPopup.hide();
+            }
+        });
     }
 
     private void loadHeaderProfileImage() {
@@ -568,13 +593,222 @@ public class MainController {
     }
 
     private void setupKpis() {
+        seedDataIfEmpty();
         LanguageManager lang = LanguageManager.getInstance();
         kpiGrid.getChildren().addAll(
-            createKpiCard(lang.get("kpi.totalStudents"), "1,250", L_SECONDARY_FIXED, L_SECONDARY, ICON_PERSON_PIN),
-            createKpiCard(lang.get("kpi.totalCourses"), "35", L_PRIMARY_FIXED, L_PRIMARY, ICON_TRENDING_UP),
-            createKpiCard(lang.get("kpi.totalTeachers"), "42", L_TERTIARY_FIXED, L_TERTIARY, ICON_SCHOOL),
-            createKpiCard(lang.get("kpi.attendance"), "92%", L_SECONDARY_FIXED, L_SECONDARY, ICON_CHECK_CIRCLE)
+            createKpiCard(lang.get("kpi.totalStudents"), String.format("%,d", DataStore.getTotalStudents()), L_SECONDARY_FIXED, L_SECONDARY, ICON_PERSON_PIN),
+            createKpiCard(lang.get("kpi.totalCourses"), String.valueOf(DataStore.getTotalCourses()), L_PRIMARY_FIXED, L_PRIMARY, ICON_TRENDING_UP),
+            createKpiCard(lang.get("kpi.totalTeachers"), String.valueOf(DataStore.getTotalTeachers()), L_TERTIARY_FIXED, L_TERTIARY, ICON_SCHOOL),
+            createKpiCard(lang.get("kpi.attendance"), DataStore.getAttendanceRate(), L_SECONDARY_FIXED, L_SECONDARY, ICON_CHECK_CIRCLE)
         );
+    }
+
+    private void seedDataIfEmpty() {
+        if (!DataStore.getCourses().isEmpty() && !DataStore.getTeachers().isEmpty()) return;
+        var rng = ThreadLocalRandom.current();
+        String[] grados = {"1ro","2do","3ro","4to","5to","6to"};
+        String[] secciones = {"A","B","C","D","E"};
+        String[] estados = {"En clase","Descanso"};
+        List<CursoController.CourseRow> seed = new java.util.ArrayList<>();
+        for (int i = 0; i < 16; i++) {
+            seed.add(new CursoController.CourseRow(null,
+                grados[rng.nextInt(grados.length)],
+                i % 8,
+                secciones[rng.nextInt(secciones.length)],
+                rng.nextInt(1, 41),
+                rng.nextInt(1, 10),
+                5.0 + rng.nextDouble() * 5.0,
+                estados[rng.nextInt(estados.length)]));
+        }
+        DataStore.setCourses(seed);
+        var teachers = new java.util.ArrayList<MaestrosController.TeacherRow>();
+        teachers.add(new MaestrosController.TeacherRow("Prof. Laura M\u00e9ndez", "laura.mendez@edu.com", "Matem\u00e1ticas", "5to E", "Activo", 0));
+        teachers.add(new MaestrosController.TeacherRow("Prof. Carlos Ruiz", "carlos.ruiz@edu.com", "Historia", "4to A", "Activo", 1));
+        teachers.add(new MaestrosController.TeacherRow("Prof. Elena Torres", "elena.torres@edu.com", "Lenguaje", "3ro B", "Activo", 2));
+        teachers.add(new MaestrosController.TeacherRow("Prof. Ana Silva", "ana.silva@edu.com", "Ciencias", "2do C", "Activo", 3));
+        DataStore.setTeachers(teachers);
+    }
+
+    private void showSearchResults() {
+        String q = searchField.getText() == null ? "" : searchField.getText().trim().toLowerCase(Locale.ROOT);
+        if (q.isEmpty()) { searchPopup.hide(); return; }
+
+        seedDataIfEmpty();
+        java.util.List<SearchResult> results = new java.util.ArrayList<>();
+
+        // search teachers
+        for (var t : DataStore.getTeachers()) {
+            if (t.nombre().toLowerCase(Locale.ROOT).contains(q)
+                || t.materia().toLowerCase(Locale.ROOT).contains(q)
+                || t.seccion().toLowerCase(Locale.ROOT).contains(q)
+                || t.email().toLowerCase(Locale.ROOT).contains(q)) {
+                results.add(new SearchResult(t.nombre(), t.materia() + " · " + t.seccion(), "Profesor", 1, t));
+            }
+        }
+
+        // search courses
+        for (var c : DataStore.getCourses()) {
+            String label = c.grado() + " " + c.seccion();
+            if (label.toLowerCase(Locale.ROOT).contains(q)
+                || DataStore.getTeacherName(c.teacherIdx()).toLowerCase(Locale.ROOT).contains(q)) {
+                results.add(new SearchResult(label, DataStore.getTeacherName(c.teacherIdx()) + " · " + c.alumnos() + " alumnos", "Curso", 2, c));
+            }
+        }
+
+        // search students from attendance store
+        var attStore = controller.AdminAttendanceView.getAttendanceStore();
+        if (attStore != null) {
+            for (var courseEntry : attStore.entrySet()) {
+                String courseKey = courseEntry.getKey();
+                for (var studentEntry : courseEntry.getValue().entrySet()) {
+                    String studentName = studentEntry.getKey();
+                    if (studentName.toLowerCase(Locale.ROOT).contains(q)) {
+                        results.add(new SearchResult(studentName, courseKey, "Estudiante", 3, new Object[]{courseKey, studentName}));
+                    }
+                }
+            }
+        }
+
+        // search schedule
+        String[][] schedule = {
+            {"08:00", "Matematicas Avanzadas", "Salon 402 - Prof. Sanchez"},
+            {"10:00", "Historia Universal", "Biblioteca - Dra. Mendez"},
+            {"12:00", "Quimica Organica", "Laboratorio B - Prof. Rico"},
+            {"14:00", "Fisica Cuantica", "Laboratorio A - Prof. Einstein"},
+            {"16:00", "Arte Moderno", "Galeria - Prof. Picasso"},
+            {"18:00", "Ingles Tecnico", "Aula 10 - Prof. Smith"}
+        };
+        for (var s : schedule) {
+            String text = s[0] + " - " + s[1];
+            if (text.toLowerCase(Locale.ROOT).contains(q)
+                || s[1].toLowerCase(Locale.ROOT).contains(q)
+                || s[2].toLowerCase(Locale.ROOT).contains(q)) {
+                results.add(new SearchResult(s[1], s[0] + " · " + s[2], "Horario", 4, null));
+            }
+        }
+
+        buildSearchPopup(results);
+    }
+
+    private void buildSearchPopup(java.util.List<SearchResult> results) {
+        VBox container = new VBox();
+        container.setPrefWidth(400);
+        LanguageManager lang = LanguageManager.getInstance();
+
+        if (results.isEmpty()) {
+            Text empty = new Text(lang.get("search.noResults", "No se encontraron resultados"));
+            empty.setFont(Font.font("Plus Jakarta Sans", 14));
+            empty.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+            VBox.setMargin(empty, new Insets(16));
+            container.getChildren().add(empty);
+        } else {
+            int limit = Math.min(results.size(), 8);
+            for (int i = 0; i < limit; i++) {
+                SearchResult r = results.get(i);
+                HBox row = new HBox(12);
+                row.setPadding(new Insets(10, 16, 10, 16));
+                row.setAlignment(Pos.CENTER_LEFT);
+                String baseStyle = "-fx-background-color: " + c(L_WHITE, D_WHITE) + ";";
+                String finalStyle = baseStyle + (i > 0 ? "-fx-border-color: transparent transparent " + c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER) + " transparent;" : "");
+                if (i == 0) finalStyle += "-fx-background-radius: 24 24 0 0;";
+                if (i == limit - 1) finalStyle += "-fx-background-radius: 0 0 24 24;";
+                row.setStyle(finalStyle);
+
+                // type badge
+                Label typeBadge = new Label(r.type());
+                typeBadge.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 10));
+                typeBadge.setPadding(new Insets(2, 8, 2, 8));
+                typeBadge.setStyle("-fx-background-color: " + c(L_PRIMARY_FIXED, D_PRIMARY_FIXED) + "; -fx-background-radius: 4; -fx-text-fill: " + c(L_ON_SURFACE, D_ON_SURFACE) + ";");
+
+                VBox info = new VBox(2);
+                Text name = new Text(r.label());
+                name.setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 14));
+                name.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
+                Text sub = new Text(r.sublabel());
+                sub.setFont(Font.font("Plus Jakarta Sans", 12));
+                sub.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
+                info.getChildren().addAll(name, sub);
+
+                row.getChildren().addAll(typeBadge, info);
+                HBox.setHgrow(info, Priority.ALWAYS);
+
+                String capturedStyle = finalStyle;
+                row.setOnMouseEntered(e -> row.setStyle("-fx-background-color: " + c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER) + ";"));
+                row.setOnMouseExited(e -> row.setStyle(capturedStyle));
+                row.setOnMouseClicked(e -> {
+                    searchPopup.hide();
+                    searchField.clear();
+                    handleSearchResultClick(r);
+                });
+                container.getChildren().add(row);
+            }
+        }
+
+        container.setStyle("-fx-background-color: " + c(L_WHITE, D_WHITE)
+            + "; -fx-background-radius: 24; -fx-border-color: " + c(L_SURFACE_CONTAINER_HIGH, D_SURFACE_CONTAINER)
+            + "; -fx-border-radius: 24; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 12, 0, 0, 4);");
+
+        searchPopup.getContent().setAll(container);
+
+        if (!searchPopup.isShowing()) {
+            Bounds bounds = searchBox.localToScreen(searchBox.getBoundsInLocal());
+            if (bounds != null) {
+                double y = bounds.getMaxY() + 4;
+                if (theme.isDark()) y += 26; // account for titlebar offset in fullscreen
+                searchPopup.show(searchBox, bounds.getMinX(), y);
+            }
+        }
+    }
+
+    private void handleSearchResultClick(SearchResult r) {
+        if ("Profesor".equals(r.type()) && r.data() instanceof MaestrosController.TeacherRow teacher) {
+            navigateToTeacherDetail(teacher);
+        } else if ("Curso".equals(r.type()) && r.data() instanceof CursoController.CourseRow course) {
+            navigateToCourseDetail(course);
+        } else if ("Estudiante".equals(r.type()) && r.data() instanceof Object[] arr && arr.length >= 2) {
+            String courseKey = (String) arr[0];
+            String studentName = (String) arr[1];
+            navigateToStudentInCourse(courseKey, studentName);
+        } else {
+            handleNavigation(r.navigateTo());
+        }
+    }
+
+    private void navigateToTeacherDetail(MaestrosController.TeacherRow teacher) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Admin/AdminDetalleProfesor.fxml"));
+            Node detailView = loader.load();
+            DetalleProfesorController ctrl = loader.getController();
+            ctrl.setTeacher(teacher, () -> handleNavigation(1));
+            setCenterView(detailView);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void navigateToCourseDetail(CursoController.CourseRow course) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Admin/AdminDetallesCursos.fxml"));
+            Node detailView = loader.load();
+            DetalleCursoController ctrl = loader.getController();
+            ctrl.setCourse(course, DataStore.getCourses(),
+                this::navigateToCourseDetail,
+                () -> handleNavigation(2));
+            setCenterView(detailView);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void navigateToStudentInCourse(String courseKey, String studentName) {
+        String[] parts = courseKey.split(" ");
+        if (parts.length < 2) { handleNavigation(3); return; }
+        String grade = parts[0];
+        String section = parts[1];
+        AdminAttendanceView attendanceView = new AdminAttendanceView(theme);
+        attendanceView.setGradeSection(grade, section);
+        attendanceView.filterStudent(studentName);
+        setCenterView(attendanceView.getView());
     }
 
     private String cardStyle(boolean dark) {
@@ -634,6 +868,7 @@ public class MainController {
     }
 
     private void setupCourseManagement() {
+        seedDataIfEmpty();
         HBox head = new HBox();
         head.setPadding(new Insets(12));
         head.setAlignment(Pos.CENTER_LEFT);
@@ -644,6 +879,7 @@ public class MainController {
         HBox.setHgrow(spacer, Priority.ALWAYS);
         btnAll = new Button(LanguageManager.getInstance().get("course.viewAll"));
         btnAll.getStyleClass().add("text-button");
+        btnAll.setOnAction(e -> handleNavigation(2));
         head.getChildren().addAll(courseTitleText, spacer, btnAll);
 
         VBox table = new VBox();
@@ -661,12 +897,16 @@ public class MainController {
         cols.getChildren().addAll(colHeaderList);
 
         table.getChildren().addAll(cols);
-        table.getChildren().addAll(
-            createCourseRow("Introduccion a la IA", "Dr. Roberto Sanchez", "32 Estudiantes", 0.92, "9.2"),
-            createCourseRow("Calculo Avanzado", "Dra. Elena Mendez", "28 Estudiantes", 0.78, "7.8"),
-            createCourseRow("Literatura Moderna", "Prof. Juan Carlos Rico", "40 Estudiantes", 0.85, "8.5"),
-            createCourseRow("Diseno UX/UI", "Mtra. Sofia Valdez", "24 Estudiantes", 0.88, "8.8")
-        );
+        int limit = Math.min(DataStore.getCourses().size(), 4);
+        for (int i = 0; i < limit; i++) {
+            var course = DataStore.getCourses().get(i);
+            String label = course.grado() + " " + course.seccion();
+            String prof = DataStore.getTeacherName(course.teacherIdx());
+            String stud = course.alumnos() + " " + LanguageManager.getInstance().get("course.studentsLabel", "Estudiantes");
+            double prog = course.rendimiento() / 10.0;
+            String score = String.format("%.1f", course.rendimiento());
+            table.getChildren().add(createCourseRow(label, prof, stud, prog, score));
+        }
 
         coursesBox.getChildren().addAll(head, table);
         coursesBox.setStyle(cardStyle(theme.isDark()));
@@ -832,14 +1072,14 @@ public class MainController {
             if (topCourses.size() > 6) topCourses = topCourses.subList(0, 6);
         }
         if (topCourses.isEmpty()) {
-            topCourses.addAll(java.util.List.of(
-                new String[]{"5to A", "9.2"},
-                new String[]{"4to B", "8.8"},
-                new String[]{"6to A", "8.5"},
-                new String[]{"3ro C", "8.1"},
-                new String[]{"5to E", "7.6"},
-                new String[]{"4to C", "7.2"}
-            ));
+            seedDataIfEmpty();
+            var courses = DataStore.getCourses();
+            for (var c : courses) {
+                String label = c.grado() + " " + c.seccion();
+                topCourses.add(new String[]{label, String.format("%.1f", c.rendimiento())});
+            }
+            topCourses.sort((a, b) -> Double.compare(Double.parseDouble(b[1]), Double.parseDouble(a[1])));
+            if (topCourses.size() > 6) topCourses = topCourses.subList(0, 6);
         }
         double maxScore = Double.parseDouble(topCourses.get(0)[1]);
 
@@ -915,12 +1155,12 @@ public class MainController {
 
         VBox list = new VBox(6);
         list.getChildren().addAll(
-            createScheduleRow("08:00", "Matematicas Avanzadas", "Salon 402 - Prof. Sanchez", false),
-            createScheduleRow("10:00", "Historia Universal", "Biblioteca - Dra. Mendez", false),
-            createScheduleRow("12:00", "Quimica Organica", "Laboratorio B - Prof. Rico", false),
-            createScheduleRow("14:00", "Fisica Cuantica", "Laboratorio A - Prof. Einstein", false),
-            createScheduleRow("16:00", "Arte Moderno", "Galeria - Prof. Picasso", false),
-            createScheduleRow("18:00", "Ingles Tecnico", "Aula 10 - Prof. Smith", false)
+            createScheduleRow("08:00", "Matematicas Avanzadas", "Salon 402 - Prof. Sanchez"),
+            createScheduleRow("10:00", "Historia Universal", "Biblioteca - Dra. Mendez"),
+            createScheduleRow("12:00", "Quimica Organica", "Laboratorio B - Prof. Rico"),
+            createScheduleRow("14:00", "Fisica Cuantica", "Laboratorio A - Prof. Einstein"),
+            createScheduleRow("16:00", "Arte Moderno", "Galeria - Prof. Picasso"),
+            createScheduleRow("18:00", "Ingles Tecnico", "Aula 10 - Prof. Smith")
         );
 
         ScrollPane sp = new ScrollPane(list);
@@ -941,7 +1181,7 @@ public class MainController {
         });
     }
 
-    private HBox createScheduleRow(String time, String subj, String det, boolean isFirst) {
+    private HBox createScheduleRow(String time, String subj, String det) {
         HBox row = new HBox(16);
         row.setPadding(new Insets(8, 0, 8, 0));
         row.setAlignment(Pos.CENTER_LEFT);
@@ -983,13 +1223,8 @@ public class MainController {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        StackPane actionBtn = new StackPane();
-        actionBtn.setPrefSize(40, 40);
-        actionBtn.getStyleClass().add("icon-button");
-        String arrowPath = isFirst ? ICON_BOLT : ICON_CHEVRON_RIGHT;
-        SVGPath arrow = createIcon(arrowPath, isFirst ? 18 : 20, c(isFirst ? L_WHITE : L_OUTLINE, isFirst ? L_WHITE : D_OUTLINE));
-        actionBtn.getChildren().add(arrow);
-        row.getChildren().addAll(iconStack, text, spacer, actionBtn);
+        row.getChildren().addAll(iconStack, text, spacer);
+        row.setOnMouseClicked(e -> handleNavigation(2));
 
         scheduleCircleList.add(iconCircle);
         scheduleSubjList.add(t1);
@@ -1000,7 +1235,6 @@ public class MainController {
             clockIcon.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
             t1.setFill(Color.web(c(L_ON_SURFACE, D_ON_SURFACE)));
             t2.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
-            arrow.setFill(Color.web(c(L_OUTLINE, D_OUTLINE)));
         });
 
         return row;
@@ -1111,25 +1345,9 @@ public class MainController {
             txt.setText(lang.get(colKeys[i], colDefs[i]));
         }
         // Update course rows
-        String[] scoreDefs = {"9.2", "7.8", "8.5", "8.8"};
-        String[] stDefs = {"32", "28", "40", "24"};
-        String[] nameDefs = {"Introduccion a la IA", "Calculo Avanzado", "Literatura Moderna", "Diseno UX/UI"};
-        String[] profDefs = {"Dr. Roberto Sanchez", "Dra. Elena Mendez", "Prof. Juan Carlos Rico", "Mtra. Sofia Valdez"};
-        for (int i = 0; i < courseNameTexts.size(); i++) {
-            String rowKey = "course.row" + (i + 1) + ".name";
-            String profKey = "course.row" + (i + 1) + ".prof";
-            String scoreKey = "course.row" + (i + 1) + ".score";
-            courseNameTexts.get(i).setText(lang.get(rowKey, nameDefs[i]));
-            courseProfTexts.get(i).setText(lang.get(profKey, profDefs[i]));
-            courseStudNumTexts.get(i).setText(lang.get("course.row" + (i + 1) + ".students", stDefs[i]));
-            courseStudLabelTexts.get(i).setText(lang.get("course.studentsLabel", "Estudiantes"));
-            courseScoreTexts.get(i).setText(lang.get(scoreKey, scoreDefs[i]));
-        }
-        // Update performance bar labels
-        String[] perfKeys = {"perf.label1", "perf.label2", "perf.label3", "perf.label4", "perf.label5", "perf.label6"};
-        String[] perfDefs = {"5to E", "6to A", "4to B", "4to C", "5to A", "6to B"};
-        for (int i = 0; i < perfBarLabelList.size() && i < perfKeys.length; i++) {
-            perfBarLabelList.get(i).setText(lang.get(perfKeys[i], perfDefs[i]));
+        String label = lang.get("course.studentsLabel", "Estudiantes");
+        for (int i = 0; i < courseStudLabelTexts.size(); i++) {
+            courseStudLabelTexts.get(i).setText(label);
         }
         // Update schedule items
         String[] timeKeys = {"schedule.row1.time", "schedule.row2.time", "schedule.row3.time", "schedule.row4.time", "schedule.row5.time", "schedule.row6.time"};
@@ -1149,6 +1367,12 @@ public class MainController {
             kpiLabelList.get(1).setText(lang.get("kpi.totalCourses").toUpperCase());
             kpiLabelList.get(2).setText(lang.get("kpi.totalTeachers").toUpperCase());
             kpiLabelList.get(3).setText(lang.get("kpi.attendance").toUpperCase());
+        }
+        if (kpiValueList.size() >= 4) {
+            kpiValueList.get(0).setText(String.format("%,d", DataStore.getTotalStudents()));
+            kpiValueList.get(1).setText(String.valueOf(DataStore.getTotalCourses()));
+            kpiValueList.get(2).setText(String.valueOf(DataStore.getTotalTeachers()));
+            kpiValueList.get(3).setText(DataStore.getAttendanceRate());
         }
     }
 }

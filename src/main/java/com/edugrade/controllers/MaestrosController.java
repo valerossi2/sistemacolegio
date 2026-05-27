@@ -1,12 +1,17 @@
 package com.edugrade.controllers;
 
+import java.io.IOException;
+import java.util.List;
+
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -18,6 +23,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import theme.ThemeManager;
+import util.DataStore;
 import util.LanguageManager;
 
 public class MaestrosController {
@@ -82,6 +88,7 @@ public class MaestrosController {
     private static final double COMPACT_THRESHOLD = 700;
 
     private final ObservableList<TeacherRow> allTeachers = FXCollections.observableArrayList();
+    private final List<Node> maestrosCardChildren = new java.util.ArrayList<>();
 
     @FXML
     private void initialize() {
@@ -89,6 +96,7 @@ public class MaestrosController {
         theme = ThemeManager.getInstance();
 
         initTeacherData();
+        DataStore.setTeachers(allTeachers);
         configureTable();
         maestrosTable.setItems(allTeachers);
         updateTexts();
@@ -141,6 +149,7 @@ public class MaestrosController {
     private void onLanguageChanged() {
         Platform.runLater(() -> {
             initTeacherData();
+            DataStore.setTeachers(allTeachers);
             updateTexts();
             maestrosTable.refresh();
         });
@@ -334,16 +343,18 @@ public class MaestrosController {
     }
 
     private void handleVerDetalles(TeacherRow teacher) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(lang.get("teachers.detallesTitle", "Detalles del Profesor"));
-        alert.setHeaderText(teacher.nombre());
-        alert.setContentText(
-            lang.get("teachers.colEmail", "Email") + ": " + teacher.email()
-            + "\n" + lang.get("teachers.colMateria", "Materia") + ": " + teacher.materia()
-            + "\n" + lang.get("teachers.colSeccion", "Sección") + ": " + teacher.seccion()
-            + "\n" + lang.get("teachers.colEstado", "Estado") + ": " + teacher.estado()
-        );
-        alert.showAndWait();
+        try {
+            if (maestrosCardChildren.isEmpty())
+                maestrosCardChildren.addAll(maestrosCard.getChildren());
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Admin/AdminDetalleProfesor.fxml"));
+            Node detailView = loader.load();
+            DetalleProfesorController ctrl = loader.getController();
+            ctrl.setTeacher(teacher, () ->
+                maestrosCard.getChildren().setAll(maestrosCardChildren));
+            maestrosCard.getChildren().setAll(detailView);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateCount(int count) {

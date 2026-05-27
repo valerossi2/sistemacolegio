@@ -275,6 +275,9 @@ public class AdminAttendanceView {
         VBox.setVgrow(tableCard, Priority.ALWAYS);
         tableColumn.getChildren().addAll(tableCard, saveButton);
 
+        saveButton.setOnMouseEntered(e -> saveButton.setStyle(saveButton.getStyle().replace("#2563eb", "#1d4ed8")));
+        saveButton.setOnMouseExited(e -> saveButton.setStyle(saveButton.getStyle().replace("#1d4ed8", "#2563eb")));
+
         languageUpdaters.add(() -> ((Label) saveContent.getChildren().get(1)).setText(lang.get("attendance.save")));
         themeUpdaters.add(() -> {
             tableCard.setStyle(cardStyle(16, borderSoft()));
@@ -426,12 +429,7 @@ public class AdminAttendanceView {
     private void wireEvents() {
         searchField.textProperty().addListener((obs, oldValue, newValue) -> refreshRows());
         saveButton.setOnAction(e -> {
-            long pending = students.stream().filter(s -> s.status == AttendanceStatus.UNMARKED).count();
-            if (pending > 0) {
-                new Alert(Alert.AlertType.WARNING, lang.get("attendance.pendingMessage").replace("{0}", String.valueOf(pending)), ButtonType.OK).showAndWait();
-                return;
-            }
-            new Alert(Alert.AlertType.INFORMATION, lang.get("attendance.savedMessage").replace("{0}", String.valueOf(students.size())), ButtonType.OK).showAndWait();
+            new Alert(Alert.AlertType.INFORMATION, "Asistencia guardada", ButtonType.OK).showAndWait();
         });
     }
 

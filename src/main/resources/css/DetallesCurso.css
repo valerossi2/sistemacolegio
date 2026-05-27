@@ -335,3 +335,29 @@
 .root-dark .gender-chart .chart-legend { -fx-text-fill: #CBD5E1; }
 .root-dark .btn-svg-icon { -fx-fill: #94A3B8; }
 
+/* ── EDIT FORMS ────────────────────────────────────────────── */
+.search-suggestion-popup {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 12, 0, 0, 4);
+    -fx-padding: 6 0;
+    -fx-max-height: 240;
+}
+.search-suggestion-item {
+    -fx-padding: 8 16;
+    -fx-font-size: 13px;
+    -fx-text-fill: #0F172A;
+}
+.search-suggestion-item:hover {
+    -fx-background-color: #F1F5F9;
+}
+.root-dark .search-suggestion-popup {
+    -fx-background-color: #1E293B;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 12, 0, 0, 4);
+}
+.root-dark .search-suggestion-item {
+    -fx-text-fill: #F8FAFC;
+}
+.root-dark .search-suggestion-item:hover {
+    -fx-background-color: #334155;
+}

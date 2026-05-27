@@ -91,11 +91,9 @@ public class DetalleCursoController {
     @FXML private Label lblTotalTeachersLabel;
     @FXML private Label lblPromedioGeneralLabel;
     @FXML private Label lblAprobadosReprobadosLabel;
-    @FXML private Label lblPromedioMateriaLabel;
     @FXML private Label lblDistribucionGeneroLabel;
     @FXML private Label lblEquipoDocenteCard;
     @FXML private Label lblListaEstudiantesCard;
-    @FXML private Label lblPromedioMateria;
     @FXML private PieChart genderChart;
 
     private CursoController.CourseRow currentCourse;
@@ -350,8 +348,6 @@ public class DetalleCursoController {
 
         lblAprobadosReprobados.setText("28 / 4");
 
-        lblPromedioMateria.setText("Matemáticas: 72.3 (La más baja)");
-
         ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
             new PieChart.Data("Masculino", 18),
             new PieChart.Data("Femenino", 12)
@@ -453,7 +449,6 @@ public class DetalleCursoController {
         if (lblTotalTeachersLabel != null) lblTotalTeachersLabel.setText(lang.get("detalle.totalTeachersLabel", "Total Profesores"));
         if (lblPromedioGeneralLabel != null) lblPromedioGeneralLabel.setText(lang.get("detalle.promedioGeneralLabel", "Promedio General"));
         if (lblAprobadosReprobadosLabel != null) lblAprobadosReprobadosLabel.setText(lang.get("detalle.aprobadosReprobadosLabel", "Aprobados / Reprobados"));
-        if (lblPromedioMateriaLabel != null) lblPromedioMateriaLabel.setText(lang.get("detalle.promedioMateriaLabel", "Promedio por Materia"));
         if (lblDistribucionGeneroLabel != null) lblDistribucionGeneroLabel.setText(lang.get("detalle.distribucionGeneroLabel", "Distribuci\u00f3n por G\u00e9nero"));
         if (lblEquipoDocenteCard != null) lblEquipoDocenteCard.setText(lang.get("detalle.equipoDocenteCard", "Equipo Docente"));
         if (lblListaEstudiantesCard != null) lblListaEstudiantesCard.setText(lang.get("detalle.listaEstudiantesCard", "Lista de Estudiantes"));

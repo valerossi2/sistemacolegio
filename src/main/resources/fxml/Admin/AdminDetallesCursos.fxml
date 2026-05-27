@@ -138,10 +138,6 @@
                             <Label fx:id="lblAprobadosReprobados" text="0 / 0" styleClass="stat-mini-card__value"/>
                         </VBox>
                     </HBox>
-                    <VBox styleClass="stat-mini-card">
-                        <Label fx:id="lblPromedioMateriaLabel" text="Promedio por Materia" styleClass="stat-mini-card__label"/>
-                        <Label fx:id="lblPromedioMateria" text="-" styleClass="stat-mini-card__value" wrapText="true"/>
-                    </VBox>
                 </VBox>
 
                 <Region styleClass="card-divider"/>

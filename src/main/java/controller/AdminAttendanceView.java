@@ -115,14 +115,10 @@ public class AdminAttendanceView {
         selectorBox.getChildren().setAll(createSelectorCard("attendance.grade", gradeSelector), createSelectorCard("attendance.section", sectionSelector));
         Region headerSpacer = new Region();
         HBox.setHgrow(headerSpacer, Priority.ALWAYS);
-        pageHeader.getChildren().setAll(titleBox, headerSpacer, selectorBox);
+        pageHeader.getChildren().addAll(titleBox, headerSpacer, selectorBox);
 
-        gradeSelector.setItems(FXCollections.observableArrayList(
-            DataStore.getCourses().stream().map(c -> c.grado()).distinct().sorted().toList()
-        ));
-        sectionSelector.setItems(FXCollections.observableArrayList(
-            DataStore.getCourses().stream().map(c -> c.seccion()).distinct().sorted().toList()
-        ));
+        populateGradeOptions();
+        populateSectionOptions();
         gradeSelector.getSelectionModel().selectFirst();
         sectionSelector.getSelectionModel().selectFirst();
 
@@ -177,10 +173,11 @@ public class AdminAttendanceView {
         HBox box = new HBox(4, label, selector);
         box.setAlignment(Pos.CENTER_LEFT);
         box.setPadding(new Insets(4, 10, 4, 10));
+        box.setOnMouseClicked(e -> selector.show());
         Runnable updateSelector = () -> {
             label.setTextFill(Color.web(textMuted()));
             selector.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-font-weight: 700; -fx-font-size: 12; -fx-text-fill: " + text() + "; -fx-mark-color: " + textMuted() + ";");
-            box.setStyle(cardStyle(8, borderSoft()));
+            box.setStyle(cardStyle(8, borderSoft()) + "; -fx-cursor: hand;");
             selector.setCellFactory(list -> new ListCell<String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
@@ -284,7 +281,7 @@ public class AdminAttendanceView {
 
         tableCard.getChildren().addAll(tableHeader, header, rowScroll, tableFooter);
 
-        HBox saveContent = new HBox(8, icon(ICON_SAVE, 17, "#ffffff"), new Label());
+        HBox saveContent = new HBox(8, icon(ICON_SAVE, 17, "#ffffff"), new Label(lang.get("attendance.save")));
         saveContent.setAlignment(Pos.CENTER);
         saveButton.setGraphic(saveContent);
         saveButton.setMaxWidth(Double.MAX_VALUE);
@@ -399,7 +396,7 @@ public class AdminAttendanceView {
     }
 
     private Button statusButton(StudentAttendance student, AttendanceStatus status, String key) {
-        Button button = new Button();
+        Button button = new Button(lang.get(key));
         button.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 12));
         button.setPadding(new Insets(8, 20, 8, 20));
         button.setMinWidth(90);
@@ -422,10 +419,40 @@ public class AdminAttendanceView {
         return "-fx-background-color: " + bg + "; -fx-text-fill: " + text + "; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-width: 0; -fx-cursor: hand; -fx-font-weight: 700;";
     }
 
+    private void populateGradeOptions() {
+        var allCourses = DataStore.getCourses();
+        String curSection = sectionSelector.getValue();
+        gradeSelector.setItems(FXCollections.observableArrayList(
+            allCourses.stream()
+                .map(c -> c.grado())
+                .filter(g -> curSection == null || allCourses.stream().anyMatch(c -> c.grado().equals(g) && c.seccion().equals(curSection)))
+                .distinct().sorted().toList()
+        ));
+    }
+
+    private void populateSectionOptions() {
+        var allCourses = DataStore.getCourses();
+        String curGrade = gradeSelector.getValue();
+        sectionSelector.setItems(FXCollections.observableArrayList(
+            allCourses.stream()
+                .map(c -> c.seccion())
+                .filter(s -> curGrade == null || allCourses.stream().anyMatch(c -> c.seccion().equals(s) && c.grado().equals(curGrade)))
+                .distinct().sorted().toList()
+        ));
+    }
+
     private void wireEvents() {
         searchField.textProperty().addListener((obs, oldValue, newValue) -> refreshRows());
-        gradeSelector.setOnAction(e -> reloadForCourse());
-        sectionSelector.setOnAction(e -> reloadForCourse());
+        gradeSelector.setOnAction(e -> {
+            populateSectionOptions();
+            sectionSelector.getSelectionModel().selectFirst();
+            reloadForCourse();
+        });
+        sectionSelector.setOnAction(e -> {
+            populateGradeOptions();
+            gradeSelector.getSelectionModel().selectFirst();
+            reloadForCourse();
+        });
         saveButton.setOnAction(e -> {
             long pending = students.stream().filter(s -> s.status == AttendanceStatus.UNMARKED).count();
             if (pending > 0) {

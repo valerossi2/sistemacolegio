@@ -145,10 +145,11 @@ public class AdminAttendanceView {
 
     private HBox createSelectorCard(String labelKey, ComboBox<String> selector) {
         Label label = new Label();
-        label.setFont(Font.font("Plus Jakarta Sans", 11));
+        label.setFont(Font.font("Plus Jakarta Sans", FontWeight.SEMI_BOLD, 11));
         languageUpdaters.add(() -> label.setText(lang.get(labelKey)));
-        selector.setPrefWidth(55);
-        selector.setMinHeight(24);
+        selector.setMinWidth(60);
+        selector.setMinHeight(32);
+        selector.setMaxHeight(32);
         selector.setVisibleRowCount(5);
         selector.setCellFactory(list -> new ListCell<String>() {
             @Override
@@ -159,46 +160,31 @@ public class AdminAttendanceView {
                 } else {
                     setText(item);
                     setTextFill(Color.web(text()));
-                    setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12));
+                    setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13));
                 }
             }
         });
-        selector.setButtonCell(new ListCell<String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item);
-                    setTextFill(Color.web(text()));
-                    setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12));
-                    setStyle("-fx-background-color: transparent; -fx-padding: 0;");
-                }
-            }
-        });
-        HBox box = new HBox(4, label, selector);
-        box.setAlignment(Pos.CENTER_LEFT);
-        box.setPadding(new Insets(4, 10, 4, 10));
+        HBox box = new HBox(8, label, selector);
+        box.setAlignment(Pos.CENTER);
+        box.setPadding(new Insets(2, 12, 2, 12));
         box.setOnMouseClicked(e -> selector.show());
         Runnable updateSelector = () -> {
             label.setTextFill(Color.web(textMuted()));
-            selector.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-font-weight: 700; -fx-font-size: 12; -fx-text-fill: " + text() + "; -fx-mark-color: " + textMuted() + ";");
-            box.setStyle(cardStyle(8, borderSoft()) + "; -fx-cursor: hand;");
+            String bg = theme.isDark() ? "#1E293B" : "#ffffff";
+            String border = borderSoft();
+            String arrow = textMuted();
+            selector.setStyle(
+                "-fx-background-color: " + bg + "; -fx-border-color: " + border + "; -fx-border-radius: 6; -fx-background-radius: 6;"
+                + "-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: " + text() + "; -fx-mark-color: " + arrow + ";"
+                + "-fx-padding: 2 8 2 8; -fx-cursor: hand;"
+            );
+            box.setStyle("-fx-background-color: " + bg + "; -fx-border-color: " + border + "; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;");
             selector.setCellFactory(list -> new ListCell<String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
                     if (empty || item == null) { setText(null); }
-                    else { setText(item); setTextFill(Color.web(text())); setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12)); }
-                }
-            });
-            selector.setButtonCell(new ListCell<String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) { setText(null); }
-                    else { setText(item); setTextFill(Color.web(text())); setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 12)); setStyle("-fx-background-color: transparent; -fx-padding: 0;"); }
+                    else { setText(item); setTextFill(Color.web(text())); setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13)); }
                 }
             });
         };
@@ -435,20 +421,14 @@ public class AdminAttendanceView {
                 .filter(c -> c.grado().equals(gradeSelector.getValue()))
                 .map(c -> c.seccion()).distinct().sorted().toList();
             sectionSelector.setItems(FXCollections.observableArrayList(filtered));
-            sectionSelector.getSelectionModel().selectFirst();
+            if (!filtered.contains(sectionSelector.getValue())) {
+                sectionSelector.getSelectionModel().selectFirst();
+            }
             adjustingSelector = false;
             reloadForCourse();
         });
         sectionSelector.setOnAction(e -> {
-            if (adjustingSelector) return;
-            adjustingSelector = true;
-            var filtered = DataStore.getCourses().stream()
-                .filter(c -> c.seccion().equals(sectionSelector.getValue()))
-                .map(c -> c.grado()).distinct().sorted().toList();
-            gradeSelector.setItems(FXCollections.observableArrayList(filtered));
-            gradeSelector.getSelectionModel().selectFirst();
-            adjustingSelector = false;
-            reloadForCourse();
+            if (!adjustingSelector) reloadForCourse();
         });
         saveButton.setOnAction(e -> {
             long pending = students.stream().filter(s -> s.status == AttendanceStatus.UNMARKED).count();

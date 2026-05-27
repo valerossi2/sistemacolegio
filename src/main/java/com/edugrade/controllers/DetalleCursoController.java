@@ -44,6 +44,10 @@ import util.DataStore;
 
 public class DetalleCursoController {
 
+    private static final java.util.Set<String> femaleNames = java.util.Set.of(
+        "Emma","Olivia","Isabella","Sophia","Mía","Valentina","Camila","Gabriela","Valeria","Sofía"
+    );
+
     private LanguageManager lang;
     private ThemeManager theme;
     private boolean showingAllTeachers = false;
@@ -82,6 +86,7 @@ public class DetalleCursoController {
     @FXML private TableView<StudentRow> studentsTable;
     @FXML private TableColumn<StudentRow, String> colStudent;
     @FXML private TableColumn<StudentRow, String> colMatricula;
+    @FXML private TableColumn<StudentRow, String> colGenero;
     @FXML private TableColumn<StudentRow, String> colAsistencia;
     @FXML private Button btnLoadMore;
     @FXML private Label lblPromedioGeneral;
@@ -226,6 +231,21 @@ public class DetalleCursoController {
     private void initStudentTable() {
         colStudent.setCellValueFactory(new PropertyValueFactory<>("name"));
         colMatricula.setCellValueFactory(new PropertyValueFactory<>("matricula"));
+        colGenero.setCellValueFactory(new PropertyValueFactory<>("genero"));
+        colGenero.setCellFactory(col -> new TableCell<StudentRow, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item);
+                    setStyle(item.equals("M")
+                        ? "-fx-text-fill: #3B82F6; -fx-font-weight: bold;"
+                        : "-fx-text-fill: #EC4899; -fx-font-weight: bold;");
+                }
+            }
+        });
         colAsistencia.setCellValueFactory(new PropertyValueFactory<>("status"));
         colAsistencia.setCellFactory(col -> new TableCell<StudentRow, String>() {
             private final Label lbl = new Label();
@@ -265,21 +285,21 @@ public class DetalleCursoController {
 
     private void initStudentData() {
         String[][] raw = {
-            {"Liam Castillo",     "MAT-001"},
-            {"Emma Rodríguez",    "MAT-002"},
-            {"Noah García",       "MAT-003"},
-            {"Olivia Martínez",   "MAT-004"},
-            {"Mateo Hernández",   "MAT-005"},
-            {"Isabella López",    "MAT-006"},
-            {"Santiago Pérez",    "MAT-007"},
-            {"Sophia González",   "MAT-008"},
-            {"Lucas Fernández",   "MAT-009"},
-            {"Mía Torres",        "MAT-010"},
+            {"Liam Castillo",     "MAT-001", "M"},
+            {"Emma Rodríguez",    "MAT-002", "F"},
+            {"Noah García",       "MAT-003", "M"},
+            {"Olivia Martínez",   "MAT-004", "F"},
+            {"Mateo Hernández",   "MAT-005", "M"},
+            {"Isabella López",    "MAT-006", "F"},
+            {"Santiago Pérez",    "MAT-007", "M"},
+            {"Sophia González",   "MAT-008", "F"},
+            {"Lucas Fernández",   "MAT-009", "M"},
+            {"Mía Torres",        "MAT-010", "F"},
         };
         String[] statuses = {"presente", "ausente", "excusa"};
         for (var r : raw) {
             String s = statuses[ThreadLocalRandom.current().nextInt(statuses.length)];
-            fullStudentData.add(new StudentRow(r[0], r[1], s));
+            fullStudentData.add(new StudentRow(r[0], r[1], r[2], s));
         }
         availableStudentPool.clear();
         availableStudentPool.addAll(fullStudentData);
@@ -290,7 +310,6 @@ public class DetalleCursoController {
 
     private void loadRealData() {
         if (currentCourse == null) return;
-        var rng = ThreadLocalRandom.current();
 
         // ── Students ──
         fullStudentData.clear();
@@ -300,7 +319,7 @@ public class DetalleCursoController {
         Map<String, String> attendance = DataStore.getAttendanceForCourse(courseKey);
         for (var s : dbStudents) {
             String status = attendance.getOrDefault(s.matricula(), "presente");
-            fullStudentData.add(new StudentRow(s.nombre(), s.matricula(), status));
+            fullStudentData.add(new StudentRow(s.nombre(), s.matricula(), s.genero(), status));
         }
         int shownStudents = Math.min(INITIAL_STUDENT_COUNT, fullStudentData.size());
         displayedStudentData.addAll(fullStudentData.subList(0, shownStudents));
@@ -327,7 +346,7 @@ public class DetalleCursoController {
 
         // ── Gender distribution ──
         int studentCount = fullStudentData.size();
-        int masc = rng.nextInt(studentCount + 1);
+        int masc = (int) fullStudentData.stream().filter(s -> "M".equals(s.getGenero())).count();
         int fem = studentCount - masc;
         genderChart.setData(FXCollections.observableArrayList(
             new PieChart.Data("Masculino", masc),
@@ -443,6 +462,7 @@ public class DetalleCursoController {
         colTeacherSubject.setText(lang.get("detalle.colMateria", "MATERIA"));
         colStudent.setText(lang.get("detalle.colStudent", "ESTUDIANTE"));
         colMatricula.setText(lang.get("detalle.colMatricula", "ID MATRÍCULA"));
+        colGenero.setText(lang.get("detalle.colGenero", "GÉNERO"));
         colAsistencia.setText(lang.get("detalle.colAsistencia", "ASISTENCIA"));
         if (lblStatsTitle != null) lblStatsTitle.setText(lang.get("detalle.statsTitle", "Estad\u00edsticas y Rendimiento"));
         if (lblTotalStudentsLabel != null) lblTotalStudentsLabel.setText(lang.get("detalle.totalStudentsLabel", "Total Estudiantes"));
@@ -797,7 +817,9 @@ public class DetalleCursoController {
 
     private void addNewStudent(String name) {
         String mat = String.format("MAT-%03d", ThreadLocalRandom.current().nextInt(1, 999));
-        StudentRow s = new StudentRow(name, mat, "presente");
+        String firstName = name.split(" ")[0];
+        String genero = femaleNames.contains(firstName) ? "F" : "M";
+        StudentRow s = new StudentRow(name, mat, genero, "presente");
         addStudentToCourse(s);
         availableStudentPool.add(s);
     }
@@ -863,11 +885,13 @@ public class DetalleCursoController {
     public static class StudentRow {
         private final StringProperty name;
         private final StringProperty matricula;
+        private final StringProperty genero;
         private final StringProperty status;
 
-        public StudentRow(String name, String matricula, String status) {
+        public StudentRow(String name, String matricula, String genero, String status) {
             this.name = new SimpleStringProperty(name);
             this.matricula = new SimpleStringProperty(matricula);
+            this.genero = new SimpleStringProperty(genero);
             this.status = new SimpleStringProperty(status);
         }
 
@@ -878,6 +902,10 @@ public class DetalleCursoController {
         public String getMatricula() { return matricula.get(); }
         public void setMatricula(String m) { matricula.set(m); }
         public StringProperty matriculaProperty() { return matricula; }
+
+        public String getGenero() { return genero.get(); }
+        public void setGenero(String g) { genero.set(g); }
+        public StringProperty generoProperty() { return genero; }
 
         public String getStatus() { return status.get(); }
         public void setStatus(String s) { status.set(s); }

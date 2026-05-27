@@ -200,9 +200,10 @@
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                         </columnResizePolicy>
                         <columns>
-                            <TableColumn fx:id="colStudent"    text="ESTUDIANTE"   prefWidth="240"/>
-                            <TableColumn fx:id="colMatricula"  text="ID MATRÍCULA" prefWidth="140"/>
-                            <TableColumn fx:id="colAsistencia" text="ASISTENCIA"   prefWidth="160"/>
+                             <TableColumn fx:id="colStudent"    text="ESTUDIANTE"   prefWidth="240"/>
+                             <TableColumn fx:id="colMatricula"  text="ID MATRÍCULA" prefWidth="140"/>
+                             <TableColumn fx:id="colGenero"     text="GÉNERO"      prefWidth="80"/>
+                             <TableColumn fx:id="colAsistencia" text="ASISTENCIA"   prefWidth="160"/>
                         </columns>
                         <placeholder>
                             <Label text="No hay estudiantes registrados."

@@ -9,7 +9,7 @@ public class DataStore {
     public record TeacherInfo(String nombre, String email, String materia, String seccion, String estado, int avatarIdx) {}
     public record CourseInfo(String grado, String seccion, String profesorNombre, int profesorIdx, int alumnos, double rendimiento, String estado) {}
     public record ScheduleInfo(String time, String subject, String detail, String gradoSeccion) {}
-    public record StudentInfo(String nombre, String matricula) {}
+    public record StudentInfo(String nombre, String matricula, String genero) {}
 
     private static final List<TeacherInfo> TEACHERS = new ArrayList<>();
     private static final List<CourseInfo> COURSES = new ArrayList<>();
@@ -60,6 +60,7 @@ public class DataStore {
 
         String[] firstNames = {"Liam","Emma","Noah","Olivia","Mateo","Isabella","Santiago","Sophia","Lucas","Mía","Benjamín","Valentina","Sebastián","Camila","Daniel","Gabriela","Carlos","Valeria","Diego","Sofía"};
         String[] lastNames = {"Castillo","Rodríguez","García","Martínez","Hernández","López","Pérez","González","Fernández","Torres","Ramírez","Morales","Ortiz","Cruz","Reyes","Vargas"};
+        Set<String> femaleNames = Set.of("Emma","Olivia","Isabella","Sophia","Mía","Valentina","Camila","Gabriela","Valeria","Sofía");
 
         for (String[] rc : rawCourses) {
             String grado = rc[0];
@@ -75,9 +76,12 @@ public class DataStore {
             // Students for this course
             List<StudentInfo> students = new ArrayList<>();
             for (int s = 0; s < alumCount; s++) {
-                String name = firstNames[ThreadLocalRandom.current().nextInt(firstNames.length)] + " " + lastNames[ThreadLocalRandom.current().nextInt(lastNames.length)];
+                String firstName = firstNames[ThreadLocalRandom.current().nextInt(firstNames.length)];
+                String lastName = lastNames[ThreadLocalRandom.current().nextInt(lastNames.length)];
+                String name = firstName + " " + lastName;
+                String genero = femaleNames.contains(firstName) ? "F" : "M";
                 String mat = String.format("MAT-%03d", ThreadLocalRandom.current().nextInt(1, 999));
-                students.add(new StudentInfo(name, mat));
+                students.add(new StudentInfo(name, mat, genero));
             }
             COURSE_STUDENTS.put(key, students);
 

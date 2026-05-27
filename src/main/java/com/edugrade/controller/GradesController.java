@@ -41,6 +41,7 @@ public class GradesController implements Initializable {
     @FXML private TableColumn<Student, String>  colNuevaCalif;
     @FXML private ComboBox<String> comboPeriodo;
     @FXML private ComboBox<String> comboTipoEval;
+    @FXML private Button btnPrint;
     @FXML private Button btnVolver;
     @FXML private Button btnGuardar;
 
@@ -219,6 +220,15 @@ public class GradesController implements Initializable {
         });
         colNuevaCalif.setEditable(true);
         gradesTable.setEditable(true);
+    }
+
+    @FXML
+    private void onImprimirReporte() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(lang.get("report.title", "Reporte"));
+        alert.setHeaderText(null);
+        alert.setContentText(lang.get("report.msg", "Impresión de reporte no implementada."));
+        alert.showAndWait();
     }
 
     private void handleSave() {

@@ -14,14 +14,24 @@
       spacing="0"
       maxWidth="Infinity"
       maxHeight="Infinity"
-      stylesheets="@../../css/base.css,@../../css/Cursos.css">
+      stylesheets="@../../css/base.css,@../../css/Cursos.css,@../../css/DetallesCurso.css">
 
     <VBox fx:id="cursosCard" styleClass="cursos-card" VBox.vgrow="ALWAYS" spacing="0">
-        <VBox fx:id="headerBox" spacing="6">
-            <padding><Insets top="32" right="40" bottom="0" left="40"/></padding>
-            <Text fx:id="pageTitle" text="Listado Completo de Cursos" styleClass="cursos-page-title" />
-            <Text fx:id="pageSubtitle" text="Gestiona los cursos activos del instituto." styleClass="cursos-page-subtitle" />
-        </VBox>
+        <HBox alignment="CENTER_LEFT" spacing="16">
+            <VBox fx:id="headerBox" spacing="6" HBox.hgrow="ALWAYS">
+                <padding><Insets top="32" right="40" bottom="0" left="40"/></padding>
+                <Text fx:id="pageTitle" text="Listado Completo de Cursos" styleClass="cursos-page-title" />
+                <Text fx:id="pageSubtitle" text="Gestiona los cursos activos del instituto." styleClass="cursos-page-subtitle" />
+            </VBox>
+            <Button fx:id="btnPrint" styleClass="btn-outlined"
+                    mnemonicParsing="false" onAction="#onImprimirReporte">
+                <graphic>
+                    <SVGPath styleClass="btn-svg-icon"
+                             content="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"
+                             scaleX="0.8" scaleY="0.8"/>
+                </graphic>
+            </Button>
+        </HBox>
 
         <HBox fx:id="countBox" alignment="CENTER_LEFT">
             <padding><Insets top="24" right="40" bottom="16" left="40"/></padding>

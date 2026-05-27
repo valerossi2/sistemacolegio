@@ -18,23 +18,32 @@
     <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
 
     <HBox fx:id="topBar" styleClass="grades-topbar" spacing="16" alignment="CENTER_LEFT">
-        <TextField fx:id="searchField" promptText="Buscar estudiante..." styleClass="grades-search" HBox.hgrow="ALWAYS" />
-        <Button fx:id="btnGuardarTop" text="Guardar Cambios" styleClass="grades-btn" />
+        <HBox spacing="6" alignment="CENTER_LEFT">
+            <Label fx:id="breadcrumbCursos"
+                   text="Cursos"
+                   styleClass="breadcrumb__parent btn-link"
+                   onMouseClicked="#onBreadcrumbCursos"/>
+            <Label text="›" styleClass="breadcrumb__separator"/>
+            <Label fx:id="breadcrumbCursoActual"
+                   text="5to E"
+                   styleClass="breadcrumb__current breadcrumb__link"
+                   onMouseClicked="#onBreadcrumbCursoActual"/>
+        </HBox>
+        <Region HBox.hgrow="ALWAYS" />
+        <HBox styleClass="grades-filter-group" spacing="16" alignment="CENTER_LEFT">
+            <VBox spacing="6">
+                <Label fx:id="lblPeriodo" text="Periodo" styleClass="grades-label" />
+                <ComboBox fx:id="comboPeriodo" styleClass="grades-combo" prefHeight="42" />
+            </VBox>
+            <VBox spacing="6">
+                <Label fx:id="lblTipoEval" text="Tipo de Evaluación" styleClass="grades-label" />
+                <ComboBox fx:id="comboTipoEval" styleClass="grades-combo" prefHeight="42" />
+            </VBox>
+        </HBox>
     </HBox>
 
     <VBox fx:id="gradesCard" styleClass="grades-card" VBox.vgrow="ALWAYS" spacing="0">
         <Text fx:id="pageTitle" text="Gestión de Calificaciones - 5to E" styleClass="grades-title" />
-
-        <HBox fx:id="filterBox" spacing="16" alignment="CENTER_LEFT">
-            <VBox spacing="6" HBox.hgrow="ALWAYS">
-                <Label fx:id="lblPeriodo" text="Periodo" styleClass="grades-label" />
-                <ComboBox fx:id="comboPeriodo" styleClass="grades-combo" maxWidth="Infinity" prefHeight="42" />
-            </VBox>
-            <VBox spacing="6" HBox.hgrow="ALWAYS">
-                <Label fx:id="lblTipoEval" text="Tipo de Evaluación" styleClass="grades-label" />
-                <ComboBox fx:id="comboTipoEval" styleClass="grades-combo" maxWidth="Infinity" prefHeight="42" />
-            </VBox>
-        </HBox>
 
         <TableView fx:id="gradesTable"
                    styleClass="grades-table"

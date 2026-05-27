@@ -2,6 +2,9 @@ package com.edugrade.model;
 
 import javafx.beans.property.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Student {
 
     public enum Gender { MALE, FEMALE }
@@ -13,6 +16,8 @@ public class Student {
     private final StringProperty  newGrade      = new SimpleStringProperty("");
     private final ObjectProperty<Gender> gender = new SimpleObjectProperty<>();
 
+    private final Map<String, Double> evalGrades = new HashMap<>();
+
     public Student(String name, String email, String studentId,
                    double currentGrade, Gender gender) {
         this.name.set(name);
@@ -20,6 +25,22 @@ public class Student {
         this.studentId.set(studentId);
         this.currentGrade.set(currentGrade);
         this.gender.set(gender);
+    }
+
+    public void addEvalGrade(String evalType, double grade) {
+        evalGrades.put(evalType, grade);
+        double sum = 0;
+        for (double g : evalGrades.values()) sum += g;
+        currentGrade.set(sum);
+    }
+
+    public double getEvalGrade(String evalType) {
+        return evalGrades.getOrDefault(evalType, 0.0);
+    }
+
+    public void clearEvalGrades() {
+        evalGrades.clear();
+        currentGrade.set(0);
     }
 
     public StringProperty  nameProperty()         { return name; }

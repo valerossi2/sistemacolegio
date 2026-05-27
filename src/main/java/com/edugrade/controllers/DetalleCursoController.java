@@ -1,5 +1,6 @@
 package com.edugrade.controllers;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
@@ -10,7 +11,9 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.chart.PieChart;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import com.edugrade.controller.GradesController;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -71,6 +74,7 @@ public class DetalleCursoController {
     @FXML private TableView<TeacherRow> teacherTable;
     @FXML private TableColumn<TeacherRow, String> colTeacherName;
     @FXML private TableColumn<TeacherRow, String> colTeacherSubject;
+    @FXML private TableColumn<TeacherRow, String> colTeacherHorario;
     @FXML private TableView<StudentRow> studentsTable;
     @FXML private TableColumn<StudentRow, String> colStudent;
     @FXML private TableColumn<StudentRow, String> colGenero;
@@ -147,6 +151,8 @@ public class DetalleCursoController {
         colTeacherName.setCellValueFactory(d -> d.getValue().nombreProperty());
         colTeacherName.setCellFactory(nombreCell());
         colTeacherSubject.setCellValueFactory(d -> d.getValue().materiaProperty());
+        colTeacherHorario.setCellValueFactory(d -> d.getValue().horarioProperty());
+        colTeacherHorario.setCellFactory(defaultSubjectCell());
     }
 
     private Callback<TableColumn<TeacherRow, String>, TableCell<TeacherRow, String>> defaultSubjectCell() {
@@ -216,19 +222,21 @@ public class DetalleCursoController {
         String _b = lang.get("detalle.subj.biology");
         String _c = lang.get("detalle.subj.chemistry");
         String _ah = lang.get("detalle.subj.artHistory");
+        String[] horarios = {"8:00 – 9:00","9:00 – 10:00","10:00 – 11:00","11:00 – 12:00",
+            "12:00 – 1:00","1:00 – 2:00","2:00 – 3:00","3:00 – 4:00"};
         fullTeacherData.setAll(
-            new TeacherRow("Prof. Laura Méndez", "laura.mendez@edu.com", _m, "5to E", activo, 0),
-            new TeacherRow("Prof. Carlos Ruiz", "carlos.ruiz@edu.com", _h, "4to A", activo, 1),
-            new TeacherRow("Prof. Elena Torres", "elena.torres@edu.com", _l, "3ro B", activo, 2),
-            new TeacherRow("Prof. Ana Silva", "ana.silva@edu.com", _s, "2do C", activo, 3),
-            new TeacherRow("Prof. Miguel Soto", "miguel.soto@edu.com", _e, "1ro A", inactivo, 4),
-            new TeacherRow("Prof. Diana Ríos", "diana.rios@edu.com", _a, "5to B", activo, 5),
-            new TeacherRow("Prof. Pedro Lima", "pedro.lima@edu.com", _p, "4to B", activo, 6),
-            new TeacherRow("Prof. Sofía Vega", "sofia.vega@edu.com", _mu, "3ro A", activo, 7),
-            new TeacherRow("Prof. Luis Paz", "luis.paz@edu.com", _ph, "6to A", inactivo, 0),
-            new TeacherRow("Prof. Carmen Rojas", "carmen.rojas@edu.com", _b, "5to C", activo, 1),
-            new TeacherRow("Prof. Andrés Cruz", "andres.cruz@edu.com", _c, "4to C", activo, 2),
-            new TeacherRow("Prof. Valeria Solís", "valeria.solis@edu.com", _ah, "6to B", activo, 3)
+            new TeacherRow("Prof. Laura Méndez", "laura.mendez@edu.com", _m, "5to E", activo, 0, horarios[0]),
+            new TeacherRow("Prof. Carlos Ruiz", "carlos.ruiz@edu.com", _h, "4to A", activo, 1, horarios[1]),
+            new TeacherRow("Prof. Elena Torres", "elena.torres@edu.com", _l, "3ro B", activo, 2, horarios[2]),
+            new TeacherRow("Prof. Ana Silva", "ana.silva@edu.com", _s, "2do C", activo, 3, horarios[3]),
+            new TeacherRow("Prof. Miguel Soto", "miguel.soto@edu.com", _e, "1ro A", inactivo, 4, horarios[4]),
+            new TeacherRow("Prof. Diana Ríos", "diana.rios@edu.com", _a, "5to B", activo, 5, horarios[5]),
+            new TeacherRow("Prof. Pedro Lima", "pedro.lima@edu.com", _p, "4to B", activo, 6, horarios[6]),
+            new TeacherRow("Prof. Sofía Vega", "sofia.vega@edu.com", _mu, "3ro A", activo, 7, horarios[7]),
+            new TeacherRow("Prof. Luis Paz", "luis.paz@edu.com", _ph, "6to A", inactivo, 0, horarios[0]),
+            new TeacherRow("Prof. Carmen Rojas", "carmen.rojas@edu.com", _b, "5to C", activo, 1, horarios[1]),
+            new TeacherRow("Prof. Andrés Cruz", "andres.cruz@edu.com", _c, "4to C", activo, 2, horarios[2]),
+            new TeacherRow("Prof. Valeria Solís", "valeria.solis@edu.com", _ah, "6to B", activo, 3, horarios[3])
         );
         displayedTeacherData.addAll(fullTeacherData.subList(0, INITIAL_TEACHER_COUNT));
         teacherTable.setItems(displayedTeacherData);
@@ -380,13 +388,16 @@ public class DetalleCursoController {
         };
         String activo = lang.get("detalle.activo", "Activo");
         String inactivo = lang.get("detalle.inactivo", "Inactivo");
+        String[] horarios = {"8:00 – 9:00","9:00 – 10:00","10:00 – 11:00","11:00 – 12:00",
+            "12:00 – 1:00","1:00 – 2:00","2:00 – 3:00","3:00 – 4:00"};
         int teacherCount = currentCourse.profesores();
         for (int i = 0; i < teacherCount; i++) {
             String subj = subjects[rng.nextInt(subjects.length)];
             String estado = rng.nextBoolean() ? activo : inactivo;
+            String horario = horarios[rng.nextInt(horarios.length)];
             fullTeacherData.add(new TeacherRow(teacherNames[i % teacherNames.length],
                 teacherNames[i % teacherNames.length].toLowerCase().replace(" ",".").replace("á","a").replace("é","e") + "@edu.com",
-                subj, currentCourse.seccion(), estado, i));
+                subj, currentCourse.seccion(), estado, i, horario));
         }
         int shownTeachers = Math.min(INITIAL_TEACHER_COUNT, fullTeacherData.size());
         displayedTeacherData.addAll(fullTeacherData.subList(0, shownTeachers));
@@ -722,8 +733,11 @@ public class DetalleCursoController {
         String q = search.toLowerCase();
         for (var t : teachers) {
             if (t.nombre().toLowerCase().contains(q)) {
+                String[] hrs = {"8:00 – 9:00","9:00 – 10:00","10:00 – 11:00","11:00 – 12:00",
+                    "12:00 – 1:00","1:00 – 2:00","2:00 – 3:00","3:00 – 4:00"};
                 TeacherRow newRow = new TeacherRow(t.nombre(), t.email(), t.materia(),
-                    currentCourse != null ? currentCourse.seccion() : "", t.estado(), t.avatarIdx());
+                    currentCourse != null ? currentCourse.seccion() : "", t.estado(), t.avatarIdx(),
+                    hrs[ThreadLocalRandom.current().nextInt(hrs.length)]);
                 addTeacherToCourse(newRow);
                 teacherSearchField.clear();
                 teacherSuggestPopup.hide();
@@ -762,8 +776,11 @@ public class DetalleCursoController {
                         item.getStyleClass().add("search-suggestion-item");
                         item.setMaxWidth(Double.MAX_VALUE);
                         item.setOnMouseClicked(e -> {
+                            String[] hrs = {"8:00 – 9:00","9:00 – 10:00","10:00 – 11:00","11:00 – 12:00",
+                                "12:00 – 1:00","1:00 – 2:00","2:00 – 3:00","3:00 – 4:00"};
                             TeacherRow newRow = new TeacherRow(t.nombre(), t.email(), t.materia(),
-                                currentCourse != null ? currentCourse.seccion() : "", t.estado(), t.avatarIdx());
+                                currentCourse != null ? currentCourse.seccion() : "", t.estado(), t.avatarIdx(),
+                                hrs[ThreadLocalRandom.current().nextInt(hrs.length)]);
                             addTeacherToCourse(newRow);
                             teacherSearchField.clear();
                             teacherSuggestPopup.hide();
@@ -882,11 +899,23 @@ public class DetalleCursoController {
 
     @FXML
     private void onCalificaciones(ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(lang.get("detalle.calificacionesTitle", "Calificaciones"));
-        alert.setHeaderText(null);
-        alert.setContentText(lang.get("detalle.calificacionesMsg", "Gestión de calificaciones no implementada."));
-        alert.showAndWait();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Mestros/Calificaciones.fxml"));
+            Node gradesView = loader.load();
+            GradesController ctrl = loader.getController();
+
+            Node p = root;
+            while (p != null && !"cursosCard".equals(p.getId())) p = p.getParent();
+            VBox cursosCard = (VBox) p;
+            List<Node> savedChildren = new java.util.ArrayList<>(cursosCard.getChildrenUnmodifiable());
+
+            Runnable backToDetail = () -> cursosCard.getChildren().setAll(savedChildren);
+            ctrl.setOnBack(backToDetail);
+            ctrl.setCourseData(currentCourse, allCourses, backToDetail);
+            cursosCard.getChildren().setAll(gradesView);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateTeacherTableHeight(int rowCount) {
@@ -961,14 +990,16 @@ public class DetalleCursoController {
         private final StringProperty materia;
         private final StringProperty seccion;
         private final StringProperty estado;
+        private final StringProperty horario;
         private final int avatarIdx;
 
-        public TeacherRow(String nombre, String email, String materia, String seccion, String estado, int avatarIdx) {
+        public TeacherRow(String nombre, String email, String materia, String seccion, String estado, int avatarIdx, String horario) {
             this.nombre = new SimpleStringProperty(nombre);
             this.email = new SimpleStringProperty(email);
             this.materia = new SimpleStringProperty(materia);
             this.seccion = new SimpleStringProperty(seccion);
             this.estado = new SimpleStringProperty(estado);
+            this.horario = new SimpleStringProperty(horario);
             this.avatarIdx = avatarIdx;
         }
 
@@ -991,6 +1022,10 @@ public class DetalleCursoController {
         public String getEstado() { return estado.get(); }
         public void setEstado(String e) { estado.set(e); }
         public StringProperty estadoProperty() { return estado; }
+
+        public String getHorario() { return horario.get(); }
+        public void setHorario(String h) { horario.set(h); }
+        public StringProperty horarioProperty() { return horario; }
 
         public int avatarIdx() { return avatarIdx; }
     }

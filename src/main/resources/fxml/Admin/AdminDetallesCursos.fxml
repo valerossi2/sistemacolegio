@@ -235,8 +235,9 @@
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                         </columnResizePolicy>
                         <columns>
-                            <TableColumn fx:id="colTeacherName" text="DOCENTE" prefWidth="220"/>
-                            <TableColumn fx:id="colTeacherSubject" text="MATERIA" prefWidth="220"/>
+                            <TableColumn fx:id="colTeacherName" text="DOCENTE" prefWidth="200"/>
+                            <TableColumn fx:id="colTeacherSubject" text="MATERIA" prefWidth="200"/>
+                            <TableColumn fx:id="colTeacherHorario" text="HORARIO" prefWidth="180"/>
                         </columns>
                         <placeholder>
                             <Label text="No hay docentes asignados." styleClass="table-placeholder-label"/>

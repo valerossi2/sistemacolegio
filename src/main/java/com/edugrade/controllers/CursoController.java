@@ -59,6 +59,7 @@ public class CursoController {
     @FXML private Text pageTitle;
     @FXML private Text pageSubtitle;
     @FXML private Label lblTotalCursos;
+    @FXML private Button btnPrint;
     @FXML private TableView<CourseRow> cursosTable;
     @FXML private TableColumn<CourseRow, String> colGrado;
     @FXML private TableColumn<CourseRow, String> colEncargado;
@@ -415,6 +416,15 @@ public class CursoController {
 
     private void updateCourseCount(int count) {
         lblTotalCursos.setText(lang.get("courses.totalLabel", "Todos los Cursos ({0})").replace("{0}", String.valueOf(count)));
+    }
+
+    @FXML
+    private void onImprimirReporte() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(lang.get("report.title", "Reporte"));
+        alert.setHeaderText(null);
+        alert.setContentText(lang.get("report.msg", "Impresión de reporte no implementada."));
+        alert.showAndWait();
     }
 
     public record CourseRow(Integer cursoId, String grado, int teacherIdx, String seccion, int alumnos, int profesores, double rendimiento, String estado) {}

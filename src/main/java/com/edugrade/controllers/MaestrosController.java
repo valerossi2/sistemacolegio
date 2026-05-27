@@ -50,6 +50,7 @@ public class MaestrosController {
     @FXML private Text pageTitle;
     @FXML private Text pageSubtitle;
     @FXML private Label lblTotalMaestros;
+    @FXML private Button btnPrint;
     @FXML private TableView<TeacherRow> maestrosTable;
     @FXML private TableColumn<TeacherRow, String> colNombre;
     @FXML private TableColumn<TeacherRow, String> colEmail;
@@ -400,6 +401,15 @@ public class MaestrosController {
 
     private void updateCount(int count) {
         lblTotalMaestros.setText(lang.get("teachers.totalLabel", "Todos los Profesores ({0})").replace("{0}", String.valueOf(count)));
+    }
+
+    @FXML
+    private void onImprimirReporte() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(lang.get("report.title", "Reporte"));
+        alert.setHeaderText(null);
+        alert.setContentText(lang.get("report.msg", "Impresión de reporte no implementada."));
+        alert.showAndWait();
     }
 
     public record TeacherRow(String nombre, String email, String materia, String seccion, String estado, int avatarIdx) {}

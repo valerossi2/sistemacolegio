@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
 
 <VBox fx:id="root"
       xmlns:fx="http://javafx.com/fxml/1"
@@ -13,37 +14,33 @@
       spacing="0"
       maxWidth="Infinity"
       maxHeight="Infinity"
-      stylesheets="@../../css/base.css,@../../css/Cursos.css,@../../css/Calificaciones.css">
+      stylesheets="@../../css/base.css,@../../css/Cursos.css,@../../css/Calificaciones.css,@../../css/DetallesCurso.css">
 
     <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
 
-    <HBox fx:id="topBar" styleClass="grades-topbar" spacing="16" alignment="CENTER_LEFT">
-        <HBox spacing="6" alignment="CENTER_LEFT">
-            <Label fx:id="breadcrumbCursos"
-                   text="Cursos"
-                   styleClass="breadcrumb__parent btn-link"
-                   onMouseClicked="#onBreadcrumbCursos"/>
-            <Label text="›" styleClass="breadcrumb__separator"/>
-            <Label fx:id="breadcrumbCursoActual"
-                   text="5to E"
-                   styleClass="breadcrumb__current breadcrumb__link"
-                   onMouseClicked="#onBreadcrumbCursoActual"/>
-        </HBox>
-        <Region HBox.hgrow="ALWAYS" />
-        <HBox styleClass="grades-filter-group" spacing="16" alignment="CENTER_LEFT">
-            <VBox spacing="6">
-                <Label fx:id="lblPeriodo" text="Periodo" styleClass="grades-label" />
-                <ComboBox fx:id="comboPeriodo" styleClass="grades-combo" prefHeight="42" />
-            </VBox>
-            <VBox spacing="6">
-                <Label fx:id="lblTipoEval" text="Tipo de Evaluación" styleClass="grades-label" />
-                <ComboBox fx:id="comboTipoEval" styleClass="grades-combo" prefHeight="42" />
-            </VBox>
-        </HBox>
-    </HBox>
-
     <VBox fx:id="gradesCard" styleClass="grades-card" VBox.vgrow="ALWAYS" spacing="0">
-        <Text fx:id="pageTitle" text="Gestión de Calificaciones - 5to E" styleClass="grades-title" />
+        <HBox alignment="CENTER_LEFT" spacing="16">
+            <Text fx:id="pageTitle" text="Gestión de Calificaciones - 5to E" styleClass="grades-title" HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnPrint" styleClass="btn-outlined"
+                    mnemonicParsing="false" onAction="#onImprimirReporte">
+                <graphic>
+                    <SVGPath styleClass="btn-svg-icon"
+                             content="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"
+                             scaleX="0.8" scaleY="0.8"/>
+                </graphic>
+            </Button>
+        </HBox>
+
+        <HBox fx:id="filterBox" spacing="16" alignment="CENTER_LEFT">
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label fx:id="lblPeriodo" text="Periodo" styleClass="grades-label input-label" />
+                <ComboBox fx:id="comboPeriodo" styleClass="grades-combo" maxWidth="Infinity" prefHeight="42" />
+            </VBox>
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label fx:id="lblTipoEval" text="Tipo de Evaluación" styleClass="grades-label input-label" />
+                <ComboBox fx:id="comboTipoEval" styleClass="grades-combo" maxWidth="Infinity" prefHeight="42" />
+            </VBox>
+        </HBox>
 
         <TableView fx:id="gradesTable"
                    styleClass="grades-table"
@@ -52,7 +49,7 @@
                 <TableColumn fx:id="colEstudiante"   text="ESTUDIANTE"     />
                 <TableColumn fx:id="colMatricula"    text="MATRÍCULA"      />
                 <TableColumn fx:id="colCalifActual"  text="NOTA ACTUAL"    />
-                <TableColumn fx:id="colNuevaCalif"   text="NUEVA NOTA"     />
+                <TableColumn fx:id="colNuevaCalif"   text="CALIF. FINAL"     />
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
@@ -63,8 +60,8 @@
         </TableView>
 
         <HBox alignment="CENTER_RIGHT" spacing="12">
-            <Button fx:id="btnCancelar" text="Cancelar" styleClass="grades-btn-secondary" />
-            <Button fx:id="btnGuardarBottom" text="Guardar Cambios" styleClass="grades-btn" />
+            <Button fx:id="btnGuardar" text="Guardar Cambios" styleClass="grades-btn-primary" />
+            <Button fx:id="btnVolver" text="Volver" styleClass="grades-btn-secondary" />
         </HBox>
     </VBox>
 </VBox>

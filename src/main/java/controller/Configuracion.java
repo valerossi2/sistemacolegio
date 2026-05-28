@@ -1,6 +1,9 @@
 package controller;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import theme.ThemeManager;
+import util.AppSession;
 import util.LanguageManager;
 import java.io.File;
 import java.util.prefs.Preferences;
@@ -1049,6 +1052,45 @@ public class Configuracion {
             "-fx-background-color: " + ThemeManager.COLOR_RED + "; -fx-text-fill: white; " +
             "-fx-font-family: 'Inter'; -fx-font-weight: bold; -fx-font-size: 14; " +
             "-fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10 0;"));
+
+        logoutBtn.setOnAction(e -> {
+            if (ownerStage != null) {
+                AppSession.getInstance().logout();
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
+                    Parent root = loader.load();
+                    controller.LoginController loginCtrl = loader.getController();
+                    loginCtrl.setOnLoginSuccess(() -> {
+                        try {
+                            FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("/fxml/main_view.fxml"));
+                            Parent mainRoot = mainLoader.load();
+                            MainController mainCtrl = mainLoader.getController();
+                            mainCtrl.setStage(ownerStage);
+                            mainCtrl.setupEverything();
+                            Scene scene = new Scene(mainRoot, ownerStage.getScene().getWidth(), ownerStage.getScene().getHeight());
+                            var t = ThemeManager.getInstance();
+                            scene.getStylesheets().add(t.isDark()
+                                ? getClass().getResource("/css/dark.css").toExternalForm()
+                                : getClass().getResource("/css/light.css").toExternalForm());
+                            t.addListener(() -> {
+                                scene.getStylesheets().clear();
+                                scene.getStylesheets().add(t.isDark()
+                                    ? getClass().getResource("/css/dark.css").toExternalForm()
+                                    : getClass().getResource("/css/light.css").toExternalForm());
+                            });
+                            ownerStage.setScene(scene);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    });
+                    Scene loginScene = new Scene(root, 820, 620);
+                    loginScene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+                    ownerStage.setScene(loginScene);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
         section.getChildren().add(logoutBtn);
 

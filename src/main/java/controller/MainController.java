@@ -40,8 +40,7 @@ public class MainController {
     @FXML private StackPane logoStack;
     @FXML private Text lTitle;
     @FXML private Text lSub;
-    @FXML private HBox logoutBox;
-    @FXML private Text logoutText;
+
     @FXML private VBox contentArea;
     @FXML private HBox header;
     @FXML private HBox searchBox;
@@ -1184,43 +1183,6 @@ public class MainController {
         setCenterView(attendanceView.getView());
     }
 
-    @FXML
-    private void onLogout() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
-            Parent root = loader.load();
-            controller.LoginController loginCtrl = loader.getController();
-            loginCtrl.setOnLoginSuccess(() -> {
-                try {
-                    FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("/fxml/main_view.fxml"));
-                    Parent mainRoot = mainLoader.load();
-                    MainController mainCtrl = mainLoader.getController();
-                    mainCtrl.setStage(stage);
-                    mainCtrl.setupEverything();
-                    Scene scene = new Scene(mainRoot, stage.getScene().getWidth(), stage.getScene().getHeight());
-                    var theme = ThemeManager.getInstance();
-                    scene.getStylesheets().add(theme.isDark()
-                        ? getClass().getResource("/css/dark.css").toExternalForm()
-                        : getClass().getResource("/css/light.css").toExternalForm());
-                    theme.addListener(() -> {
-                        scene.getStylesheets().clear();
-                        scene.getStylesheets().add(theme.isDark()
-                            ? getClass().getResource("/css/dark.css").toExternalForm()
-                            : getClass().getResource("/css/light.css").toExternalForm());
-                    });
-                    stage.setScene(scene);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            });
-            Scene scene = new Scene(root, 820, 620);
-            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-            stage.setScene(scene);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void seedDataIfEmpty() {
         DataStore.seedIfEmpty();
     }
@@ -1241,10 +1203,6 @@ public class MainController {
 
         LanguageManager.getInstance().addListener(this::updateLanguageTexts);
         updateLanguageTexts();
-
-        themeUpdaters.add(() -> {
-            logoutText.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
-        });
 
         theme.addListener(() -> {
             for (Runnable r : themeUpdaters) r.run();

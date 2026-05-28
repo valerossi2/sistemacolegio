@@ -32,15 +32,6 @@
                 </VBox>
             </HBox>
             <VBox fx:id="navItemsContainer" spacing="12" VBox.vgrow="ALWAYS" />
-            <HBox fx:id="logoutBox" alignment="CENTER_LEFT" spacing="12"
-                  style="-fx-cursor: hand;" onMouseClicked="#onLogout">
-                <padding>
-                    <Insets left="20" right="20" top="12" bottom="12"/>
-                </padding>
-                <Label text="🚪" style="-fx-font-size: 18px;"/>
-                <Text fx:id="logoutText" text="Cerrar Sesión"
-                      style="-fx-font-size: 14px; -fx-font-weight: medium;"/>
-            </HBox>
         </VBox>
 
         <VBox fx:id="contentArea" HBox.hgrow="ALWAYS">

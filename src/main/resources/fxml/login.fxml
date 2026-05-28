@@ -24,27 +24,21 @@
 
     <StackPane styleClass="left-panel" prefWidth="350" maxWidth="380">
 
-        <SVGPath styleClass="wave-shape"
-                 content="M 0 0 L 270 0 Q 320 160 270 310 Q 240 460 270 620 L 0 620 Z"
-                 StackPane.alignment="CENTER_LEFT"/>
-
-        <VBox styleClass="left-text-box" maxWidth="240" spacing="10"
-              StackPane.alignment="CENTER_LEFT">
-            <StackPane.margin><Insets left="32"/></StackPane.margin>
-            <Label styleClass="left-title" wrapText="true"
-                   text="Gestiona Calificaciones&#10;y Progreso Académico&#10;con Facilidad"/>
-            <Label styleClass="left-subtitle" wrapText="true"
-                   text="¡Bienvenido de nuevo! Por favor,&#10;inicia sesión en tu cuenta."/>
+        <VBox spacing="20" alignment="CENTER" maxWidth="320"
+              StackPane.alignment="CENTER">
+            <VBox spacing="8" alignment="CENTER" maxWidth="260">
+                <Label styleClass="left-title" wrapText="true"
+                       text="Gestiona Calificaciones&#10;y Progreso Académico&#10;con Facilidad"/>
+                <Label styleClass="left-subtitle" wrapText="true"
+                       text="¡Bienvenido de nuevo! Por favor,&#10;inicia sesión en tu cuenta."/>
+            </VBox>
+            <ImageView fx:id="heroImage" fitWidth="350" fitHeight="300"
+                       preserveRatio="true">
+                <image>
+                    <Image url="@../img/descarga.png"/>
+                </image>
+            </ImageView>
         </VBox>
-
-        <ImageView fx:id="heroImage" fitWidth="220" fitHeight="180"
-                   preserveRatio="true" styleClass="hero-image"
-                   StackPane.alignment="BOTTOM_LEFT">
-            <image>
-                <Image url="@../img/logoCEPVAremove.png"/>
-            </image>
-            <StackPane.margin><Insets bottom="20" left="20"/></StackPane.margin>
-        </ImageView>
 
     </StackPane>
 

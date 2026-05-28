@@ -50,6 +50,7 @@
                 <TableColumn fx:id="colMateria"  text="MATERIA"  />
                 <TableColumn fx:id="colSeccion"  text="SECCIÓN"  />
                 <TableColumn fx:id="colEstado"   text="ESTADO"   />
+                <TableColumn fx:id="colRol"      text="ROL"      />
                 <TableColumn fx:id="colAcciones" text="ACCIONES" />
             </columns>
             <placeholder>

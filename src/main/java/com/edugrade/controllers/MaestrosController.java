@@ -349,10 +349,9 @@ public class MaestrosController {
 
             boolean dark = theme.isDark();
             String textColor = dark ? "#F8FAFC" : "#1F2937";
-            String bgColor = dark ? "#1E293B" : "#FFFFFF";
 
             Label nameLabel = new Label(teacher.nombre());
-            nameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: " + textColor + ";");
+            nameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1F2937;");
 
             Button btnGoDetails = new Button(lang.get("teachers.btnVerDetalles", "Ver detalles"));
             btnGoDetails.getStyleClass().add("btn-ver-detalles");
@@ -363,14 +362,12 @@ public class MaestrosController {
             VBox content = new VBox(16, qrView, nameLabel, btnGoDetails);
             content.setAlignment(Pos.CENTER);
             content.setPadding(new Insets(24));
-            content.setStyle("-fx-background-color: " + bgColor + "; -fx-background-radius: 16;");
 
             Dialog<Void> dialog = new Dialog<>();
             dialog.setTitle("Código QR - " + teacher.nombre());
             DialogPane pane = dialog.getDialogPane();
             pane.setContent(content);
             pane.getButtonTypes().add(ButtonType.CLOSE);
-            pane.setStyle("-fx-background-color: " + bgColor + "; -fx-background-radius: 16;");
             var closeBtn = pane.lookupButton(ButtonType.CLOSE);
             if (closeBtn != null) closeBtn.setStyle("-fx-text-fill: " + textColor + ";");
             dialog.showAndWait();

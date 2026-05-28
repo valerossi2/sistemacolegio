@@ -14,8 +14,18 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import java.util.HashMap;
-import java.util.Map;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
+import javafx.util.Callback;
+import theme.ThemeManager;
+import util.AppSession;
+import util.DataStore;
+import util.LanguageManager;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import java.util.function.Consumer;
 
 public class MaestrosController {
@@ -40,7 +50,6 @@ public class MaestrosController {
     @FXML private TableColumn<TeacherRow, String> colEmail;
     @FXML private TableColumn<TeacherRow, String> colMateria;
     @FXML private TableColumn<TeacherRow, String> colSeccion;
-    @FXML private TableColumn<TeacherRow, String> colRol;
     @FXML private TableColumn<TeacherRow, String> colEstado;
     @FXML private TableColumn<TeacherRow, String> colAcciones;
 
@@ -57,7 +66,6 @@ public class MaestrosController {
     private static final double COMPACT_THRESHOLD = 700;
 
     private final ObservableList<TeacherRow> allTeachers = FXCollections.observableArrayList();
-    private final Map<String, String> teacherRoles = new HashMap<>();
 
     @FXML
     private void initialize() {
@@ -70,10 +78,6 @@ public class MaestrosController {
         for (DataStore.TeacherInfo t : DataStore.getTeachers()) {
             if (filterIdx >= 0 && t.avatarIdx() != filterIdx) continue;
             allTeachers.add(new TeacherRow(t.nombre(), t.email(), t.materia(), t.seccion(), t.estado(), t.avatarIdx()));
-            teacherRoles.put(t.nombre(), "Profesor");
-        }
-        if (filterIdx >= 0 && teacherRoles.containsKey("Jose Sierra")) {
-            teacherRoles.put("Jose Sierra", "Admin");
         }
 
         configureTable();
@@ -99,17 +103,14 @@ public class MaestrosController {
             if (w < 600) {
                 colEmail.setVisible(false);
                 colSeccion.setVisible(false);
-                colRol.setVisible(false);
                 colEstado.setVisible(false);
             } else if (w < 800) {
                 colEmail.setVisible(false);
                 colSeccion.setVisible(true);
-                colRol.setVisible(false);
                 colEstado.setVisible(true);
             } else {
                 colEmail.setVisible(true);
                 colSeccion.setVisible(true);
-                colRol.setVisible(true);
                 colEstado.setVisible(true);
             }
 
@@ -156,7 +157,6 @@ public class MaestrosController {
         colEmail.setText(lang.get("teachers.colEmail", "EMAIL"));
         colMateria.setText(lang.get("teachers.colMateria", "MATERIA"));
         colSeccion.setText(lang.get("teachers.colSeccion", "SECCIÓN"));
-        colRol.setText(lang.get("teachers.colRol", "ROL"));
         colEstado.setText(lang.get("teachers.colEstado", "ESTADO"));
     }
 
@@ -172,9 +172,6 @@ public class MaestrosController {
 
         colSeccion.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().seccion()));
         colSeccion.setCellFactory(seccionCell());
-
-        colRol.setCellValueFactory(d -> new SimpleStringProperty(teacherRoles.getOrDefault(d.getValue().nombre(), "Profesor")));
-        colRol.setCellFactory(rolCell());
 
         colEstado.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().estado()));
         colEstado.setCellFactory(statusCell());
@@ -267,35 +264,6 @@ public class MaestrosController {
         };
     }
 
-    private Callback<TableColumn<TeacherRow, String>, TableCell<TeacherRow, String>> rolCell() {
-        return col -> new TableCell<>() {
-            private final ComboBox<String> combo = new ComboBox<>();
-            {
-                combo.getItems().addAll("Profesor", "Admin");
-                combo.getStyleClass().add("btn-ver-detalles");
-                combo.setMinWidth(100);
-                setGraphic(combo);
-                setPadding(new Insets(8, 16, 8, 16));
-            }
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                var tv = getTableView();
-                if (empty || tv == null || getIndex() < 0 || getIndex() >= tv.getItems().size()) {
-                    combo.setVisible(false);
-                } else {
-                    TeacherRow row = tv.getItems().get(getIndex());
-                    combo.setVisible(true);
-                    String current = teacherRoles.getOrDefault(row.nombre(), "Profesor");
-                    combo.setValue(current);
-                    combo.setOnAction(e -> {
-                        teacherRoles.put(row.nombre(), combo.getValue());
-                    });
-                }
-            }
-        };
-    }
-
     private Callback<TableColumn<TeacherRow, String>, TableCell<TeacherRow, String>> statusCell() {
         return col -> new TableCell<>() {
             private final Label label = new Label();
@@ -364,7 +332,8 @@ public class MaestrosController {
 
     private void showQRDialog(TeacherRow teacher) {
         try {
-            String data = teacher.nombre() + "\n" + teacher.email() + "\n" + teacher.materia() + "\n" + teacher.seccion();
+            String sep = "\n";
+            String data = teacher.nombre() + sep + teacher.email() + sep + teacher.materia() + sep + teacher.seccion();
             QRCodeWriter writer = new QRCodeWriter();
             BitMatrix matrix = writer.encode(data, BarcodeFormat.QR_CODE, 250, 250);
             WritableImage image = new WritableImage(250, 250);
@@ -377,13 +346,33 @@ public class MaestrosController {
             ImageView qrView = new ImageView(image);
             qrView.setFitWidth(200);
             qrView.setFitHeight(200);
-            VBox content = new VBox(12, qrView, new Label(teacher.nombre()));
+
+            boolean dark = theme.isDark();
+            String textColor = dark ? "#F8FAFC" : "#1F2937";
+            String bgColor = dark ? "#1E293B" : "#FFFFFF";
+
+            Label nameLabel = new Label(teacher.nombre());
+            nameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: " + textColor + ";");
+
+            Button btnGoDetails = new Button(lang.get("teachers.btnVerDetalles", "Ver detalles"));
+            btnGoDetails.getStyleClass().add("btn-ver-detalles");
+            btnGoDetails.setOnAction(e -> {
+                if (onVerDetalles != null) onVerDetalles.accept(teacher);
+            });
+
+            VBox content = new VBox(16, qrView, nameLabel, btnGoDetails);
             content.setAlignment(Pos.CENTER);
-            content.setPadding(new Insets(20));
+            content.setPadding(new Insets(24));
+            content.setStyle("-fx-background-color: " + bgColor + "; -fx-background-radius: 16;");
+
             Dialog<Void> dialog = new Dialog<>();
             dialog.setTitle("Código QR - " + teacher.nombre());
-            dialog.getDialogPane().setContent(content);
-            dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+            DialogPane pane = dialog.getDialogPane();
+            pane.setContent(content);
+            pane.getButtonTypes().add(ButtonType.CLOSE);
+            pane.setStyle("-fx-background-color: " + bgColor + "; -fx-background-radius: 16;");
+            var closeBtn = pane.lookupButton(ButtonType.CLOSE);
+            if (closeBtn != null) closeBtn.setStyle("-fx-text-fill: " + textColor + ";");
             dialog.showAndWait();
         } catch (WriterException e) {
             e.printStackTrace();

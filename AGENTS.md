@@ -10,11 +10,11 @@
 ## Build & Run
 
 ```sh
-./mvnw.cmd compile          # compile only
-./mvnw.cmd javafx:run       # run the app
+$env:JAVA_HOME="C:\Users\angel\.jdks\temurin-21.0.3"; ./mvnw.cmd compile          # compile only
+$env:JAVA_HOME="C:\Users\angel\.jdks\temurin-21.0.3"; ./mvnw.cmd javafx:run       # run the app
 ```
 
-- Java 17 source, `release 21` target. JDK must include JavaFX or the javafx-maven-plugin handles it.
+- Java 17 source, `release 21` target. JDK at `C:\Users\angel\.jdks\temurin-21.0.3`.
 - No tests, no test framework, no CI found.
 
 ## Key State Singletons

@@ -151,17 +151,21 @@ public class AdminAttendanceView {
         selector.setMinHeight(32);
         selector.setMaxHeight(32);
         selector.setVisibleRowCount(5);
-        selector.setCellFactory(list -> new ListCell<String>() {
+        ListCell<String> defaultCell = new ListCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item);
-                    setTextFill(Color.web(text()));
-                    setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13));
-                }
+                if (empty || item == null) { setText(null); }
+                else { setText(item); setTextFill(Color.web(text())); setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13)); }
+            }
+        };
+        selector.setButtonCell(defaultCell);
+        selector.setCellFactory(list -> new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { setText(null); }
+                else { setText(item); setTextFill(Color.web(text())); setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13)); }
             }
         });
         HBox box = new HBox(8, label, selector);
@@ -169,22 +173,34 @@ public class AdminAttendanceView {
         box.setPadding(new Insets(2, 12, 2, 12));
         box.setOnMouseClicked(e -> selector.show());
         Runnable updateSelector = () -> {
-            label.setTextFill(Color.web(textMuted()));
+            String textColor = text();
             String bg = theme.isDark() ? "#1E293B" : "#ffffff";
+            String popupBg = theme.isDark() ? "#0F172A" : "#ffffff";
             String border = borderSoft();
             String arrow = textMuted();
             selector.setStyle(
                 "-fx-background-color: " + bg + "; -fx-border-color: " + border + "; -fx-border-radius: 6; -fx-background-radius: 6;"
-                + "-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: " + text() + "; -fx-mark-color: " + arrow + ";"
+                + "-fx-font-weight: 700; -fx-font-size: 13; -fx-text-fill: " + textColor + "; -fx-mark-color: " + arrow + ";"
                 + "-fx-padding: 2 8 2 8; -fx-cursor: hand;"
+                + "-fx-control-inner-background: " + popupBg + ";"
             );
+            label.setTextFill(Color.web(textMuted()));
             box.setStyle("-fx-background-color: " + bg + "; -fx-border-color: " + border + "; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;");
-            selector.setCellFactory(list -> new ListCell<String>() {
+            ListCell<String> btnCell = new ListCell<>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
                     if (empty || item == null) { setText(null); }
-                    else { setText(item); setTextFill(Color.web(text())); setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13)); }
+                    else { setText(item); setTextFill(Color.web(textColor)); setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13)); }
+                }
+            };
+            selector.setButtonCell(btnCell);
+            selector.setCellFactory(list -> new ListCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) { setText(null); }
+                    else { setText(item); setTextFill(Color.web(textColor)); setFont(Font.font("Plus Jakarta Sans", FontWeight.BOLD, 13)); }
                 }
             });
         };

@@ -22,33 +22,56 @@ public class LuminaAcademyFX extends Application {
         try { Hibernate_config.init(); } catch (Exception e) { System.err.println("Hibernate init falló: " + e.getMessage()); }
 
         primaryStage.initStyle(StageStyle.UNDECORATED);
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_view.fxml"));
-            Parent rootNode = loader.load();
-            MainController controller = loader.getController();
-            controller.setStage(primaryStage);
-            controller.setupEverything();
 
-            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-            double width = Math.min(1050, screenBounds.getWidth() * 0.7);
-            double height = Math.min(700, screenBounds.getHeight() * 0.7);
-            Scene scene = new Scene(rootNode, width, height);
+        // Navigation helper to switch to main view after login
+        java.util.function.Consumer<Stage> showMainView = (Stage st) -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_view.fxml"));
+                Parent rootNode = loader.load();
+                MainController controller = loader.getController();
+                controller.setStage(st);
+                controller.setupEverything();
 
-            primaryStage.setMinWidth(700);
-            primaryStage.setMinHeight(450);
+                Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+                double width = Math.min(1050, screenBounds.getWidth() * 0.7);
+                double height = Math.min(700, screenBounds.getHeight() * 0.7);
+                Scene scene = new Scene(rootNode, width, height);
 
-            theme.addListener(() -> {
-                scene.getStylesheets().clear();
+                st.setMinWidth(700);
+                st.setMinHeight(450);
+
+                theme.addListener(() -> {
+                    scene.getStylesheets().clear();
+                    scene.getStylesheets().add(theme.isDark()
+                        ? getClass().getResource("/css/dark.css").toExternalForm()
+                        : getClass().getResource("/css/light.css").toExternalForm());
+                });
+
                 scene.getStylesheets().add(theme.isDark()
                     ? getClass().getResource("/css/dark.css").toExternalForm()
                     : getClass().getResource("/css/light.css").toExternalForm());
-            });
 
-            scene.getStylesheets().add(theme.isDark()
-                ? getClass().getResource("/css/dark.css").toExternalForm()
-                : getClass().getResource("/css/light.css").toExternalForm());
+                st.setTitle("Lumina Academy - Admin Portal");
+                st.setScene(scene);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
 
-            primaryStage.setTitle("Lumina Academy - Admin Portal");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
+            Parent rootNode = loader.load();
+            controller.LoginController loginCtrl = loader.getController();
+            loginCtrl.setOnLoginSuccess(() -> showMainView.accept(primaryStage));
+
+            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+            double width = Math.min(820, screenBounds.getWidth());
+            double height = Math.min(620, screenBounds.getHeight());
+            Scene scene = new Scene(rootNode, width, height);
+
+            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+
+            primaryStage.setTitle("Lumina Academy - Iniciar Sesión");
             primaryStage.setScene(scene);
             primaryStage.show();
 

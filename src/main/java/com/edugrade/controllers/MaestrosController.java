@@ -1,19 +1,12 @@
 package com.edugrade.controllers;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -24,25 +17,16 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
-import model.Curso;
-import model.Usuario;
-import repository.AsignacionRepository;
-import repository.UsuarioRepositry;
-import java.util.List;
-import report.ReporteService;
 import theme.ThemeManager;
 import util.DataStore;
 import util.LanguageManager;
+import java.util.function.Consumer;
 
 public class MaestrosController {
 
     private static final String[] AVATAR_COLORS = {
         "#3B82F6", "#8B5CF6", "#EC4899", "#F59E0B", "#10B981", "#EF4444", "#6366F1", "#14B8A6"
     };
-
-    private final UsuarioRepositry usuarioRepo = new UsuarioRepositry();
-    private final AsignacionRepository asigRepo = new AsignacionRepository();
-    private final ReporteService reporteService = new ReporteService();
 
     private LanguageManager lang;
     private ThemeManager theme;
@@ -63,35 +47,10 @@ public class MaestrosController {
     @FXML private TableColumn<TeacherRow, String> colEstado;
     @FXML private TableColumn<TeacherRow, String> colAcciones;
 
-    private void initTeacherData() {
-        String activo = lang.get("teachers.activo", "Activo");
-        String inactivo = lang.get("teachers.inactivo", "Inactivo");
-        String _m = lang.get("teachers.subj.mathematics");
-        String _h = lang.get("teachers.subj.history");
-        String _l = lang.get("teachers.subj.language");
-        String _s = lang.get("teachers.subj.science");
-        String _e = lang.get("teachers.subj.english");
-        String _a = lang.get("teachers.subj.art");
-        String _p = lang.get("teachers.subj.pe");
-        String _mu = lang.get("teachers.subj.music");
-        String _ph = lang.get("teachers.subj.philosophy");
-        String _b = lang.get("teachers.subj.biology");
-        String _c = lang.get("teachers.subj.chemistry");
-        String _ah = lang.get("teachers.subj.artHistory");
-        allTeachers.setAll(
-            new TeacherRow("Prof. Laura Méndez", "laura.mendez@edu.com", _m, "5to E", activo, 0),
-            new TeacherRow("Prof. Carlos Ruiz", "carlos.ruiz@edu.com", _h, "4to A", activo, 1),
-            new TeacherRow("Prof. Elena Torres", "elena.torres@edu.com", _l, "3ro B", activo, 2),
-            new TeacherRow("Prof. Ana Silva", "ana.silva@edu.com", _s, "2do C", activo, 3),
-            new TeacherRow("Prof. Miguel Soto", "miguel.soto@edu.com", _e, "1ro A", inactivo, 4),
-            new TeacherRow("Prof. Diana Ríos", "diana.rios@edu.com", _a, "5to B", activo, 5),
-            new TeacherRow("Prof. Pedro Lima", "pedro.lima@edu.com", _p, "4to B", activo, 6),
-            new TeacherRow("Prof. Sofía Vega", "sofia.vega@edu.com", _mu, "3ro A", activo, 7),
-            new TeacherRow("Prof. Luis Paz", "luis.paz@edu.com", _ph, "6to A", inactivo, 0),
-            new TeacherRow("Prof. Carmen Rojas", "carmen.rojas@edu.com", _b, "5to C", activo, 1),
-            new TeacherRow("Prof. Andrés Cruz", "andres.cruz@edu.com", _c, "4to C", activo, 2),
-            new TeacherRow("Prof. Valeria Solís", "valeria.solis@edu.com", _ah, "6to B", activo, 3)
-        );
+    private Consumer<TeacherRow> onVerDetalles;
+
+    public void setOnVerDetalles(Consumer<TeacherRow> callback) {
+        this.onVerDetalles = callback;
     }
 
     private static final Insets HEADER_PADDING_DEFAULT = new Insets(32, 40, 0, 40);
@@ -101,14 +60,17 @@ public class MaestrosController {
     private static final double COMPACT_THRESHOLD = 700;
 
     private final ObservableList<TeacherRow> allTeachers = FXCollections.observableArrayList();
-    private final List<Node> maestrosCardChildren = new java.util.ArrayList<>();
 
     @FXML
     private void initialize() {
         lang = LanguageManager.getInstance();
         theme = ThemeManager.getInstance();
 
-        initTeacherData();
+        DataStore.seedIfEmpty();
+        for (DataStore.TeacherInfo t : DataStore.getTeachers()) {
+            allTeachers.add(new TeacherRow(t.nombre(), t.email(), t.materia(), t.seccion(), t.estado(), t.avatarIdx()));
+        }
+
         configureTable();
         maestrosTable.setItems(allTeachers);
         updateTexts();
@@ -123,39 +85,6 @@ public class MaestrosController {
         setupResponsive();
         lang.addListener(this::onLanguageChanged);
         theme.addListener(this::onThemeChanged);
-
-        loadTeachersFromDB();
-    }
-
-    private void loadTeachersFromDB() {
-        new Thread(() -> {
-            try {
-                List<Usuario> maestros = usuarioRepo.findAllMaestros();
-                Platform.runLater(() -> {
-                    allTeachers.clear();
-                    for (Usuario u : maestros) {
-                        String materia = "";
-                        String seccion = "";
-                        List<Curso> cursos = asigRepo.findCursosByMaestro(u.getId());
-                        if (!cursos.isEmpty()) {
-                            Curso c = cursos.get(0);
-                            materia = c.getMateria().getNombre();
-                            seccion = c.getSeccion().getGrado().getNombre() + " " + c.getSeccion().getNombre();
-                        }
-                        String estado = Boolean.TRUE.equals(u.getActivo()) ? "Activo" : "Inactivo";
-                        int avatarIdx = u.getId() % AVATAR_COLORS.length;
-                        allTeachers.add(new TeacherRow(u.getNombreCompleto(), u.getEmail(), materia, seccion, estado, avatarIdx));
-                    }
-                    updateCount(allTeachers.size());
-                });
-            } catch (Exception e) {
-                Platform.runLater(() -> {
-                    allTeachers.clear();
-                    allTeachers.add(new TeacherRow("Error al cargar: " + e.getMessage(), "", "", "", "", 0));
-                    updateCount(0);
-                });
-            }
-        }).start();
     }
 
     private void setupResponsive() {
@@ -193,7 +122,6 @@ public class MaestrosController {
 
     private void onLanguageChanged() {
         Platform.runLater(() -> {
-            initTeacherData();
             updateTexts();
             maestrosTable.refresh();
         });
@@ -221,7 +149,6 @@ public class MaestrosController {
         colMateria.setText(lang.get("teachers.colMateria", "MATERIA"));
         colSeccion.setText(lang.get("teachers.colSeccion", "SECCIÓN"));
         colEstado.setText(lang.get("teachers.colEstado", "ESTADO"));
-        colAcciones.setText(lang.get("teachers.colAcciones", "ACCIONES"));
     }
 
     private void configureTable() {
@@ -240,9 +167,8 @@ public class MaestrosController {
         colEstado.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().estado()));
         colEstado.setCellFactory(statusCell());
 
-        colAcciones.setCellValueFactory(d -> new SimpleStringProperty(""));
+        colAcciones.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().nombre()));
         colAcciones.setCellFactory(accionesCell());
-
         colAcciones.setStyle("-fx-alignment: CENTER-LEFT;");
         colAcciones.getStyleClass().add("col-acciones-header");
     }
@@ -285,7 +211,7 @@ public class MaestrosController {
         return col -> new TableCell<>() {
             private final Label label = new Label();
             {
-                label.setStyle("-fx-text-fill: #475569; -fx-font-size: 14px;");
+                label.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 14px;");
                 setGraphic(label);
                 setPadding(new Insets(8, 16, 8, 16));
             }
@@ -344,7 +270,7 @@ public class MaestrosController {
                     label.setText(null);
                 } else {
                     label.getStyleClass().add("status-pill");
-                    if (lang.get("teachers.activo", "Activo").equals(item)) {
+                    if ("Activo".equals(item)) {
                         label.getStyleClass().add("status-pill--active");
                     } else {
                         label.getStyleClass().add("status-pill--inactive");
@@ -356,18 +282,13 @@ public class MaestrosController {
         };
     }
 
+
+
     private Callback<TableColumn<TeacherRow, String>, TableCell<TeacherRow, String>> accionesCell() {
         return col -> new TableCell<>() {
             private final Button btn = new Button();
             {
                 btn.getStyleClass().add("btn-ver-detalles");
-                btn.setOnAction(e -> {
-                    var tv = getTableView();
-                    int idx = getIndex();
-                    if (tv != null && idx >= 0 && idx < tv.getItems().size()) {
-                        handleVerDetalles(tv.getItems().get(idx));
-                    }
-                });
                 setGraphic(btn);
                 setAlignment(Pos.CENTER_LEFT);
                 setPadding(new Insets(8, 16, 8, 16));
@@ -375,30 +296,20 @@ public class MaestrosController {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
+                var tv = getTableView();
+                if (empty || tv == null || getIndex() < 0 || getIndex() >= tv.getItems().size()) {
                     btn.setText(null);
                     btn.setVisible(false);
                 } else {
                     btn.setText(lang.get("teachers.btnVerDetalles", "Ver detalles"));
                     btn.setVisible(true);
+                    TeacherRow row = tv.getItems().get(getIndex());
+                    btn.setOnAction(e -> {
+                        if (onVerDetalles != null) onVerDetalles.accept(row);
+                    });
                 }
             }
         };
-    }
-
-    private void handleVerDetalles(TeacherRow teacher) {
-        try {
-            if (maestrosCardChildren.isEmpty())
-                maestrosCardChildren.addAll(maestrosCard.getChildren());
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Admin/AdminDetalleProfesor.fxml"));
-            Node detailView = loader.load();
-            DetalleProfesorController ctrl = loader.getController();
-            ctrl.setTeacher(teacher, () ->
-                maestrosCard.getChildren().setAll(maestrosCardChildren));
-            maestrosCard.getChildren().setAll(detailView);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void updateCount(int count) {
@@ -407,24 +318,11 @@ public class MaestrosController {
 
     @FXML
     private void onImprimirReporte() {
-        try {
-            java.util.List<Usuario> maestros = usuarioRepo.findAllMaestros();
-            File tempDir = new File(System.getProperty("java.io.tmpdir"), "ReportesDocentes_" + System.currentTimeMillis());
-            tempDir.mkdirs();
-            for (Usuario m : maestros) {
-                String fileName = "Docente_" + m.getNombre().replaceAll("\\s+","_") + "_" + m.getApellido().replaceAll("\\s+","_") + ".pdf";
-                reporteService.reporteDocenteIndividual(m, new File(tempDir, fileName).getAbsolutePath());
-            }
-            if (Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().open(tempDir);
-            }
-        } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle(lang.get("report.errorTitle", "Error"));
-            alert.setHeaderText(null);
-            alert.setContentText(lang.get("report.errorMsg", "No se pudo generar el reporte: ") + e.getMessage());
-            alert.showAndWait();
-        }
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(lang.get("report.title", "Reporte"));
+        alert.setHeaderText(null);
+        alert.setContentText(lang.get("report.msg", "Impresión de reporte no implementada."));
+        alert.showAndWait();
     }
 
     public record TeacherRow(String nombre, String email, String materia, String seccion, String estado, int avatarIdx) {}

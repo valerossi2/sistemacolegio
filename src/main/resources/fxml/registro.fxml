@@ -25,7 +25,7 @@
     <StackPane styleClass="left-panel" prefWidth="350" maxWidth="380">
 
         <SVGPath styleClass="wave-shape"
-                 content="M 350 0 L 280 0 Q 315 310 260 620 L 350 620 Z"
+                 content="M 0 0 L 270 0 Q 320 160 270 310 Q 240 460 270 620 L 0 620 Z"
                  StackPane.alignment="CENTER_LEFT"/>
 
         <VBox styleClass="left-text-box" maxWidth="240" spacing="10"
@@ -42,7 +42,7 @@
                    preserveRatio="true" styleClass="hero-image"
                    StackPane.alignment="BOTTOM_LEFT">
             <image>
-                <Image url="@../img/lider.png"/>
+                <Image url="@../img/logoCEPVAremove.png"/>
             </image>
             <StackPane.margin><Insets bottom="20" left="20"/></StackPane.margin>
         </ImageView>

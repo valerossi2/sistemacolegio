@@ -69,9 +69,7 @@ public class RegisterController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) nameField.getScene().getWindow();
-            Scene scene = new Scene(root, 820, 600);
-            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-            scene.getStylesheets().add(getClass().getResource("/css/base.css").toExternalForm());
+            Scene scene = new Scene(root, 820, 560);
             stage.setScene(scene);
         } catch (Exception e) {
             e.printStackTrace();

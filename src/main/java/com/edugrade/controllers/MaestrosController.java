@@ -1,5 +1,7 @@
 package com.edugrade.controllers;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,6 +29,7 @@ import model.Usuario;
 import repository.AsignacionRepository;
 import repository.UsuarioRepositry;
 import java.util.List;
+import report.ReporteService;
 import theme.ThemeManager;
 import util.DataStore;
 import util.LanguageManager;
@@ -39,6 +42,7 @@ public class MaestrosController {
 
     private final UsuarioRepositry usuarioRepo = new UsuarioRepositry();
     private final AsignacionRepository asigRepo = new AsignacionRepository();
+    private final ReporteService reporteService = new ReporteService();
 
     private LanguageManager lang;
     private ThemeManager theme;
@@ -105,7 +109,6 @@ public class MaestrosController {
         theme = ThemeManager.getInstance();
 
         initTeacherData();
-        DataStore.setTeachers(allTeachers);
         configureTable();
         maestrosTable.setItems(allTeachers);
         updateTexts();
@@ -191,7 +194,6 @@ public class MaestrosController {
     private void onLanguageChanged() {
         Platform.runLater(() -> {
             initTeacherData();
-            DataStore.setTeachers(allTeachers);
             updateTexts();
             maestrosTable.refresh();
         });
@@ -405,11 +407,24 @@ public class MaestrosController {
 
     @FXML
     private void onImprimirReporte() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(lang.get("report.title", "Reporte"));
-        alert.setHeaderText(null);
-        alert.setContentText(lang.get("report.msg", "Impresión de reporte no implementada."));
-        alert.showAndWait();
+        try {
+            java.util.List<Usuario> maestros = usuarioRepo.findAllMaestros();
+            File tempDir = new File(System.getProperty("java.io.tmpdir"), "ReportesDocentes_" + System.currentTimeMillis());
+            tempDir.mkdirs();
+            for (Usuario m : maestros) {
+                String fileName = "Docente_" + m.getNombre().replaceAll("\\s+","_") + "_" + m.getApellido().replaceAll("\\s+","_") + ".pdf";
+                reporteService.reporteDocenteIndividual(m, new File(tempDir, fileName).getAbsolutePath());
+            }
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(tempDir);
+            }
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(lang.get("report.errorTitle", "Error"));
+            alert.setHeaderText(null);
+            alert.setContentText(lang.get("report.errorMsg", "No se pudo generar el reporte: ") + e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     public record TeacherRow(String nombre, String email, String materia, String seccion, String estado, int avatarIdx) {}

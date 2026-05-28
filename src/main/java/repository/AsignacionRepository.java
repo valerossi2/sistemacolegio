@@ -42,6 +42,18 @@ public class AsignacionRepository {
         }
     }
 
+    public List<AsignacionMaestro> findAsignacionesByCurso(Integer cursoId) {
+        try (Session s = Hibernate_config.getSessionFactory().openSession()) {
+            return s.createQuery(
+                            "FROM AsignacionMaestro a " +
+                                    "WHERE a.curso.id = :cursoId " +
+                                    "ORDER BY a.maestro.apellido",
+                            AsignacionMaestro.class)
+                    .setParameter("cursoId", cursoId)
+                    .list();
+        }
+    }
+
     public void save(AsignacionMaestro asignacion) {
         Transaction tx = null;
         try (Session s = Hibernate_config.getSessionFactory().openSession()) {

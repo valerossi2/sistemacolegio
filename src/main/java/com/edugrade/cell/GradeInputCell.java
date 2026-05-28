@@ -8,11 +8,17 @@ import javafx.scene.input.KeyCode;
 public class GradeInputCell extends TableCell<Student, String> {
 
     private final TextField input = new TextField();
+    private double maxGrade = 100.0;
+
+    public void setMaxGrade(double maxGrade) {
+        this.maxGrade = maxGrade;
+        input.setPromptText(String.format("0 \u2013 %.0f", maxGrade));
+    }
 
     public GradeInputCell() {
         super();
         input.getStyleClass().add("grade-input");
-        input.setPromptText("0 – 100");
+        input.setPromptText("0 \u2013 100");
 
         input.setOnAction(e -> submitGrade());
 

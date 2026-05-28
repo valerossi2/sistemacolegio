@@ -42,6 +42,7 @@ public class ReporteService {
     private final CursoRepository      cursoRepo      = new CursoRepository();
     private final AsignacionRepository asignacionRepo = new AsignacionRepository();
     private final EstudianteRepository estudianteRepo = new EstudianteRepository();
+    private final UsuarioRepositry     usuarioRepo    = new UsuarioRepositry();
     private final CalificationService calSvc         = new CalificationService();
     private final AsistenciaService    asistSvc       = new AsistenciaService();
 
@@ -432,8 +433,314 @@ public class ReporteService {
     }
 
     // ═══════════════════════════════════════════════════════════
-    // MÉTODOS AUXILIARES — construcción de elementos
+    // 4. REPORTE INDIVIDUAL DE DOCENTE (Admin)
     // ═══════════════════════════════════════════════════════════
+    public void reporteDocenteIndividual(Usuario maestro, String rutaArchivo) throws IOException {
+
+        PdfFont bold    = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+        PdfFont regular = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+
+        // Cursos asignados al maestro
+        List<Curso> cursos = asignacionRepo.findCursosByMaestro(maestro.getId());
+
+        PdfDocument pdfDoc  = new PdfDocument(new PdfWriter(rutaArchivo));
+        Document    document = new Document(pdfDoc, PageSize.A4);
+        document.setMargins(28, 28, 28, 28);
+
+        // ── Encabezado ────────────────────────────────────────
+        document.add(buildEncabezado(bold, regular,
+                "FICHA DEL DOCENTE",
+                LocalDate.now().format(FMT)));
+        document.add(spacer(5));
+
+        // ── Datos personales ──────────────────────────────────
+        addSectionTitle(document, "DATOS PERSONALES", bold);
+
+        Table datos = new Table(
+                UnitValue.createPercentArray(new float[]{25, 75}))
+                .useAllAvailableWidth();
+
+        addDatoCell(datos, "Nombre:",       bold,    10, AZUL_OSCURO, GRIS_CLARO);
+        addDatoCell(datos, maestro.getNombreCompleto(), regular, 10, GRIS_TEXTO, BLANCO);
+        addDatoCell(datos, "Email:",        bold,    10, AZUL_OSCURO, GRIS_CLARO);
+        addDatoCell(datos, maestro.getEmail(),        regular, 10, GRIS_TEXTO, BLANCO);
+        addDatoCell(datos, "Cédula / ID:",  bold,    10, AZUL_OSCURO, GRIS_CLARO);
+        addDatoCell(datos, String.valueOf(maestro.getId()), regular, 10, GRIS_TEXTO, BLANCO);
+        addDatoCell(datos, "Estado:",       bold,    10, AZUL_OSCURO, GRIS_CLARO);
+        String estado = Boolean.TRUE.equals(maestro.getActivo()) ? "Activo" : "Inactivo";
+        DeviceRgb estadoColor = Boolean.TRUE.equals(maestro.getActivo()) ? VERDE : ROJO;
+        addDatoCell(datos, estado, regular, 10, estadoColor, BLANCO);
+
+        document.add(datos);
+        document.add(spacer(5));
+
+        // ── Cursos asignados ──────────────────────────────────
+        addSectionTitle(document, "CURSOS ASIGNADOS", bold);
+
+        if (cursos.isEmpty()) {
+            document.add(new Paragraph("No tiene cursos asignados actualmente.")
+                    .setFont(regular).setFontSize(10).setFontColor(GRIS_TEXTO)
+                    .setPaddingLeft(6));
+        } else {
+            Table tabla = new Table(
+                    UnitValue.createPercentArray(new float[]{5, 28, 20, 20, 15, 12}))
+                    .useAllAvailableWidth();
+
+            for (String h : new String[]{"#","Materia","Grado","Sección","Período","Estado"}) {
+                tabla.addHeaderCell(tableHeaderCell(h, bold));
+            }
+
+            int i = 1;
+            for (Curso c : cursos) {
+                DeviceRgb bg = (i % 2 == 0) ? GRIS_CLARO : BLANCO;
+                DeviceRgb cEstColor = c.estaAbierto() ? VERDE : ROJO;
+
+                tabla.addCell(tableCell(String.valueOf(i),
+                        regular, 9, GRIS_TEXTO, bg, TextAlignment.CENTER));
+                tabla.addCell(tableCell(c.getMateria().getNombre(),
+                        bold, 9, AZUL_OSCURO, bg, TextAlignment.LEFT));
+                tabla.addCell(tableCell(c.getSeccion().getGrado().getNombre(),
+                        regular, 9, GRIS_TEXTO, bg, TextAlignment.CENTER));
+                tabla.addCell(tableCell(c.getSeccion().getNombre(),
+                        regular, 9, GRIS_TEXTO, bg, TextAlignment.CENTER));
+                tabla.addCell(tableCell(c.getPeriodo().getNombre(),
+                        regular, 9, GRIS_TEXTO, bg, TextAlignment.CENTER));
+                tabla.addCell(tableCell(c.estaAbierto() ? "Abierto" : "Cerrado",
+                        bold, 9, cEstColor, bg, TextAlignment.CENTER));
+                i++;
+            }
+
+            document.add(tabla);
+        }
+
+        document.add(spacer(5));
+
+        // ── Resumen ───────────────────────────────────────────
+        addSectionTitle(document, "RESUMEN", bold);
+
+        Table resumen = new Table(
+                UnitValue.createPercentArray(new float[]{50, 50}))
+                .useAllAvailableWidth();
+        addResumenCell(resumen, String.valueOf(cursos.size()),
+                "Total Cursos Asignados", bold, regular, AZUL_OSCURO);
+        addResumenCell(resumen, estado,
+                "Estado", bold, regular, estadoColor);
+
+        document.add(resumen);
+        document.add(spacer(5));
+
+        // ── Firmas ────────────────────────────────────────────
+        Table firmas = new Table(
+                UnitValue.createPercentArray(new float[]{50, 50}))
+                .useAllAvailableWidth();
+        firmas.addCell(firmaCell("_____________________________",
+                "Director Académico", COLEGIO, bold, regular));
+        firmas.addCell(firmaCell("_____________________________",
+                maestro.getNombreCompleto(), "Firma del Docente", bold, regular));
+
+        document.add(firmas);
+        document.add(buildFooter(regular,
+                "Ficha Docente — " + maestro.getNombreCompleto()));
+        document.close();
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 5. REPORTE DE DETALLE DE CURSO (Admin — vista detalle)
+    // ═══════════════════════════════════════════════════════════
+    public void reporteDetalleCurso(
+            String nombreCurso, String estadoCurso, double promedioGeneral,
+            int totalEstudiantes, int totalDocentes,
+            java.util.List<String[]> docentes,
+            java.util.List<String[]> estudiantes,
+            String rutaArchivo) throws IOException {
+
+        PdfFont bold    = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+        PdfFont regular = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+
+        PdfDocument pdfDoc  = new PdfDocument(new PdfWriter(rutaArchivo));
+        Document    document = new Document(pdfDoc, PageSize.A4);
+        document.setMargins(28, 28, 28, 28);
+
+        // ── Encabezado ────────────────────────────────────────
+        document.add(buildEncabezado(bold, regular,
+                "Detalle del Curso",
+                nombreCurso + " — " + LocalDate.now().format(FMT)));
+        document.add(spacer(5));
+
+        // ── KPIs ──────────────────────────────────────────────
+        Table kpiRow = new Table(
+                UnitValue.createPercentArray(new float[]{25, 25, 25, 25}))
+                .useAllAvailableWidth();
+        addResumenCell(kpiRow, String.valueOf(totalEstudiantes),
+                "Estudiantes", bold, regular, AZUL_OSCURO);
+        addResumenCell(kpiRow, String.valueOf(totalDocentes),
+                "Docentes", bold, regular, AZUL_OSCURO);
+        addResumenCell(kpiRow, String.format("%.1f", promedioGeneral),
+                "Promedio General", bold, regular, colorNota(promedioGeneral));
+        addResumenCell(kpiRow, estadoCurso,
+                "Estado", bold, regular, "En clase".equals(estadoCurso) ? VERDE : NARANJA);
+        document.add(kpiRow);
+        document.add(spacer(5));
+
+        // ── Docentes ──────────────────────────────────────────
+        addSectionTitle(document, "EQUIPO DOCENTE", bold);
+
+        if (docentes.isEmpty()) {
+            document.add(new Paragraph("Sin docentes asignados.")
+                    .setFont(regular).setFontSize(10).setFontColor(GRIS_TEXTO)
+                    .setPaddingLeft(6));
+        } else {
+            Table tDoc = new Table(
+                    UnitValue.createPercentArray(new float[]{5, 35, 30, 30}))
+                    .useAllAvailableWidth();
+            for (String h : new String[]{"#","Nombre","Materia","Estado"}) {
+                tDoc.addHeaderCell(tableHeaderCell(h, bold));
+            }
+            int i = 1;
+            for (String[] d : docentes) {
+                DeviceRgb bg = (i % 2 == 0) ? GRIS_CLARO : BLANCO;
+                tDoc.addCell(tableCell(String.valueOf(i),     regular, 9, GRIS_TEXTO, bg, TextAlignment.CENTER));
+                tDoc.addCell(tableCell(d[0],                  bold,    9, AZUL_OSCURO, bg, TextAlignment.LEFT));
+                tDoc.addCell(tableCell(d.length > 1 ? d[1] : "—", regular, 9, GRIS_TEXTO, bg, TextAlignment.CENTER));
+                tDoc.addCell(tableCell(d.length > 2 ? d[2] : "—", regular, 9, GRIS_TEXTO, bg, TextAlignment.CENTER));
+                i++;
+            }
+            document.add(tDoc);
+        }
+
+        document.add(spacer(5));
+
+        // ── Estudiantes ───────────────────────────────────────
+        addSectionTitle(document, "LISTA DE ESTUDIANTES", bold);
+
+        if (estudiantes.isEmpty()) {
+            document.add(new Paragraph("Sin estudiantes matriculados.")
+                    .setFont(regular).setFontSize(10).setFontColor(GRIS_TEXTO)
+                    .setPaddingLeft(6));
+        } else {
+            Table tEst = new Table(
+                    UnitValue.createPercentArray(new float[]{5, 30, 20, 20, 25}))
+                    .useAllAvailableWidth();
+            for (String h : new String[]{"#","Nombre","Matrícula","Género","Asistencia"}) {
+                tEst.addHeaderCell(tableHeaderCell(h, bold));
+            }
+            int i = 1;
+            for (String[] e : estudiantes) {
+                DeviceRgb bg = (i % 2 == 0) ? GRIS_CLARO : BLANCO;
+                tEst.addCell(tableCell(String.valueOf(i),     regular, 9, GRIS_TEXTO, bg, TextAlignment.CENTER));
+                tEst.addCell(tableCell(e[0],                  bold,    9, AZUL_OSCURO, bg, TextAlignment.LEFT));
+                tEst.addCell(tableCell(e.length > 1 ? e[1] : "—", regular, 9, GRIS_TEXTO, bg, TextAlignment.CENTER));
+                tEst.addCell(tableCell(e.length > 2 ? e[2] : "—", regular, 9, GRIS_TEXTO, bg, TextAlignment.CENTER));
+                String asis = e.length > 3 ? e[3] : "—";
+                DeviceRgb asisColor = "presente".equals(asis) ? VERDE : ROJO;
+                tEst.addCell(tableCell(asis, regular, 9, asisColor, bg, TextAlignment.CENTER));
+                i++;
+            }
+            document.add(tEst);
+        }
+
+        document.add(spacer(5));
+
+        // ── Firmas ────────────────────────────────────────────
+        Table firmas = new Table(
+                UnitValue.createPercentArray(new float[]{50, 50}))
+                .useAllAvailableWidth();
+        firmas.addCell(firmaCell("_____________________________",
+                "Director Académico", COLEGIO, bold, regular));
+        firmas.addCell(firmaCell("_____________________________",
+                "Secretaría", COLEGIO, bold, regular));
+        document.add(firmas);
+
+        document.add(buildFooter(regular, "Detalle — " + nombreCurso));
+        document.close();
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 6. REPORTE DE CALIFICACIONES (Vista de notas)
+    // ═══════════════════════════════════════════════════════════
+    public void reporteCalificaciones(
+            String nombreCurso, String periodo, String tipoEvaluacion,
+            java.util.List<String[]> estudiantes,
+            String rutaArchivo) throws IOException {
+
+        PdfFont bold    = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+        PdfFont regular = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+
+        PdfDocument pdfDoc  = new PdfDocument(new PdfWriter(rutaArchivo));
+        Document    document = new Document(pdfDoc, PageSize.A4);
+        document.setMargins(28, 28, 28, 28);
+
+        // ── Encabezado ────────────────────────────────────────
+        document.add(buildEncabezado(bold, regular,
+                "REPORTE DE CALIFICACIONES",
+                nombreCurso + " — " + LocalDate.now().format(FMT)));
+        document.add(spacer(5));
+
+        // ── Datos del curso ───────────────────────────────────
+        addSectionTitle(document, "DATOS DEL CURSO", bold);
+
+        Table info = new Table(
+                UnitValue.createPercentArray(new float[]{25, 75}))
+                .useAllAvailableWidth();
+        addDatoCell(info, "Curso:",    bold,    10, AZUL_OSCURO, GRIS_CLARO);
+        addDatoCell(info, nombreCurso, regular, 10, GRIS_TEXTO, BLANCO);
+        addDatoCell(info, "Período:",  bold,    10, AZUL_OSCURO, GRIS_CLARO);
+        addDatoCell(info, periodo,     regular, 10, GRIS_TEXTO, BLANCO);
+        addDatoCell(info, "Evaluación:", bold,  10, AZUL_OSCURO, GRIS_CLARO);
+        addDatoCell(info, tipoEvaluacion, regular, 10, GRIS_TEXTO, BLANCO);
+        document.add(info);
+        document.add(spacer(5));
+
+        // ── Tabla de notas ────────────────────────────────────
+        addSectionTitle(document, "CALIFICACIONES DE ESTUDIANTES", bold);
+
+        Table tabla = new Table(
+                UnitValue.createPercentArray(new float[]{5, 25, 22, 22, 26}))
+                .useAllAvailableWidth();
+
+        for (String h : new String[]{"#","Estudiante","Matrícula","Nota Actual","Nueva Nota"}) {
+            tabla.addHeaderCell(tableHeaderCell(h, bold));
+        }
+
+        int idx = 1;
+        for (String[] e : estudiantes) {
+            DeviceRgb bg = (idx % 2 == 0) ? GRIS_CLARO : BLANCO;
+            String nombre  = e.length > 0 ? e[0] : "—";
+            String matricula = e.length > 1 ? e[1] : "—";
+            String notaActual = e.length > 2 ? e[2] : "—";
+            String nuevaNota  = e.length > 3 ? e[3] : "—";
+
+            double n = 0;
+            try { n = Double.parseDouble(notaActual); } catch (Exception ignored) {}
+            DeviceRgb colorActual = colorNota(n);
+
+            tabla.addCell(tableCell(String.valueOf(idx),  regular, 9, GRIS_TEXTO, bg, TextAlignment.CENTER));
+            tabla.addCell(tableCell(nombre,               bold,    9, AZUL_OSCURO, bg, TextAlignment.LEFT));
+            tabla.addCell(tableCell(matricula,            regular, 9, GRIS_TEXTO, bg, TextAlignment.CENTER));
+            tabla.addCell(tableCell(notaActual,           bold,    9, colorActual, bg, TextAlignment.CENTER));
+            tabla.addCell(tableCell(nuevaNota,             regular, 9, GRIS_TEXTO, bg, TextAlignment.CENTER));
+            idx++;
+        }
+
+        document.add(tabla);
+        document.add(spacer(5));
+
+        // ── Firmas ────────────────────────────────────────────
+        Table firmas = new Table(
+                UnitValue.createPercentArray(new float[]{50, 50}))
+                .useAllAvailableWidth();
+        firmas.addCell(firmaCell("_____________________________",
+                "Docente", "Firma", bold, regular));
+        firmas.addCell(firmaCell("_____________________________",
+                "Director Académico", COLEGIO, bold, regular));
+        document.add(firmas);
+
+        document.add(buildFooter(regular, "Calificaciones — " + nombreCurso));
+        document.close();
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // MÉTODOS AUXILIARES — construcción de elementos
 
     private Table buildEncabezado(PdfFont bold, PdfFont regular,
                                   String titulo, String subtitulo) throws IOException {

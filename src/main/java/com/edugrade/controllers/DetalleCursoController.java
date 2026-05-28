@@ -1,5 +1,7 @@
 package com.edugrade.controllers;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -38,6 +40,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.util.Callback;
+import report.ReporteService;
 import theme.ThemeManager;
 import util.LanguageManager;
 import util.DataStore;
@@ -67,6 +70,8 @@ public class DetalleCursoController {
     private final ObservableList<TeacherRow> displayedTeacherData = FXCollections.observableArrayList();
     private final ObservableList<StudentRow> fullStudentData = FXCollections.observableArrayList();
     private final ObservableList<StudentRow> displayedStudentData = FXCollections.observableArrayList();
+
+    private final ReporteService reporteService = new ReporteService();
 
     @FXML private VBox root;
     @FXML private VBox courseOverviewCard;
@@ -504,11 +509,37 @@ public class DetalleCursoController {
 
     @FXML
     private void onImprimirReporte(ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(lang.get("detalle.reporteTitle", "Reporte"));
-        alert.setHeaderText(null);
-        alert.setContentText(lang.get("detalle.reporteMsg", "Impresión de reporte no implementada."));
-        alert.showAndWait();
+        try {
+            File tempFile = File.createTempFile("DetalleCurso_", ".pdf");
+            String nombreCurso = currentCourse.grado() + " " + currentCourse.seccion();
+            java.util.List<String[]> docentesList = new java.util.ArrayList<>();
+            for (TeacherRow t : fullTeacherData) {
+                docentesList.add(new String[]{t.getNombre(), t.getMateria(), t.getEstado()});
+            }
+            java.util.List<String[]> estudiantesList = new java.util.ArrayList<>();
+            for (StudentRow s : fullStudentData) {
+                estudiantesList.add(new String[]{s.getName(), s.getMatricula(), s.getGenero(), s.getStatus()});
+            }
+            reporteService.reporteDetalleCurso(
+                nombreCurso,
+                currentCourse.estado(),
+                currentCourse.rendimiento(),
+                fullStudentData.size(),
+                fullTeacherData.size(),
+                docentesList,
+                estudiantesList,
+                tempFile.getAbsolutePath()
+            );
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(tempFile);
+            }
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(lang.get("detalle.reporteTitle", "Error"));
+            alert.setHeaderText(null);
+            alert.setContentText("No se pudo generar el reporte: " + e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     @FXML

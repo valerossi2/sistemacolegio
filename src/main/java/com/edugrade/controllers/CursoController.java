@@ -6,6 +6,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -31,6 +33,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
+import report.ReporteService;
 import theme.ThemeManager;
 import util.DataStore;
 import util.LanguageManager;
@@ -75,6 +78,7 @@ public class CursoController {
     private static final Insets COUNT_PADDING_COMPACT = new Insets(12, 16, 8, 16);
     private static final double COMPACT_THRESHOLD = 700;
 
+    private final ReporteService reporteService = new ReporteService();
     private final ObservableList<CourseRow> allCourses = FXCollections.observableArrayList();
 
     @FXML
@@ -83,7 +87,6 @@ public class CursoController {
         theme = ThemeManager.getInstance();
 
         buildSampleData();
-        DataStore.setCourses(allCourses);
         configureCourseTable();
         cursosTable.setItems(allCourses);
         updateTexts();
@@ -420,11 +423,19 @@ public class CursoController {
 
     @FXML
     private void onImprimirReporte() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(lang.get("report.title", "Reporte"));
-        alert.setHeaderText(null);
-        alert.setContentText(lang.get("report.msg", "Impresión de reporte no implementada."));
-        alert.showAndWait();
+        try {
+            File tempFile = File.createTempFile("ReporteCursos_", ".pdf");
+            reporteService.reporteGeneralCursos(tempFile.getAbsolutePath());
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(tempFile);
+            }
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(lang.get("report.errorTitle", "Error"));
+            alert.setHeaderText(null);
+            alert.setContentText(lang.get("report.errorMsg", "No se pudo generar el reporte: ") + e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     public record CourseRow(Integer cursoId, String grado, int teacherIdx, String seccion, int alumnos, int profesores, double rendimiento, String estado) {}

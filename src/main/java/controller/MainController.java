@@ -602,42 +602,12 @@ public class MainController {
             createKpiCard(lang.get("kpi.totalStudents"), String.format("%,d", DataStore.getTotalStudents()), L_SECONDARY_FIXED, L_SECONDARY, ICON_PERSON_PIN),
             createKpiCard(lang.get("kpi.totalCourses"), String.valueOf(DataStore.getTotalCourses()), L_PRIMARY_FIXED, L_PRIMARY, ICON_TRENDING_UP),
             createKpiCard(lang.get("kpi.totalTeachers"), String.valueOf(DataStore.getTotalTeachers()), L_TERTIARY_FIXED, L_TERTIARY, ICON_SCHOOL),
-            createKpiCard(lang.get("kpi.attendance"), DataStore.getAttendanceRate(), L_SECONDARY_FIXED, L_SECONDARY, ICON_CHECK_CIRCLE)
+            createKpiCard(lang.get("kpi.attendance"), computeAttendanceRate(), L_SECONDARY_FIXED, L_SECONDARY, ICON_CHECK_CIRCLE)
         );
     }
 
     private void seedDataIfEmpty() {
-        if (!DataStore.getCourses().isEmpty() && !DataStore.getTeachers().isEmpty()) return;
-        var rng = ThreadLocalRandom.current();
-        String[] grados = {"1ro","2do","3ro","4to","5to","6to"};
-        String[] secciones = {"A","B","C","D","E"};
-        String[] estados = {"En clase","Descanso"};
-        List<CursoController.CourseRow> seed = new java.util.ArrayList<>();
-        for (int i = 0; i < 16; i++) {
-            seed.add(new CursoController.CourseRow(null,
-                grados[rng.nextInt(grados.length)],
-                i % 12,
-                secciones[rng.nextInt(secciones.length)],
-                rng.nextInt(1, 41),
-                rng.nextInt(1, 10),
-                5.0 + rng.nextDouble() * 5.0,
-                estados[rng.nextInt(estados.length)]));
-        }
-        DataStore.setCourses(seed);
-        var teachers = new java.util.ArrayList<MaestrosController.TeacherRow>();
-        teachers.add(new MaestrosController.TeacherRow("Prof. Laura M\u00e9ndez", "laura.mendez@edu.com", "Matem\u00e1ticas", "5to E", "Activo", 0));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Carlos Ruiz", "carlos.ruiz@edu.com", "Historia", "4to A", "Activo", 1));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Elena Torres", "elena.torres@edu.com", "Lenguaje", "3ro B", "Activo", 2));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Ana Silva", "ana.silva@edu.com", "Ciencias", "2do C", "Activo", 3));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Miguel Soto", "miguel.soto@edu.com", "Ingl\u00e9s", "1ro A", "Inactivo", 4));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Diana R\u00edos", "diana.rios@edu.com", "Arte", "5to B", "Activo", 5));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Pedro Lima", "pedro.lima@edu.com", "Educaci\u00f3n F\u00edsica", "4to B", "Activo", 6));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Sof\u00eda Vega", "sofia.vega@edu.com", "M\u00fasica", "3ro A", "Activo", 7));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Luis Paz", "luis.paz@edu.com", "Filosof\u00eda", "6to A", "Inactivo", 0));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Carmen Rojas", "carmen.rojas@edu.com", "Biolog\u00eda", "5to C", "Activo", 1));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Andr\u00e9s Cruz", "andres.cruz@edu.com", "Qu\u00edmica", "4to C", "Activo", 2));
-        teachers.add(new MaestrosController.TeacherRow("Prof. Valeria Sol\u00eds", "valeria.solis@edu.com", "Historia del Arte", "6to B", "Activo", 3));
-        DataStore.setTeachers(teachers);
+        DataStore.seedIfEmpty();
     }
 
     private void showSearchResults() {
@@ -661,21 +631,20 @@ public class MainController {
         for (var c : DataStore.getCourses()) {
             String label = c.grado() + " " + c.seccion();
             if (label.toLowerCase(Locale.ROOT).contains(q)
-                || DataStore.getTeacherName(c.teacherIdx()).toLowerCase(Locale.ROOT).contains(q)) {
-                results.add(new SearchResult(label, DataStore.getTeacherName(c.teacherIdx()) + " · " + c.alumnos() + " alumnos", "Curso", 2, c));
+                || DataStore.getTeacherName(c.profesorIdx()).toLowerCase(Locale.ROOT).contains(q)) {
+                results.add(new SearchResult(label, DataStore.getTeacherName(c.profesorIdx()) + " · " + c.alumnos() + " alumnos", "Curso", 2, c));
             }
         }
 
         // search students from attendance store
-        var attStore = controller.AdminAttendanceView.getAttendanceStore();
-        if (attStore != null) {
-            for (var courseEntry : attStore.entrySet()) {
-                String courseKey = courseEntry.getKey();
-                for (var studentEntry : courseEntry.getValue().entrySet()) {
-                    String studentName = studentEntry.getKey();
-                    if (studentName.toLowerCase(Locale.ROOT).contains(q)) {
-                        results.add(new SearchResult(studentName, courseKey, "Estudiante", 3, new Object[]{courseKey, studentName}));
-                    }
+        for (var course : DataStore.getCourses()) {
+            String courseKey = course.grado() + " " + course.seccion();
+            var attendance = DataStore.getAttendanceForCourse(courseKey);
+            if (attendance == null) continue;
+            for (var entry : attendance.entrySet()) {
+                String studentName = entry.getKey();
+                if (studentName.toLowerCase(Locale.ROOT).contains(q)) {
+                    results.add(new SearchResult(studentName, courseKey, "Estudiante", 3, new Object[]{courseKey, studentName}));
                 }
             }
         }
@@ -802,7 +771,10 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Admin/AdminDetallesCursos.fxml"));
             Node detailView = loader.load();
             DetalleCursoController ctrl = loader.getController();
-            ctrl.setCourse(course, DataStore.getCourses(),
+            var allCourses = DataStore.getCourses().stream()
+                .map(c -> new CursoController.CourseRow(null, c.grado(), c.profesorIdx(), c.seccion(), c.alumnos(), 3, c.rendimiento(), c.estado()))
+                .collect(java.util.stream.Collectors.toList());
+            ctrl.setCourse(course, allCourses,
                 this::navigateToCourseDetail,
                 () -> handleNavigation(2));
             setCenterView(detailView);
@@ -817,8 +789,7 @@ public class MainController {
         String grade = parts[0];
         String section = parts[1];
         AdminAttendanceView attendanceView = new AdminAttendanceView(theme);
-        attendanceView.setGradeSection(grade, section);
-        attendanceView.filterStudent(studentName);
+        attendanceView.selectCourse(grade, section);
         setCenterView(attendanceView.getView());
     }
 
@@ -927,10 +898,10 @@ public class MainController {
             var course = DataStore.getCourses().get(i);
             String label = course.grado() + " " + course.seccion();
             String prof;
-            if (!teachers.isEmpty() && course.teacherIdx() >= 0 && course.teacherIdx() < teachers.size()) {
-                prof = teachers.get(course.teacherIdx()).nombre();
+            if (!teachers.isEmpty() && course.profesorIdx() >= 0 && course.profesorIdx() < teachers.size()) {
+                prof = teachers.get(course.profesorIdx()).nombre();
             } else {
-                prof = DataStore.getTeacherName(course.teacherIdx());
+                prof = DataStore.getTeacherName(course.profesorIdx());
             }
             String stud = course.alumnos() + " " + lang.get("course.studentsLabel", "Estudiantes");
             double prog = course.rendimiento() / 10.0;
@@ -1092,7 +1063,7 @@ public class MainController {
             kpiValueList.get(0).setText(String.format("%,d", DataStore.getTotalStudents()));
             kpiValueList.get(1).setText(String.valueOf(DataStore.getTotalCourses()));
             kpiValueList.get(2).setText(String.valueOf(DataStore.getTotalTeachers()));
-            kpiValueList.get(3).setText(DataStore.getAttendanceRate());
+            kpiValueList.get(3).setText(computeAttendanceRate());
         }
         populateCourseRows();
         populateSchedule();
@@ -1107,17 +1078,17 @@ public class MainController {
         defaultHighlightBar = -1;
 
         java.util.List<String[]> topCourses = new java.util.ArrayList<>();
-        var store = AdminAttendanceView.getAttendanceStore();
-        if (store != null && !store.isEmpty()) {
-            for (var entry : store.entrySet()) {
-                var students = entry.getValue();
-                if (students.isEmpty()) continue;
-                long presentCount = students.values().stream()
-                    .filter(s -> s == AdminAttendanceView.AttendanceStatus.PRESENT)
-                    .count();
-                double avg = (double) presentCount / students.size() * 10.0;
-                topCourses.add(new String[]{entry.getKey(), String.format("%.1f", avg)});
-            }
+        for (var course : DataStore.getCourses()) {
+            String key = course.grado() + " " + course.seccion();
+            var attendance = DataStore.getAttendanceForCourse(key);
+            if (attendance == null || attendance.isEmpty()) continue;
+            long presentCount = attendance.values().stream()
+                .filter(s -> "presente".equals(s))
+                .count();
+            double avg = (double) presentCount / attendance.size() * 10.0;
+            topCourses.add(new String[]{key, String.format(Locale.US, "%.1f", avg)});
+        }
+        if (!topCourses.isEmpty()) {
             topCourses.sort((a, b) -> Double.compare(Double.parseDouble(b[1]), Double.parseDouble(a[1])));
             if (topCourses.size() > 6) topCourses = topCourses.subList(0, 6);
         }
@@ -1126,7 +1097,7 @@ public class MainController {
             var courses = DataStore.getCourses();
             for (var c : courses) {
                 String label = c.grado() + " " + c.seccion();
-                topCourses.add(new String[]{label, String.format("%.1f", c.rendimiento())});
+                topCourses.add(new String[]{label, String.format(Locale.US, "%.1f", c.rendimiento())});
             }
             topCourses.sort((a, b) -> Double.compare(Double.parseDouble(b[1]), Double.parseDouble(a[1])));
             if (topCourses.size() > 6) topCourses = topCourses.subList(0, 6);
@@ -1426,7 +1397,23 @@ public class MainController {
             kpiValueList.get(0).setText(String.format("%,d", DataStore.getTotalStudents()));
             kpiValueList.get(1).setText(String.valueOf(DataStore.getTotalCourses()));
             kpiValueList.get(2).setText(String.valueOf(DataStore.getTotalTeachers()));
-            kpiValueList.get(3).setText(DataStore.getAttendanceRate());
+            kpiValueList.get(3).setText(computeAttendanceRate());
         }
+    }
+
+    private String computeAttendanceRate() {
+        long total = 0;
+        long present = 0;
+        for (var course : DataStore.getCourses()) {
+            String key = course.grado() + " " + course.seccion();
+            var attendance = DataStore.getAttendanceForCourse(key);
+            if (attendance == null) continue;
+            for (var status : attendance.values()) {
+                total++;
+                if ("presente".equals(status)) present++;
+            }
+        }
+        if (total == 0) return "0%";
+        return Math.round((double) present / total * 100) + "%";
     }
 }

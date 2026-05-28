@@ -19,9 +19,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import theme.ThemeManager;
+import report.ReporteService;
 import util.DataStore;
 import util.LanguageManager;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.ThreadLocalRandom;
@@ -60,6 +63,7 @@ public class GradesController implements Initializable {
     );
 
     private final ObservableList<Student> masterData = FXCollections.observableArrayList();
+    private final ReporteService reporteService = new ReporteService();
 
     private FilteredList<Student> filteredData;
 
@@ -224,11 +228,31 @@ public class GradesController implements Initializable {
 
     @FXML
     private void onImprimirReporte() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(lang.get("report.title", "Reporte"));
-        alert.setHeaderText(null);
-        alert.setContentText(lang.get("report.msg", "Impresión de reporte no implementada."));
-        alert.showAndWait();
+        try {
+            File tempFile = File.createTempFile("Calificaciones_", ".pdf");
+            java.util.List<String[]> estudiantesList = new java.util.ArrayList<>();
+            for (Student s : masterData) {
+                String nueva = s.getNewGrade();
+                if (nueva == null || nueva.isBlank()) nueva = "—";
+                estudiantesList.add(new String[]{s.getName(), s.getStudentId(), String.format("%.1f", s.getCurrentGrade()), nueva});
+            }
+            reporteService.reporteCalificaciones(
+                courseKey,
+                comboPeriodo.getValue(),
+                comboTipoEval.getValue(),
+                estudiantesList,
+                tempFile.getAbsolutePath()
+            );
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(tempFile);
+            }
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(lang.get("report.errorTitle", "Error"));
+            alert.setHeaderText(null);
+            alert.setContentText("No se pudo generar el reporte: " + e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     private void handleSave() {

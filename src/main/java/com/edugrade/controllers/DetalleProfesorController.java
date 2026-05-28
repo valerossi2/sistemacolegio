@@ -16,6 +16,15 @@ import javafx.geometry.Pos;
 import javafx.event.Event;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import javafx.scene.image.PixelFormat;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -64,6 +73,7 @@ public class DetalleProfesorController implements Initializable {
     @FXML private VBox scheduleCard;
     @FXML private Label lblScheduleTitle;
     @FXML private VBox scheduleRows;
+    @FXML private ImageView qrImage;
 
     public void setTeacher(MaestrosController.TeacherRow teacher, Runnable onBackToList) {
         this.currentTeacher = teacher;
@@ -104,8 +114,27 @@ public class DetalleProfesorController implements Initializable {
         breadcrumbActual.setText(currentTeacher.nombre());
         pageTitle.setText(lang.get("teachers.detallesTitle", "Detalles del Profesor") + ": " + currentTeacher.nombre());
         injectAvatar(currentTeacher.nombre(), currentTeacher.avatarIdx());
+        generateQR(currentTeacher.nombre(), currentTeacher.email(), currentTeacher.materia(), currentTeacher.seccion());
         loadSampleAttendance();
         loadSchedule();
+    }
+
+    private void generateQR(String name, String email, String subject, String section) {
+        try {
+            String data = "Nombre: " + name + "\nEmail: " + email + "\nMateria: " + subject + "\nSección: " + section;
+            QRCodeWriter writer = new QRCodeWriter();
+            BitMatrix matrix = writer.encode(data, BarcodeFormat.QR_CODE, 300, 300);
+            WritableImage image = new WritableImage(300, 300);
+            PixelWriter pw = image.getPixelWriter();
+            for (int y = 0; y < 300; y++) {
+                for (int x = 0; x < 300; x++) {
+                    pw.setArgb(x, y, matrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
+                }
+            }
+            qrImage.setImage(image);
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
     }
 
     private void injectAvatar(String nombre, int avatarIdx) {

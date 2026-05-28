@@ -65,6 +65,16 @@
 
                     <Region styleClass="card-divider"/>
 
+                    <HBox spacing="24" alignment="CENTER">
+                        <VBox spacing="8" alignment="CENTER">
+                            <Label text="Código QR" styleClass="stat-mini-card__label"/>
+                            <ImageView fx:id="qrImage" fitWidth="120" fitHeight="120"
+                                       preserveRatio="true"/>
+                        </VBox>
+                    </HBox>
+
+                    <Region styleClass="card-divider"/>
+
                     <GridPane hgap="24" vgap="8" VBox.vgrow="NEVER">
                         <columnConstraints>
                             <ColumnConstraints percentWidth="50"/>

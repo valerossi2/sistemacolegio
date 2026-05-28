@@ -23,6 +23,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import theme.ThemeManager;
+import util.AppSession;
 import util.DataStore;
 import util.LanguageManager;
 
@@ -167,8 +168,11 @@ public class CursoController {
     private void buildSampleData() {
         DataStore.seedIfEmpty();
         allCourses.clear();
+        AppSession session = AppSession.getInstance();
+        int filterIdx = session.getFilterTeacherIdx();
         List<DataStore.CourseInfo> stored = DataStore.getCourses();
         for (DataStore.CourseInfo c : stored) {
+            if (filterIdx >= 0 && c.profesorIdx() != filterIdx) continue;
             allCourses.add(new CourseRow(null, c.grado(), c.profesorIdx(), c.seccion(), c.alumnos(), 3, c.rendimiento(), c.estado()));
         }
     }

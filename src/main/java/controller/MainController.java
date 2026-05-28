@@ -1,6 +1,7 @@
 package controller;
 
 import theme.ThemeManager;
+import util.AppSession;
 import util.DataStore;
 import util.LanguageManager;
 import com.edugrade.controllers.CursoController;
@@ -39,6 +40,8 @@ public class MainController {
     @FXML private StackPane logoStack;
     @FXML private Text lTitle;
     @FXML private Text lSub;
+    @FXML private HBox logoutBox;
+    @FXML private Text logoutText;
     @FXML private VBox contentArea;
     @FXML private HBox header;
     @FXML private HBox searchBox;
@@ -592,10 +595,19 @@ public class MainController {
     private void setupKpis() {
         DataStore.seedIfEmpty();
         LanguageManager lang = LanguageManager.getInstance();
+        AppSession session = AppSession.getInstance();
+        int filterIdx = session.getFilterTeacherIdx();
+        List<DataStore.CourseInfo> courses = DataStore.getCourses();
+        if (filterIdx >= 0) {
+            courses = courses.stream().filter(c -> c.profesorIdx() == filterIdx).toList();
+        }
+        int totalStudents = courses.stream().mapToInt(DataStore.CourseInfo::alumnos).sum();
+        int totalCourses = courses.size();
+        int totalTeachers = filterIdx >= 0 ? 1 : DataStore.getTotalTeachers();
         kpiGrid.getChildren().addAll(
-            createKpiCard(lang.get("kpi.totalStudents"), String.format("%,d", DataStore.getTotalStudents()), L_SECONDARY_FIXED, L_SECONDARY, ICON_PERSON_PIN),
-            createKpiCard(lang.get("kpi.totalCourses"), String.valueOf(DataStore.getTotalCourses()), L_PRIMARY_FIXED, L_PRIMARY, ICON_TRENDING_UP),
-            createKpiCard(lang.get("kpi.totalTeachers"), String.valueOf(DataStore.getTotalTeachers()), L_TERTIARY_FIXED, L_TERTIARY, ICON_SCHOOL)
+            createKpiCard(lang.get("kpi.totalStudents"), String.format("%,d", totalStudents), L_SECONDARY_FIXED, L_SECONDARY, ICON_PERSON_PIN),
+            createKpiCard(lang.get("kpi.totalCourses"), String.valueOf(totalCourses), L_PRIMARY_FIXED, L_PRIMARY, ICON_TRENDING_UP),
+            createKpiCard(lang.get("kpi.totalTeachers"), String.valueOf(totalTeachers), L_TERTIARY_FIXED, L_TERTIARY, ICON_SCHOOL)
         );
     }
 
@@ -692,7 +704,13 @@ public class MainController {
         courseScoreTexts.clear();
 
         table.getChildren().addAll(cols);
-        DataStore.getCourses().stream().limit(4).forEach(c -> {
+        AppSession session = AppSession.getInstance();
+        int filterIdx = session.getFilterTeacherIdx();
+        java.util.stream.Stream<DataStore.CourseInfo> courseStream = DataStore.getCourses().stream();
+        if (filterIdx >= 0) {
+            courseStream = courseStream.filter(c -> c.profesorIdx() == filterIdx);
+        }
+        courseStream.limit(4).forEach(c -> {
             String st = c.alumnos() + " Estudiantes";
             String score = String.format("%.1f", c.rendimiento());
             HBox row = createCourseRow(c.grado() + " " + c.seccion(), c.profesorNombre(), st, c.rendimiento() / 10.0, score);
@@ -1166,6 +1184,43 @@ public class MainController {
         setCenterView(attendanceView.getView());
     }
 
+    @FXML
+    private void onLogout() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
+            Parent root = loader.load();
+            controller.LoginController loginCtrl = loader.getController();
+            loginCtrl.setOnLoginSuccess(() -> {
+                try {
+                    FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("/fxml/main_view.fxml"));
+                    Parent mainRoot = mainLoader.load();
+                    MainController mainCtrl = mainLoader.getController();
+                    mainCtrl.setStage(stage);
+                    mainCtrl.setupEverything();
+                    Scene scene = new Scene(mainRoot, stage.getScene().getWidth(), stage.getScene().getHeight());
+                    var theme = ThemeManager.getInstance();
+                    scene.getStylesheets().add(theme.isDark()
+                        ? getClass().getResource("/css/dark.css").toExternalForm()
+                        : getClass().getResource("/css/light.css").toExternalForm());
+                    theme.addListener(() -> {
+                        scene.getStylesheets().clear();
+                        scene.getStylesheets().add(theme.isDark()
+                            ? getClass().getResource("/css/dark.css").toExternalForm()
+                            : getClass().getResource("/css/light.css").toExternalForm());
+                    });
+                    stage.setScene(scene);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            });
+            Scene scene = new Scene(root, 820, 620);
+            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+            stage.setScene(scene);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void seedDataIfEmpty() {
         DataStore.seedIfEmpty();
     }
@@ -1186,6 +1241,10 @@ public class MainController {
 
         LanguageManager.getInstance().addListener(this::updateLanguageTexts);
         updateLanguageTexts();
+
+        themeUpdaters.add(() -> {
+            logoutText.setFill(Color.web(c(L_ON_SURFACE_VARIANT, D_ON_SURFACE_VARIANT)));
+        });
 
         theme.addListener(() -> {
             for (Runnable r : themeUpdaters) r.run();

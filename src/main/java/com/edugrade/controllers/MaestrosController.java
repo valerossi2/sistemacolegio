@@ -18,6 +18,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import theme.ThemeManager;
+import util.AppSession;
 import util.DataStore;
 import util.LanguageManager;
 import java.util.function.Consumer;
@@ -67,7 +68,10 @@ public class MaestrosController {
         theme = ThemeManager.getInstance();
 
         DataStore.seedIfEmpty();
+        AppSession session = AppSession.getInstance();
+        int filterIdx = session.getFilterTeacherIdx();
         for (DataStore.TeacherInfo t : DataStore.getTeachers()) {
+            if (filterIdx >= 0 && t.avatarIdx() != filterIdx) continue;
             allTeachers.add(new TeacherRow(t.nombre(), t.email(), t.materia(), t.seccion(), t.estado(), t.avatarIdx()));
         }
 
